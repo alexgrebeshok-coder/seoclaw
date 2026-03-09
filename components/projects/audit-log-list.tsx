@@ -13,19 +13,19 @@ const ACTION_LABELS: Record<string, string> = {
   milestone_reached: "Милестон достигнут",
 };
 
-const ACTION_VARIANTS: Record<string, "default" | "secondary" | "outline"> = {
-  created: "default",
-  updated: "secondary",
-  status_changed: "outline",
-  milestone_reached: "default",
+const ACTION_VARIANTS: Record<string, "neutral" | "success" | "warning" | "danger" | "info"> = {
+  created: "success",
+  updated: "neutral",
+  status_changed: "info",
+  milestone_reached: "success",
 };
 
 function getActionLabel(action: string): string {
   return ACTION_LABELS[action] ?? action;
 }
 
-function getActionVariant(action: string): "default" | "secondary" | "outline" {
-  return ACTION_VARIANTS[action] ?? "outline";
+function getActionVariant(action: string): "neutral" | "success" | "warning" | "danger" | "info" {
+  return ACTION_VARIANTS[action] ?? "neutral";
 }
 
 function formatTimestamp(timestamp: string): string {

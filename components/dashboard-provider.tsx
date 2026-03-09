@@ -49,6 +49,13 @@ const emptyDashboardState: DashboardState = {
   risks: [],
   documents: [],
   milestones: [],
+  currentUser: {
+    id: "user-1",
+    name: "Саша",
+    role: "PM",
+    email: "alex@example.com",
+  },
+  auditLogEntries: [],
 };
 
 export interface AddTaskPayload {
@@ -91,6 +98,7 @@ type DashboardCachePayload =
     };
 
 const DashboardContext = createContext<DashboardContextValue | null>(null);
+export { DashboardContext };
 
 function readCachedState(): DashboardState | null {
   try {
@@ -425,6 +433,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       risks: current.risks.filter((item) => item.projectId !== projectId),
       documents: current.documents.filter((item) => item.projectId !== projectId),
       milestones: current.milestones.filter((item) => item.projectId !== projectId),
+      currentUser: current.currentUser,
+      auditLogEntries: current.auditLogEntries,
     }));
 
     try {

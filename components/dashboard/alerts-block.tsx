@@ -105,7 +105,7 @@ export function AlertsBlock({ projects, risks }: AlertsBlockProps) {
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="h-5 w-5 text-red-500" aria-hidden="true" />
         <h3 className="font-semibold">Что требует внимания</h3>
-        <Badge variant="destructive">{alerts.length}</Badge>
+        <Badge variant="danger">{alerts.length}</Badge>
       </div>
 
       <div className="space-y-2" role="list">

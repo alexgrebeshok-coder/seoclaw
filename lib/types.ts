@@ -179,3 +179,111 @@ export interface ProjectFormValues {
   status: ProjectStatus;
   progress: number;
 }
+
+// ============================================
+// AI-PMO Types: EVM Metrics & Health Scores
+// ============================================
+
+/**
+ * Earned Value Management (EVM) metrics
+ * - EV (Earned Value): Budgeted cost of work performed
+ * - PV (Planned Value): Budgeted cost of work scheduled
+ * - AC (Actual Cost): Actual cost of work performed
+ * - CPI (Cost Performance Index): EV / AC (>1 = under budget)
+ * - SPI (Schedule Performance Index): EV / PV (>1 = ahead of schedule)
+ * - EAC (Estimate at Completion): Expected total cost
+ */
+export interface EVMMetrics {
+  /** Earned Value (выполненная работа в деньгах) */
+  ev: number;
+  /** Planned Value (запланированная работа в деньгах) */
+  pv: number;
+  /** Actual Cost (фактические затраты) */
+  ac: number;
+  /** Cost Performance Index (CPI = EV / AC, >1 хорошо) */
+  cpi: number;
+  /** Schedule Performance Index (SPI = EV / PV, >1 хорошо) */
+  spi: number;
+  /** Estimate at Completion (прогноз полного бюджета) */
+  eac: number;
+  /** Variance at Completion (отклонение от плана) */
+  vac: number;
+  /** Percent complete (процент выполнения по EVM) */
+  percentComplete: number;
+}
+
+/**
+ * Budget forecast for project completion
+ */
+export interface BudgetForecast {
+  /** Estimated final cost */
+  estimatedTotal: number;
+  /** Original budget */
+  originalBudget: number;
+  /** Variance (positive = under budget, negative = over budget) */
+  variance: number;
+  /** Variance percentage */
+  variancePercent: number;
+  /** Forecast date */
+  forecastDate: string;
+  /** Confidence level (0-100) */
+  confidence: number;
+}
+
+/**
+ * Project health score breakdown
+ * - Overall health (0-100)
+ * - Budget health (0-100)
+ * - Schedule health (0-100)
+ * - Risk health (0-100)
+ */
+export interface ProjectHealth {
+  /** Overall health score (0-100) */
+  overall: number;
+  /** Budget health score (0-100) */
+  budget: number;
+  /** Schedule health score (0-100) */
+  schedule: number;
+  /** Risk health score (0-100) */
+  risks: number;
+  /** Health trend: improving, stable, declining */
+  trend: "improving" | "stable" | "declining";
+  /** Last calculated timestamp */
+  calculatedAt: string;
+}
+
+/**
+ * Auto-detected risk from monitoring agent
+ */
+export interface AutoRisk {
+  id: string;
+  projectId: string;
+  type: "schedule" | "budget" | "resource" | "scope";
+  severity: Severity;
+  title: string;
+  description: string;
+  detectedAt: string;
+  probability: number;
+  impact: number;
+  recommendation: string;
+}
+
+/**
+ * Portfolio health summary
+ */
+export interface PortfolioHealth {
+  /** Overall portfolio health (0-100) */
+  overall: number;
+  /** Number of healthy projects */
+  healthy: number;
+  /** Number of at-risk projects */
+  atRisk: number;
+  /** Number of critical projects */
+  critical: number;
+  /** Total budget variance */
+  budgetVariance: number;
+  /** Average schedule variance */
+  scheduleVariance: number;
+  /** AI-generated insights */
+  insights: string[];
+}
