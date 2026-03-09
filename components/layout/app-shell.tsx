@@ -6,7 +6,6 @@ import { X } from "lucide-react";
 
 import { Sidebar } from "@/components/layout/sidebar";
 import { StatusBar } from "@/components/layout/status-bar";
-import { TitleBar } from "@/components/layout/title-bar";
 import { Topbar } from "@/components/layout/topbar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,8 +17,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-[var(--surface)] text-[var(--ink)]">
       <div className="flex min-h-screen flex-col">
-        <TitleBar />
-
         <div className="flex min-h-0 flex-1">
           <aside className="app-shell-sidebar hidden shrink-0 lg:block">
             <Sidebar pathname={pathname} />
