@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "check": "./scripts/check.sh",
+    "check:safe": "./scripts/check-safe.sh",
+    "smoke": "./scripts/smoke.sh",
     "db:seed": "prisma db seed"
   },
   "prisma": {

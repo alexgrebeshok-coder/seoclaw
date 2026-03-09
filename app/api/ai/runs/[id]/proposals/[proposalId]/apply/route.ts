@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { applyServerAIProposal } from "@/lib/ai/server-runs";
+import { badRequest } from "@/lib/server/api-utils";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,12 +22,9 @@ export async function POST(
     });
     return NextResponse.json(run);
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error ? error.message : "Failed to apply AI proposal.",
-      },
-      { status: 400 }
+    return badRequest(
+      error instanceof Error ? error.message : "Failed to apply AI proposal.",
+      "AI_PROPOSAL_APPLY_FAILED"
     );
   }
 }

@@ -4,6 +4,7 @@ import Script from "next/script";
 import { Toaster } from "sonner";
 
 import { DashboardProvider } from "@/components/dashboard-provider";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { AppShell } from "@/components/layout/app-shell";
 import { AIProvider } from "@/contexts/ai-context";
 import { LocaleProvider } from "@/contexts/locale-context";
@@ -79,7 +80,9 @@ export default function RootLayout({
             <PreferencesProvider>
               <DashboardProvider>
                 <AIProvider>
-                  <AppShell>{children}</AppShell>
+                  <ErrorBoundary resetKey="app-shell">
+                    <AppShell>{children}</AppShell>
+                  </ErrorBoundary>
                   <Toaster position="top-right" richColors />
                 </AIProvider>
               </DashboardProvider>

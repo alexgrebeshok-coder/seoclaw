@@ -29,29 +29,60 @@ const milestoneStatusMap: Record<string, string> = {
   in_progress: "in_progress",
 };
 
-export function badRequest(message: string): NextResponse {
-  return NextResponse.json({ error: message }, { status: 400 });
-}
+type APIErrorPayload = {
+  error: {
+    code: string;
+    message: string;
+    details?: unknown;
+  };
+};
 
-export function notFound(message: string): NextResponse {
-  return NextResponse.json({ error: message }, { status: 404 });
-}
-
-export function validationError(error: z.ZodError): NextResponse {
+export function jsonError(
+  status: number,
+  code: string,
+  message: string,
+  details?: unknown
+): NextResponse<APIErrorPayload> {
   return NextResponse.json(
     {
-      error: "Validation failed",
-      details: error.flatten(),
-      code: "VALIDATION_ERROR",
+      error: {
+        code,
+        message,
+        ...(details !== undefined ? { details } : {}),
+      },
     },
-    { status: 400 }
+    { status }
   );
 }
 
-export function serverError(error: unknown, fallback: string): NextResponse {
-  return NextResponse.json(
-    { error: error instanceof Error ? error.message : fallback },
-    { status: 500 }
+export function badRequest(
+  message: string,
+  code = "BAD_REQUEST",
+  details?: unknown
+): NextResponse<APIErrorPayload> {
+  return jsonError(400, code, message, details);
+}
+
+export function notFound(
+  message: string,
+  code = "NOT_FOUND"
+): NextResponse<APIErrorPayload> {
+  return jsonError(404, code, message);
+}
+
+export function validationError(error: z.ZodError): NextResponse<APIErrorPayload> {
+  return jsonError(400, "VALIDATION_ERROR", "Validation failed", error.flatten());
+}
+
+export function serverError(
+  error: unknown,
+  fallback: string,
+  code = "INTERNAL_SERVER_ERROR"
+): NextResponse<APIErrorPayload> {
+  return jsonError(
+    500,
+    code,
+    error instanceof Error && error.message.trim() ? error.message : fallback
   );
 }
 

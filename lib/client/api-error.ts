@@ -9,6 +9,21 @@ export class APIError extends Error {
   }
 }
 
+type APIErrorResponse =
+  | {
+      error?: string;
+      code?: string;
+      message?: string;
+    }
+  | {
+      error?: {
+        code?: string;
+        message?: string;
+      };
+      code?: string;
+      message?: string;
+    };
+
 async function parseResponse<T>(response: Response): Promise<T> {
   if (response.status === 204) {
     throw new APIError("Unexpected empty response", response.status, "EMPTY_RESPONSE");
@@ -31,9 +46,17 @@ export async function apiRequest<T>(url: string, options?: RequestInit): Promise
     let code: string | undefined;
 
     try {
-      const errorData = (await response.json()) as { error?: string; code?: string };
-      message = errorData.error || message;
-      code = errorData.code;
+      const errorData = (await response.json()) as APIErrorResponse;
+
+      if (typeof errorData.error === "string") {
+        message = errorData.error || message;
+      } else if (errorData.error && typeof errorData.error === "object") {
+        message = errorData.error.message || errorData.message || message;
+        code = errorData.error.code || errorData.code;
+      } else {
+        message = errorData.message || message;
+        code = errorData.code;
+      }
     } catch {}
 
     throw new APIError(message, response.status, code);
