@@ -229,8 +229,8 @@ export function CalendarPage() {
                         <p
                           className={
                             event.type === "milestone"
-                              ? "mt-1.5 overflow-hidden break-words text-[13px] font-semibold leading-5 text-[var(--ink)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
-                              : "mt-1.5 overflow-hidden break-words text-[13px] font-semibold leading-5 text-[var(--ink)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
+                              ? "mt-1.5 overflow-hidden break-normal hyphens-auto text-[13px] font-semibold leading-5 text-[var(--ink)] [display:-webkit-box] [overflow-wrap:normal] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
+                              : "mt-1.5 overflow-hidden break-normal hyphens-auto text-[13px] font-semibold leading-5 text-[var(--ink)] [display:-webkit-box] [overflow-wrap:normal] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
                           }
                         >
                           {event.title}
@@ -238,8 +238,8 @@ export function CalendarPage() {
                         <p
                           className={
                             event.type === "milestone"
-                              ? "mt-1 overflow-hidden break-words text-[11px] leading-4 text-[var(--ink-soft)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
-                              : "mt-1 overflow-hidden break-words text-[11px] leading-4 text-[var(--ink-soft)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
+                              ? "mt-1 overflow-hidden break-normal hyphens-auto text-[11px] leading-4 text-[var(--ink-soft)] [display:-webkit-box] [overflow-wrap:normal] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
+                              : "mt-1 overflow-hidden break-normal hyphens-auto text-[11px] leading-4 text-[var(--ink-soft)] [display:-webkit-box] [overflow-wrap:normal] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
                           }
                         >
                           {event.subtitle}
