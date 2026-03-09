@@ -169,8 +169,8 @@ export function ProjectsPage({ initialQuery = "" }: { initialQuery?: string }) {
               <Button onClick={() => setProjectModalOpen(true)}>{t("action.addProject")}</Button>
             </div>
           </CardHeader>
-          <CardContent className="grid gap-6 xl:grid-cols-[1.1fr_.9fr]">
-            <div className="grid gap-4 lg:grid-cols-2">
+          <CardContent className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,.9fr)]">
+            <div className="grid min-w-0 gap-4 lg:grid-cols-2">
               {filteredProjects.map((project) => (
                 <ProjectCard
                   key={project.id}
@@ -181,7 +181,7 @@ export function ProjectsPage({ initialQuery = "" }: { initialQuery?: string }) {
                 />
               ))}
             </div>
-            <Card className="bg-[color:var(--surface-panel)]">
+            <Card className="min-w-0 bg-[color:var(--surface-panel)]">
               <CardHeader>
                 <CardTitle>{t("projects.comparison")}</CardTitle>
               </CardHeader>

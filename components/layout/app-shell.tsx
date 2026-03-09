@@ -17,8 +17,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="h-[100dvh] min-h-[100dvh] overflow-hidden bg-[var(--surface)] text-[var(--ink)]">
       <div className="flex h-full min-h-0 flex-col">
-        <div className="flex min-h-0 flex-1">
-          <aside className="app-shell-sidebar hidden shrink-0 lg:block">
+        <div className="flex min-h-0 flex-1 overflow-hidden">
+          <aside className="app-shell-sidebar hidden min-h-0 shrink-0 lg:block">
             <Sidebar pathname={pathname} />
           </aside>
 
@@ -40,11 +40,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           ) : null}
 
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
             <Topbar onOpenMenu={() => setMobileOpen(true)} />
             <main
               className={cn(
-                "app-shell-main min-h-0 flex-1 overflow-y-auto",
+                "app-shell-main min-h-0 flex-1 overflow-x-hidden overflow-y-auto",
                 pathname === "/chat" && "px-0 pb-0 pt-0 sm:px-0 lg:px-0"
               )}
               id="main-content"
