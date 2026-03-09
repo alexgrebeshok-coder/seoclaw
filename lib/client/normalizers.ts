@@ -387,12 +387,22 @@ export function buildDashboardStateFromApi(input: {
     (project.milestones ?? []).map(normalizeMilestone)
   );
 
+  // Default current user (will be overridden by mock data)
+  const currentUser = {
+    id: "user1",
+    name: "Саша",
+    role: "PM" as const,
+    email: "sasha@example.com",
+  };
+
   return {
+    currentUser,
     projects,
     tasks,
     team,
     risks,
     documents,
     milestones,
+    auditLogEntries: [],
   };
 }

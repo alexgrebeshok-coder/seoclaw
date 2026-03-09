@@ -16,6 +16,7 @@ import {
 
 import { AIContextActions } from "@/components/ai/ai-context-actions";
 import { useDashboard } from "@/components/dashboard-provider";
+import { AlertsBlock } from "@/components/dashboard/alerts-block";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { ProjectFormModal } from "@/components/projects/project-form-modal";
 import { ProjectCard } from "@/components/projects/project-card";
@@ -306,6 +307,8 @@ export function DashboardHome() {
   return (
     <>
       <div className="grid gap-6">
+        <AlertsBlock projects={projects} risks={risks} />
+
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <KpiCard
             description={t("dashboard.kpi.activeProjectsDescription")}

@@ -52,6 +52,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocale } from "@/contexts/locale-context";
 import { downloadProjectPdf, downloadTasksCsv } from "@/lib/export";
 import { TaskStatus } from "@/lib/types";
+import { AuditLogList } from "@/components/projects/audit-log-list";
 import {
   cn,
   formatCurrency,
@@ -396,6 +397,7 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
             <TabsTrigger value="team">{t("project.team")}</TabsTrigger>
             <TabsTrigger value="risks">{t("project.risks")}</TabsTrigger>
             <TabsTrigger value="gantt">{t("project.gantt")}</TabsTrigger>
+            <TabsTrigger value="history">{t("project.history")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -859,6 +861,18 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
                     );
                   })}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="history">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("project.history")}</CardTitle>
+                <CardDescription>{t("project.historyDescription")}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AuditLogList projectId={project.id} entries={auditLogEntries} />
               </CardContent>
             </Card>
           </TabsContent>

@@ -5,6 +5,15 @@ export type ProjectStatus =
   | "completed"
   | "at-risk";
 
+export type UserRole = "EXEC" | "CURATOR" | "PM" | "MEMBER" | "SOLO";
+
+export interface User {
+  id: string;
+  name: string;
+  role: UserRole;
+  email: string;
+}
+
 export type ProjectDirection =
   | "metallurgy"
   | "logistics"
@@ -126,13 +135,25 @@ export interface NotificationItem {
   projectId?: string;
 }
 
+export interface AuditLogEntry {
+  id: string;
+  projectId: string;
+  action: string;
+  userId: string;
+  userName: string;
+  timestamp: string;
+  details: string;
+}
+
 export interface DashboardState {
+  currentUser: User;
   projects: Project[];
   tasks: Task[];
   team: TeamMember[];
   risks: Risk[];
   documents: ProjectDocument[];
   milestones: Milestone[];
+  auditLogEntries: AuditLogEntry[];
 }
 
 export interface ProjectFormValues {
