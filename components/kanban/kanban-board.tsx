@@ -20,7 +20,12 @@ import { KanbanColumn } from "@/components/kanban/kanban-column";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataErrorState } from "@/components/ui/data-error-state";
 import { fieldStyles } from "@/components/ui/field";
-import { KpiCardSkeleton, Skeleton } from "@/components/ui/skeleton";
+import {
+  AIContextActionsSkeleton,
+  KanbanColumnSkeleton,
+  KpiCardSkeleton,
+  Skeleton,
+} from "@/components/ui/skeleton";
 import { useLocale } from "@/contexts/locale-context";
 import { useProjects, useTasks } from "@/lib/hooks/use-api";
 import type { Task, TaskStatus } from "@/lib/types";
@@ -201,6 +206,32 @@ export function KanbanBoard() {
   if (showHydrationSkeleton) {
     return (
       <div className="grid gap-6">
+        <AIContextActionsSkeleton />
+
+        <Card>
+          <CardHeader className="flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-40" />
+              <Skeleton className="h-4 w-80" />
+            </div>
+            <div className="grid gap-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-12 w-[320px]" />
+            </div>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-3">
+            {Array.from({ length: 3 }, (_, index) => (
+              <div
+                key={index}
+                className="rounded-[8px] border border-[var(--line)] bg-[var(--panel-soft)] p-4"
+              >
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="mt-3 h-10 w-16" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
         <div className="grid gap-4 md:grid-cols-3">
           {Array.from({ length: 3 }, (_, index) => (
             <KpiCardSkeleton key={index} />
@@ -208,15 +239,7 @@ export function KanbanBoard() {
         </div>
         <div className="grid gap-4 xl:grid-cols-4">
           {Array.from({ length: 4 }, (_, index) => (
-            <Card key={index}>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-              </CardHeader>
-              <CardContent className="grid gap-3">
-                <Skeleton className="h-28 w-full" />
-                <Skeleton className="h-28 w-full" />
-              </CardContent>
-            </Card>
+            <KanbanColumnSkeleton key={index} />
           ))}
         </div>
       </div>

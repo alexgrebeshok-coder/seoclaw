@@ -247,6 +247,63 @@ textarea {
   box-shadow: none;
 }
 
+@keyframes desktop-skeleton-sheen {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.desktop-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--panel-soft) 92%, white 8%) 0%,
+    var(--panel-soft) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--line) 72%, transparent 28%);
+}
+
+.desktop-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, white 54%, transparent 46%) 48%,
+    transparent 100%
+  );
+  animation: desktop-skeleton-sheen 1.35s ease-in-out infinite;
+}
+
+.dark .desktop-skeleton {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--panel-soft) 88%, white 12%) 0%,
+    var(--panel-soft) 100%
+  );
+}
+
+.dark .desktop-skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, white 16%, transparent 84%) 48%,
+    transparent 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktop-skeleton::after {
+    animation: none;
+  }
+}
+
 .skip-link {
   position: absolute;
   left: 1rem;

@@ -7,6 +7,7 @@ import { useDashboard } from "@/components/dashboard-provider";
 import { ClientChart } from "@/components/ui/client-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { fieldStyles } from "@/components/ui/field";
+import { ChartSkeleton } from "@/components/ui/skeleton";
 import { useLocale } from "@/contexts/locale-context";
 import { formatCurrency } from "@/lib/utils";
 
@@ -17,7 +18,7 @@ const AnalyticsTrendChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="h-full w-full rounded-2xl bg-[var(--panel-soft)]/80" />,
+    loading: () => <ChartSkeleton />,
   }
 );
 
@@ -28,7 +29,7 @@ const AnalyticsHealthChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="h-full w-full rounded-2xl bg-[var(--panel-soft)]/80" />,
+    loading: () => <ChartSkeleton />,
   }
 );
 
@@ -39,7 +40,7 @@ const AnalyticsBudgetChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="h-full w-full rounded-2xl bg-[var(--panel-soft)]/80" />,
+    loading: () => <ChartSkeleton />,
   }
 );
 

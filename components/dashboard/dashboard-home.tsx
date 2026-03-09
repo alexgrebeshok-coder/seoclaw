@@ -33,10 +33,11 @@ import {
 import { fieldStyles } from "@/components/ui/field";
 import { Progress } from "@/components/ui/progress";
 import {
+  AIContextActionsSkeleton,
+  ChartSkeleton,
   KpiCardSkeleton,
   ProjectCardSkeleton,
   Skeleton,
-  TaskTableSkeleton,
 } from "@/components/ui/skeleton";
 import { DataErrorState } from "@/components/ui/data-error-state";
 import { useLocale } from "@/contexts/locale-context";
@@ -52,7 +53,7 @@ const DashboardTrendChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="h-full w-full rounded-2xl bg-[var(--panel-soft)]/80" />,
+    loading: () => <ChartSkeleton />,
   }
 );
 
@@ -63,7 +64,7 @@ const DashboardBudgetChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="h-full w-full rounded-2xl bg-[var(--panel-soft)]/80" />,
+    loading: () => <ChartSkeleton />,
   }
 );
 
@@ -74,7 +75,7 @@ const DashboardRiskChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="h-full w-full rounded-2xl bg-[var(--panel-soft)]/80" />,
+    loading: () => <ChartSkeleton />,
   }
 );
 
@@ -163,51 +164,123 @@ export function DashboardHome() {
   if (showHydrationSkeleton) {
     return (
       <div className="grid gap-6">
-        <section className="grid gap-6 xl:grid-cols-[1.25fr_.75fr]">
-          <Card className="overflow-hidden border-none bg-[linear-gradient(145deg,#09101d_0%,#14253d_35%,#1d4ed8_100%)] text-white shadow-[0_36px_120px_rgba(15,23,42,.22)]">
-            <CardContent className="grid gap-8 p-8 lg:grid-cols-[1.15fr_.85fr]">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <Skeleton className="h-6 w-48 bg-white/30" />
-                  <Skeleton className="h-14 w-3/4 bg-white/30" />
-                  <Skeleton className="h-4 w-full bg-white/20" />
-                  <Skeleton className="h-4 w-5/6 bg-white/20" />
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  <Skeleton className="h-12 w-40 bg-white/30" />
-                  <Skeleton className="h-12 w-40 bg-white/20" />
-                  <Skeleton className="h-12 w-40 bg-white/20" />
-                </div>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                <Skeleton className="h-40 rounded-2xl bg-white/20" />
-                <Skeleton className="h-40 rounded-2xl bg-white/15" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <TaskTableSkeleton />
-        </section>
-
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }, (_, index) => (
+          {Array.from({ length: 6 }, (_, index) => (
             <KpiCardSkeleton key={index} />
           ))}
         </section>
 
-        <section className="grid gap-6 2xl:grid-cols-[1.15fr_.85fr]">
-          <div className="grid gap-6">
-            <div className="grid gap-4 xl:grid-cols-2">
+        <section className="grid gap-6 xl:grid-cols-[1.2fr_.8fr]">
+          <Card className="overflow-hidden">
+            <CardContent className="grid gap-5 p-6 xl:grid-cols-[minmax(0,1.12fr)_minmax(260px,.88fr)]">
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <Skeleton className="h-7 w-56 rounded-full" />
+                  <Skeleton className="h-12 w-4/5" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Skeleton className="h-11 w-40" />
+                  <Skeleton className="h-11 w-40" />
+                  <Skeleton className="h-11 w-40" />
+                  <Skeleton className="h-11 w-36" />
+                </div>
+              </div>
+              <div className="grid gap-4">
+                <div className="rounded-[12px] border border-[var(--line)] bg-[var(--panel-soft)] p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-7 w-14 rounded-full" />
+                  </div>
+                  <Skeleton className="mt-4 h-12 w-36" />
+                  <Skeleton className="mt-4 h-2.5 w-full rounded-full" />
+                  <Skeleton className="mt-3 h-4 w-5/6" />
+                </div>
+                <div className="rounded-[12px] border border-[var(--line)] bg-[var(--panel-soft)] p-5">
+                  <Skeleton className="h-4 w-36" />
+                  <div className="mt-4 grid gap-3">
+                    {Array.from({ length: 2 }, (_, index) => (
+                      <div
+                        key={index}
+                        className="rounded-[10px] border border-[var(--line)] bg-[color:var(--surface-panel)] px-4 py-3"
+                      >
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="mt-2 h-4 w-2/3" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-7 w-56" />
+              <Skeleton className="h-4 w-full" />
+            </CardHeader>
+            <CardContent className="grid gap-4">
               {Array.from({ length: 4 }, (_, index) => (
-                <ProjectCardSkeleton key={index} />
+                <div
+                  key={index}
+                  className="rounded-[12px] border border-[var(--line)] bg-[var(--panel-soft)] p-4"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <Skeleton className="h-5 w-4/5" />
+                      <Skeleton className="h-4 w-3/5" />
+                    </div>
+                    <Skeleton className="h-5 w-5 rounded-sm" />
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </section>
+
+        <AIContextActionsSkeleton />
+
+        <section className="grid gap-6 2xl:grid-cols-[1.12fr_.88fr]">
+          <div className="grid gap-6">
+            <Card>
+              <CardHeader className="flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-7 w-52" />
+                  <Skeleton className="h-4 w-72" />
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Skeleton className="h-12 w-44" />
+                  <Skeleton className="h-12 w-44" />
+                </div>
+              </CardHeader>
+              <CardContent className="grid gap-4 xl:grid-cols-2">
+                {Array.from({ length: 4 }, (_, index) => (
+                  <ProjectCardSkeleton key={index} />
+                ))}
+              </CardContent>
+            </Card>
+
+            <div className="grid gap-6 xl:grid-cols-2">
+              {Array.from({ length: 2 }, (_, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <Skeleton className="h-7 w-48" />
+                    <Skeleton className="h-4 w-full" />
+                  </CardHeader>
+                  <CardContent>
+                    <ChartSkeleton className="h-[320px]" />
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
+
           <div className="grid gap-6">
             {Array.from({ length: 4 }, (_, index) => (
               <Card key={index}>
                 <CardContent className="space-y-4 p-6">
-                  <Skeleton className="h-6 w-40" />
+                  <Skeleton className="h-7 w-40" />
                   <Skeleton className="h-20 w-full" />
                   <Skeleton className="h-20 w-full" />
                 </CardContent>

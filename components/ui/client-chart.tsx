@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 
+import { ChartSkeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export function ClientChart({
@@ -19,11 +20,7 @@ export function ClientChart({
 
   return (
     <div className={cn("min-h-0 min-w-0", className)}>
-      {mounted ? (
-        children
-      ) : (
-        <div className="h-full w-full rounded-[24px] bg-[var(--panel-soft)]/80" />
-      )}
+      {mounted ? children : <ChartSkeleton />}
     </div>
   );
 }

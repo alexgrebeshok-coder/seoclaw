@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataErrorState } from "@/components/ui/data-error-state";
 import { fieldStyles } from "@/components/ui/field";
-import { ProjectCardSkeleton, Skeleton } from "@/components/ui/skeleton";
+import { ChartSkeleton, ProjectCardSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { useLocale } from "@/contexts/locale-context";
 import { useProjects, useTasks } from "@/lib/hooks/use-api";
 import { Project } from "@/lib/types";
@@ -26,7 +26,7 @@ const ProjectsComparisonChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="h-full w-full rounded-2xl bg-[var(--panel-soft)]/80" />,
+    loading: () => <ChartSkeleton />,
   }
 );
 
@@ -82,13 +82,13 @@ export function ProjectsPage({ initialQuery = "" }: { initialQuery?: string }) {
         <Card>
           <CardHeader className="flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="space-y-2">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-3 w-80" />
+              <Skeleton className="h-7 w-52" />
+              <Skeleton className="h-4 w-80" />
             </div>
             <div className="grid gap-3 md:grid-cols-[minmax(280px,1fr)_220px_auto]">
-              <Skeleton className="h-11 w-full" />
-              <Skeleton className="h-11 w-full" />
-              <Skeleton className="h-11 w-40" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-44" />
             </div>
           </CardHeader>
           <CardContent className="grid gap-6 xl:grid-cols-[1.1fr_.9fr]">
@@ -99,11 +99,22 @@ export function ProjectsPage({ initialQuery = "" }: { initialQuery?: string }) {
             </div>
             <Card className="bg-[color:var(--surface-panel)]">
               <CardContent className="space-y-6 p-6">
-                <Skeleton className="h-6 w-44" />
-                <Skeleton className="h-[320px] w-full" />
+                <Skeleton className="h-7 w-44" />
+                <ChartSkeleton className="h-[320px]" />
                 <div className="grid gap-3">
                   {Array.from({ length: 4 }, (_, index) => (
-                    <Skeleton key={index} className="h-16 w-full" />
+                    <div
+                      key={index}
+                      className="rounded-[10px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-4"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <Skeleton className="h-5 w-4/5" />
+                          <Skeleton className="h-4 w-3/5" />
+                        </div>
+                        <Skeleton className="h-8 w-16 rounded-full" />
+                      </div>
+                    </div>
                   ))}
                 </div>
               </CardContent>

@@ -11,7 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataErrorState } from "@/components/ui/data-error-state";
 import { fieldStyles } from "@/components/ui/field";
-import { KpiCardSkeleton, Skeleton, TaskTableSkeleton } from "@/components/ui/skeleton";
+import {
+  AIContextActionsSkeleton,
+  KpiCardSkeleton,
+  TaskTableSkeleton,
+} from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -68,6 +72,8 @@ export function TasksPage() {
   if (showHydrationSkeleton) {
     return (
       <div className="grid gap-6">
+        <AIContextActionsSkeleton />
+
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 4 }, (_, index) => (
             <KpiCardSkeleton key={index} />
@@ -75,12 +81,6 @@ export function TasksPage() {
         </div>
 
         <TaskTableSkeleton />
-
-        <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-          <Skeleton className="h-11 w-full" />
-          <Skeleton className="h-11 w-full" />
-          <Skeleton className="h-11 w-40" />
-        </div>
       </div>
     );
   }
