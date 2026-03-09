@@ -200,16 +200,18 @@ export function Sidebar({
             return (
               <Link
                 className={cn(
-                  "app-shell-project-link flex items-center gap-3 rounded-md px-3 py-2 text-sm text-[var(--ink-soft)] transition hover:bg-[var(--panel-soft)] hover:text-[var(--ink)]",
+                  "app-shell-project-link flex min-w-0 items-center gap-3 overflow-hidden rounded-md px-3 py-2 text-sm text-[var(--ink-soft)] transition hover:bg-[var(--panel-soft)] hover:text-[var(--ink)]",
                   active && "bg-[var(--panel-soft)] text-[var(--ink)]"
                 )}
                 href={`/projects/${project.id}`}
                 key={project.id}
                 onClick={onNavigate}
               >
-                <span className={cn("h-2.5 w-2.5 rounded-full", getProjectTone(project.status))} />
-                <span className="min-w-0 flex-1 truncate">{project.name}</span>
-                <span className="text-xs text-[var(--ink-muted)]">{project.progress}%</span>
+                <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", getProjectTone(project.status))} />
+                <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                  {project.name}
+                </span>
+                <span className="shrink-0 text-xs text-[var(--ink-muted)]">{project.progress}%</span>
               </Link>
             );
           })
