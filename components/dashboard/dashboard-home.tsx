@@ -109,7 +109,7 @@ function buildPortfolioTrend(
 export function DashboardHome() {
   const { enumLabel, formatDateLocalized, locale, t } = useLocale();
   const { duplicateProject, notifications } = useDashboard();
-  const { documents, error, isLoading, projects, retry, tasks, team } = useDashboardSnapshot();
+  const { documents, error, isLoading, projects, retry, risks, tasks, team } = useDashboardSnapshot();
   const [statusFilter, setStatusFilter] = useState<"all" | Project["status"]>("all");
   const [directionFilter, setDirectionFilter] = useState<"all" | Project["direction"]>("all");
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -335,10 +335,10 @@ export function DashboardHome() {
               icon: BriefcaseBusiness,
               tone: "neutral",
               breakdown: [
-                { label: t("enum.projectStatus.active"), value: projects.filter(p => p.status === "active").length, tone: "success" },
-                { label: t("enum.projectStatus.planning"), value: projects.filter(p => p.status === "planning").length, tone: "neutral" },
-                { label: t("enum.projectStatus.at-risk"), value: projects.filter(p => p.status === "at-risk").length, tone: "danger" },
-                { label: t("enum.projectStatus.on-hold"), value: projects.filter(p => p.status === "on-hold").length, tone: "warning" },
+                { label: t("projectStatus.active"), value: projects.filter(p => p.status === "active").length, tone: "success" },
+                { label: t("projectStatus.planning"), value: projects.filter(p => p.status === "planning").length, tone: "neutral" },
+                { label: t("projectStatus.at-risk"), value: projects.filter(p => p.status === "at-risk").length, tone: "danger" },
+                { label: t("projectStatus.on-hold"), value: projects.filter(p => p.status === "on-hold").length, tone: "warning" },
               ],
               actions: [{ label: t("action.openPortfolio"), href: "/projects" }],
             })}
@@ -378,10 +378,10 @@ export function DashboardHome() {
               icon: ListTodo,
               tone: "neutral",
               breakdown: [
-                { label: t("enum.taskStatus.todo"), value: tasks.filter(t => t.status === "todo").length, tone: "neutral" },
-                { label: t("enum.taskStatus.in-progress"), value: tasks.filter(t => t.status === "in-progress").length, tone: "warning" },
-                { label: t("enum.taskStatus.done"), value: tasks.filter(t => t.status === "done").length, tone: "success" },
-                { label: t("enum.taskStatus.blocked"), value: tasks.filter(t => t.status === "blocked").length, tone: "danger" },
+                { label: t("taskStatus.todo"), value: tasks.filter(t => t.status === "todo").length, tone: "neutral" },
+                { label: t("taskStatus.in-progress"), value: tasks.filter(t => t.status === "in-progress").length, tone: "warning" },
+                { label: t("taskStatus.done"), value: tasks.filter(t => t.status === "done").length, tone: "success" },
+                { label: t("taskStatus.blocked"), value: tasks.filter(t => t.status === "blocked").length, tone: "danger" },
               ],
               actions: [{ label: t("nav.tasks"), href: "/tasks" }],
             })}
@@ -421,9 +421,9 @@ export function DashboardHome() {
               icon: AlertTriangle,
               tone: openRiskCount > 0 ? "danger" : "success",
               breakdown: [
-                { label: t("enum.severity.critical"), value: notifications.filter(n => n.severity === "critical").length, tone: "danger" },
-                { label: t("enum.severity.warning"), value: notifications.filter(n => n.severity === "warning").length, tone: "warning" },
-                { label: t("enum.severity.info"), value: notifications.filter(n => n.severity === "info").length, tone: "neutral" },
+                { label: t("severity.critical"), value: notifications.filter(n => n.severity === "critical").length, tone: "danger" },
+                { label: t("severity.warning"), value: notifications.filter(n => n.severity === "warning").length, tone: "warning" },
+                { label: t("severity.info"), value: notifications.filter(n => n.severity === "info").length, tone: "neutral" },
               ],
               actions: [{ label: t("nav.risks"), href: "/risks" }],
             })}
@@ -444,7 +444,7 @@ export function DashboardHome() {
               breakdown: [
                 { label: t("dashboard.active"), value: team.filter(m => m.allocated < 70).length, tone: "success" },
                 { label: t("dashboard.atRisk"), value: team.filter(m => m.allocated >= 70 && m.allocated < 85).length, tone: "warning" },
-                { label: t("enum.severity.critical"), value: team.filter(m => m.allocated >= 85).length, tone: "danger" },
+                { label: t("severity.critical"), value: team.filter(m => m.allocated >= 85).length, tone: "danger" },
               ],
               actions: [{ label: t("nav.team"), href: "/team" }],
             })}
