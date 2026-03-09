@@ -7,6 +7,24 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Project, Risk } from "@/lib/types";
 
+// Вынесено за компонент для оптимизации
+const STATUS_LABELS: Record<string, string> = {
+  active: "Активен",
+  planning: "Планирование",
+  "on-hold": "Приостановлен",
+  completed: "Завершён",
+  "at-risk": "В зоне риска",
+};
+
+function getStatusLabel(status: string): string {
+  return STATUS_LABELS[status] ?? status;
+}
+
+// Шкала 1-5 → проценты (1=20%, 5=100%)
+function riskToPercent(value: number): number {
+  return Math.round((value / 5) * 100);
+}
+
 interface Alert {
   id: string;
   projectId: string;
@@ -61,9 +79,9 @@ export function AlertsBlock({ projects, risks }: AlertsBlockProps) {
       }
     });
 
-    // Critical risks
+    // Critical risks (probability & impact >= 3.5 из шкалы 1-5 = 70%)
     risks.forEach((risk) => {
-      if (risk.probability >= 0.7 && risk.impact >= 0.7) {
+      if (risk.probability >= 3.5 && risk.impact >= 3.5) {
         const project = projects.find((p) => p.id === risk.projectId);
         result.push({
           id: `risk-${risk.id}`,
@@ -71,7 +89,7 @@ export function AlertsBlock({ projects, risks }: AlertsBlockProps) {
           projectName: project?.name ?? "Проект",
           type: "critical-risk",
           title: `${risk.title} — критический риск`,
-          description: `Вероятность: ${(risk.probability * 100).toFixed(0)}%, Влияние: ${(risk.impact * 100).toFixed(0)}%`,
+          description: `Вероятность: ${riskToPercent(risk.probability)}%, Влияние: ${riskToPercent(risk.impact)}%`,
           severity: "critical",
         });
       }
@@ -83,44 +101,34 @@ export function AlertsBlock({ projects, risks }: AlertsBlockProps) {
   if (alerts.length === 0) return null;
 
   return (
-    <Card className="p-4 mb-4 border-l-4 border-l-red-500">
+    <Card className="p-4 mb-4 border-l-4 border-l-red-500" role="region" aria-label="Сигналы и оповещения">
       <div className="flex items-center gap-2 mb-3">
-        <AlertTriangle className="h-5 w-5 text-red-500" />
+        <AlertTriangle className="h-5 w-5 text-red-500" aria-hidden="true" />
         <h3 className="font-semibold">Что требует внимания</h3>
         <Badge variant="destructive">{alerts.length}</Badge>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2" role="list">
         {alerts.slice(0, 5).map((alert) => (
           <Link
             key={alert.id}
             href={`/projects/${alert.projectId}`}
             className="flex items-start justify-between gap-2 p-2 rounded hover:bg-muted transition-colors"
+            role="listitem"
           >
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                {alert.type === "at-risk" && <ShieldAlert className="h-4 w-4 text-red-500" />}
-                {alert.type === "budget-deviation" && <TrendingDown className="h-4 w-4 text-amber-500" />}
-                {alert.type === "critical-risk" && <AlertTriangle className="h-4 w-4 text-red-500" />}
+                {alert.type === "at-risk" && <ShieldAlert className="h-4 w-4 text-red-500" aria-hidden="true" />}
+                {alert.type === "budget-deviation" && <TrendingDown className="h-4 w-4 text-amber-500" aria-hidden="true" />}
+                {alert.type === "critical-risk" && <AlertTriangle className="h-4 w-4 text-red-500" aria-hidden="true" />}
                 <span className="text-sm font-medium truncate">{alert.title}</span>
               </div>
               <p className="text-xs text-muted-foreground">{alert.description}</p>
             </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
+            <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
           </Link>
         ))}
       </div>
     </Card>
   );
-}
-
-function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    active: "Активен",
-    planning: "Планирование",
-    "on-hold": "Приостановлен",
-    completed: "Завершён",
-    "at-risk": "В зоне риска",
-  };
-  return labels[status] ?? status;
 }

@@ -5,46 +5,54 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { AuditLogEntry } from "@/lib/types";
 
+// Вынесено за компонент для оптимизации
+const ACTION_LABELS: Record<string, string> = {
+  created: "Создан",
+  updated: "Обновлён",
+  status_changed: "Статус изменён",
+  milestone_reached: "Милестон достигнут",
+};
+
+const ACTION_VARIANTS: Record<string, "default" | "secondary" | "outline"> = {
+  created: "default",
+  updated: "secondary",
+  status_changed: "outline",
+  milestone_reached: "default",
+};
+
+function getActionLabel(action: string): string {
+  return ACTION_LABELS[action] ?? action;
+}
+
+function getActionVariant(action: string): "default" | "secondary" | "outline" {
+  return ACTION_VARIANTS[action] ?? "outline";
+}
+
+function formatTimestamp(timestamp: string): string {
+  return new Date(timestamp).toLocaleString("ru-RU", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 interface AuditLogListProps {
   projectId: string;
   entries: AuditLogEntry[];
 }
 
-export function AuditLogList({ projectId, entries }: AuditLogListProps) {
+/**
+ * Компонент для отображения истории изменений проекта
+ * @param projectId - ID проекта
+ * @param entries - Массив записей истории
+ */
+export const AuditLogList = function AuditLogList({ projectId, entries }: AuditLogListProps) {
   const filteredEntries = useMemo(() => {
     return entries
       .filter((entry) => entry.projectId === projectId)
       .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
   }, [projectId, entries]);
-
-  const getActionLabel = (action: string) => {
-    const labels: Record<string, string> = {
-      created: "Создан",
-      updated: "Обновлён",
-      status_changed: "Статус изменён",
-      milestone_reached: "Милестон достигнут",
-    };
-    return labels[action] || action;
-  };
-
-  const getActionVariant = (action: string) => {
-    const variants: Record<string, "default" | "secondary" | "outline"> = {
-      created: "default",
-      updated: "secondary",
-      status_changed: "outline",
-      milestone_reached: "default",
-    };
-    return variants[action] || "outline";
-  };
-
-  const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString("ru-RU", {
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   if (filteredEntries.length === 0) {
     return (
@@ -55,9 +63,9 @@ export function AuditLogList({ projectId, entries }: AuditLogListProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" role="list" aria-label="История изменений проекта">
       {filteredEntries.map((entry) => (
-        <Card key={entry.id} className="p-4">
+        <Card key={entry.id} className="p-4" role="listitem">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
@@ -71,11 +79,11 @@ export function AuditLogList({ projectId, entries }: AuditLogListProps) {
               <p className="text-sm">{entry.details}</p>
             </div>
             <time className="text-xs text-muted-foreground whitespace-nowrap">
-              {formatDate(entry.timestamp)}
+              {formatTimestamp(entry.timestamp)}
             </time>
           </div>
         </Card>
       ))}
     </div>
   );
-}
+};

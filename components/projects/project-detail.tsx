@@ -99,6 +99,7 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
   const router = useRouter();
   const { enumLabel, formatDateLocalized, t } = useLocale();
   const {
+    auditLogEntries,
     deleteProject,
     documents,
     duplicateProject,
