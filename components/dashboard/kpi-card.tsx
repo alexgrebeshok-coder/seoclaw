@@ -10,6 +10,7 @@ interface KpiCardProps {
   description: string;
   icon: LucideIcon;
   tone?: "neutral" | "success" | "warning" | "danger";
+  onClick?: () => void;
 }
 
 const toneStyles: Record<NonNullable<KpiCardProps["tone"]>, string> = {
@@ -25,9 +26,27 @@ function KpiCardComponent({
   description,
   icon: Icon,
   tone = "neutral",
+  onClick,
 }: KpiCardProps) {
+  const isClickable = Boolean(onClick);
+
   return (
-    <Card className="relative overflow-hidden">
+    <Card
+      className={cn(
+        "relative overflow-hidden",
+        isClickable && "cursor-pointer transition-all hover:bg-muted active:scale-[0.98] focus:ring-2"
+      )}
+      onClick={onClick}
+      role={isClickable ? "button" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      aria-label={isClickable ? `${title}: ${value}. ${description}. Click for details.` : undefined}
+      onKeyDown={(e) => {
+        if (isClickable && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+    >
       <CardContent className="relative flex h-full flex-col gap-4 p-5">
         <div className="flex items-start justify-between">
           <div>

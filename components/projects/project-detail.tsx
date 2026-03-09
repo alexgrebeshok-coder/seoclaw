@@ -228,9 +228,9 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
   return (
     <>
       <div className="grid gap-6">
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_.85fr]">
+        <section className="grid gap-6 grid-cols-1 xl:grid-cols-[1.15fr_.85fr]">
           <Card className="overflow-hidden">
-            <CardContent className="grid gap-8 p-8 lg:grid-cols-[1.1fr_.9fr]">
+            <CardContent className="grid gap-8 p-6 md:p-8 grid-cols-1 lg:grid-cols-[1.1fr_.9fr]">
               <div className="space-y-6">
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
@@ -318,7 +318,7 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
             </CardContent>
           </Card>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
+          <div className="grid gap-4 grid-cols-1 xl:grid-cols-1">
             <Card>
               <CardHeader>
                 <CardTitle>{t("project.keyMetrics")}</CardTitle>
@@ -390,14 +390,14 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
         <AIContextActions />
 
         <Tabs defaultValue="overview">
-          <TabsList>
+          <TabsList className="w-full overflow-x-auto flex-nowrap justify-start sm:justify-center">
             <TabsTrigger value="overview">{t("project.overview")}</TabsTrigger>
             <TabsTrigger value="tasks">{t("project.tasks")}</TabsTrigger>
             <TabsTrigger value="charts">{t("project.charts")}</TabsTrigger>
             <TabsTrigger value="documents">{t("project.documents")}</TabsTrigger>
             <TabsTrigger value="team">{t("project.team")}</TabsTrigger>
             <TabsTrigger value="risks">{t("project.risks")}</TabsTrigger>
-            <TabsTrigger value="gantt">{t("project.gantt")}</TabsTrigger>
+            <TabsTrigger value="gantt" className="hidden sm:flex">{t("project.gantt")}</TabsTrigger>
             <TabsTrigger value="history">{t("project.history")}</TabsTrigger>
           </TabsList>
 
@@ -776,7 +776,7 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
             </div>
           </TabsContent>
 
-          <TabsContent value="gantt">
+          <TabsContent value="gantt" className="hidden sm:block">
             <Card>
               <CardHeader>
                 <CardTitle>{t("project.gantt")}</CardTitle>

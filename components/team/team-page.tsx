@@ -1,10 +1,9 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataErrorState } from "@/components/ui/data-error-state";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TeamMemberCard } from "@/components/team/team-member-card";
 import { useLocale } from "@/contexts/locale-context";
 import { useTeam } from "@/lib/hooks/use-api";
 
@@ -54,69 +53,64 @@ export function TeamPage() {
     );
   }
 
+  // Calculate team stats
+  const criticalCount = team.filter(m => m.allocated >= 90).length;
+  const highLoadCount = team.filter(m => m.allocated >= 70 && m.allocated < 90).length;
+  const normalCount = team.filter(m => m.allocated < 70).length;
+
   return (
     <div className="grid gap-6">
+      {/* Team Summary Stats */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card className="bg-green-500/5 border-green-500/20">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-green-500/14 flex items-center justify-center">
+                <div className="h-3 w-3 rounded-full bg-green-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-heading font-semibold text-green-600">{normalCount}</p>
+                <p className="text-xs text-[var(--ink-muted)]">Normal Load</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-amber-500/5 border-amber-500/20">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-amber-500/14 flex items-center justify-center">
+                <div className="h-3 w-3 rounded-full bg-amber-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-heading font-semibold text-amber-600">{highLoadCount}</p>
+                <p className="text-xs text-[var(--ink-muted)]">High Load</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-red-500/5 border-red-500/20">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-red-500/14 flex items-center justify-center">
+                <div className="h-3 w-3 rounded-full bg-red-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-heading font-semibold text-red-600">{criticalCount}</p>
+                <p className="text-xs text-[var(--ink-muted)]">Critical</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Team Grid */}
       <Card>
         <CardHeader>
           <CardTitle>{t("team.title")}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {team.map((member) => (
-            <Card key={member.id} className="bg-[color:var(--surface-panel)]">
-              <CardContent className="space-y-4 p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand)] text-sm font-semibold text-white">
-                      {member.name
-                        .split(" ")
-                        .map((part) => part[0])
-                        .join("")
-                        .slice(0, 2)
-                        .toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="font-heading text-xl font-semibold tracking-[-0.04em] text-[var(--ink)]">
-                        {member.name}
-                      </p>
-                      <p className="text-sm text-[var(--ink-soft)]">{member.role}</p>
-                    </div>
-                  </div>
-                  <Badge
-                    variant={
-                      member.allocated >= 85
-                        ? "danger"
-                        : member.allocated >= 70
-                          ? "warning"
-                          : "success"
-                    }
-                  >
-                    {member.allocated}%
-                  </Badge>
-                </div>
-                <Progress value={member.allocated} />
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-[8px] bg-[var(--panel-soft)] p-3 text-center">
-                    <div className="text-lg font-semibold text-[var(--ink)]">{member.projects.length}</div>
-                    <div className="text-xs text-[var(--ink-muted)]">{t("nav.projects")}</div>
-                  </div>
-                  <div className="rounded-[8px] bg-[var(--panel-soft)] p-3 text-center">
-                    <div className="text-lg font-semibold text-[var(--ink)]">{member.allocated}%</div>
-                    <div className="text-xs text-[var(--ink-muted)]">{t("analytics.resourceUtilization")}</div>
-                  </div>
-                </div>
-                <div className="text-sm text-[var(--ink-soft)]">
-                  <div>{member.location}</div>
-                  <div>{member.email}</div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {member.projects.map((project) => (
-                    <Badge key={project} variant="neutral">
-                      {project}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <TeamMemberCard key={member.id} member={member} />
           ))}
         </CardContent>
       </Card>

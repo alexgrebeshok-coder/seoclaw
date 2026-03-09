@@ -18,6 +18,7 @@ import { AIContextActions } from "@/components/ai/ai-context-actions";
 import { useDashboard } from "@/components/dashboard-provider";
 import { AlertsBlock } from "@/components/dashboard/alerts-block";
 import { KpiCard } from "@/components/dashboard/kpi-card";
+import { KpiDetailModal, type KpiBreakdownItem, type KpiAction } from "@/components/dashboard/kpi-detail-modal";
 import { ProjectFormModal } from "@/components/projects/project-form-modal";
 import { ProjectCard } from "@/components/projects/project-card";
 import { TaskFormModal } from "@/components/tasks/task-form-modal";
@@ -114,6 +115,16 @@ export function DashboardHome() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [kpiModalState, setKpiModalState] = useState<{
+    open: boolean;
+    title: string;
+    value: string;
+    description: string;
+    icon: typeof BriefcaseBusiness;
+    tone: "neutral" | "success" | "warning" | "danger";
+    breakdown?: KpiBreakdownItem[];
+    actions?: KpiAction[];
+  } | null>(null);
 
   const filteredProjects = projects.filter((project) => {
     const statusMatch = statusFilter === "all" ? true : project.status === statusFilter;
@@ -309,13 +320,28 @@ export function DashboardHome() {
       <div className="grid gap-6">
         <AlertsBlock projects={projects} risks={risks} />
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <section className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           <KpiCard
             description={t("dashboard.kpi.activeProjectsDescription")}
             icon={BriefcaseBusiness}
             title={t("dashboard.kpi.activeProjects")}
             tone="neutral"
             value={String(activeProjects)}
+            onClick={() => setKpiModalState({
+              open: true,
+              title: t("dashboard.kpi.activeProjects"),
+              value: String(activeProjects),
+              description: t("dashboard.kpi.activeProjectsDescription"),
+              icon: BriefcaseBusiness,
+              tone: "neutral",
+              breakdown: [
+                { label: t("enum.projectStatus.active"), value: projects.filter(p => p.status === "active").length, tone: "success" },
+                { label: t("enum.projectStatus.planning"), value: projects.filter(p => p.status === "planning").length, tone: "neutral" },
+                { label: t("enum.projectStatus.at-risk"), value: projects.filter(p => p.status === "at-risk").length, tone: "danger" },
+                { label: t("enum.projectStatus.on-hold"), value: projects.filter(p => p.status === "on-hold").length, tone: "warning" },
+              ],
+              actions: [{ label: t("action.openPortfolio"), href: "/projects" }],
+            })}
           />
           <KpiCard
             description={t("dashboard.kpi.portfolioStatusDescription")}
@@ -323,6 +349,20 @@ export function DashboardHome() {
             title={t("dashboard.kpi.portfolioStatus")}
             tone={portfolioHealth >= 70 ? "success" : "warning"}
             value={`${portfolioHealth}%`}
+            onClick={() => setKpiModalState({
+              open: true,
+              title: t("dashboard.kpi.portfolioStatus"),
+              value: `${portfolioHealth}%`,
+              description: t("dashboard.kpi.portfolioStatusDescription"),
+              icon: FolderKanban,
+              tone: portfolioHealth >= 70 ? "success" : "warning",
+              breakdown: [
+                { label: t("project.progress"), value: `${Math.round(projects.reduce((s, p) => s + p.progress, 0) / Math.max(projects.length, 1))}%`, tone: "neutral" },
+                { label: t("project.health"), value: `${portfolioHealth}%`, tone: portfolioHealth >= 70 ? "success" : "warning" },
+                { label: t("dashboard.budgetVariance"), value: `${budgetUsed}%`, tone: budgetUsed > 90 ? "danger" : budgetUsed > 75 ? "warning" : "success" },
+              ],
+              actions: [{ label: t("action.openPortfolio"), href: "/projects" }],
+            })}
           />
           <KpiCard
             description={t("tasks.total")}
@@ -330,6 +370,21 @@ export function DashboardHome() {
             title={t("tasks.total")}
             tone="neutral"
             value={String(totalTasks)}
+            onClick={() => setKpiModalState({
+              open: true,
+              title: t("tasks.total"),
+              value: String(totalTasks),
+              description: t("tasks.description"),
+              icon: ListTodo,
+              tone: "neutral",
+              breakdown: [
+                { label: t("enum.taskStatus.todo"), value: tasks.filter(t => t.status === "todo").length, tone: "neutral" },
+                { label: t("enum.taskStatus.in-progress"), value: tasks.filter(t => t.status === "in-progress").length, tone: "warning" },
+                { label: t("enum.taskStatus.done"), value: tasks.filter(t => t.status === "done").length, tone: "success" },
+                { label: t("enum.taskStatus.blocked"), value: tasks.filter(t => t.status === "blocked").length, tone: "danger" },
+              ],
+              actions: [{ label: t("nav.tasks"), href: "/tasks" }],
+            })}
           />
           <KpiCard
             description={t("tasks.inProgress")}
@@ -337,6 +392,20 @@ export function DashboardHome() {
             title={t("tasks.inProgress")}
             tone={inProgressTasks > 0 ? "warning" : "neutral"}
             value={String(inProgressTasks)}
+            onClick={() => setKpiModalState({
+              open: true,
+              title: t("tasks.inProgress"),
+              value: String(inProgressTasks),
+              description: t("tasks.description"),
+              icon: Clock3,
+              tone: inProgressTasks > 0 ? "warning" : "neutral",
+              breakdown: [
+                { label: t("tasks.total"), value: totalTasks },
+                { label: t("tasks.inProgress"), value: inProgressTasks, tone: "warning" },
+                { label: t("tasks.blocked"), value: tasks.filter(t => t.status === "blocked").length, tone: "danger" },
+              ],
+              actions: [{ label: t("nav.tasks"), href: "/tasks" }],
+            })}
           />
           <KpiCard
             description={t("dashboard.criticalFeedDescription")}
@@ -344,6 +413,20 @@ export function DashboardHome() {
             title={t("dashboard.criticalFeed")}
             tone={openRiskCount > 0 ? "danger" : "success"}
             value={String(openRiskCount)}
+            onClick={() => setKpiModalState({
+              open: true,
+              title: t("dashboard.criticalFeed"),
+              value: String(openRiskCount),
+              description: t("dashboard.criticalFeedDescription"),
+              icon: AlertTriangle,
+              tone: openRiskCount > 0 ? "danger" : "success",
+              breakdown: [
+                { label: t("enum.severity.critical"), value: notifications.filter(n => n.severity === "critical").length, tone: "danger" },
+                { label: t("enum.severity.warning"), value: notifications.filter(n => n.severity === "warning").length, tone: "warning" },
+                { label: t("enum.severity.info"), value: notifications.filter(n => n.severity === "info").length, tone: "neutral" },
+              ],
+              actions: [{ label: t("nav.risks"), href: "/risks" }],
+            })}
           />
           <KpiCard
             description={t("dashboard.teamLoadDescription")}
@@ -351,6 +434,20 @@ export function DashboardHome() {
             title={t("nav.team")}
             tone="neutral"
             value={String(team.length)}
+            onClick={() => setKpiModalState({
+              open: true,
+              title: t("nav.team"),
+              value: String(team.length),
+              description: t("dashboard.teamLoadDescription"),
+              icon: Users2,
+              tone: "neutral",
+              breakdown: [
+                { label: t("dashboard.active"), value: team.filter(m => m.allocated < 70).length, tone: "success" },
+                { label: t("dashboard.atRisk"), value: team.filter(m => m.allocated >= 70 && m.allocated < 85).length, tone: "warning" },
+                { label: t("enum.severity.critical"), value: team.filter(m => m.allocated >= 85).length, tone: "danger" },
+              ],
+              actions: [{ label: t("nav.team"), href: "/team" }],
+            })}
           />
         </section>
 
@@ -654,6 +751,21 @@ export function DashboardHome() {
         project={editingProject}
       />
       <TaskFormModal open={taskModalOpen} onOpenChange={setTaskModalOpen} />
+      {kpiModalState && (
+        <KpiDetailModal
+          open={kpiModalState.open}
+          onOpenChange={(open) => {
+            if (!open) setKpiModalState(null);
+          }}
+          title={kpiModalState.title}
+          value={kpiModalState.value}
+          description={kpiModalState.description}
+          icon={kpiModalState.icon}
+          tone={kpiModalState.tone}
+          breakdown={kpiModalState.breakdown}
+          actions={kpiModalState.actions}
+        />
+      )}
     </>
   );
 }

@@ -74,7 +74,7 @@ export function TasksPage() {
       <div className="grid gap-6">
         <AIContextActionsSkeleton />
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 4 }, (_, index) => (
             <KpiCardSkeleton key={index} />
           ))}
@@ -100,7 +100,7 @@ export function TasksPage() {
     <div className="grid gap-6">
       <AIContextActions />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardContent className="p-6">
             <p className="text-sm text-[var(--ink-muted)]">{t("tasks.total")}</p>

@@ -147,7 +147,7 @@ export function ProjectsPage({ initialQuery = "" }: { initialQuery?: string }) {
                 {t("projects.portfolioViewDescription")}
               </p>
             </div>
-            <div className="grid gap-3 md:grid-cols-[minmax(280px,1fr)_220px_auto]">
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-[minmax(280px,1fr)_220px_auto]">
               <input
                 className={fieldStyles}
                 onChange={(event) => setQuery(event.target.value)}
@@ -169,8 +169,8 @@ export function ProjectsPage({ initialQuery = "" }: { initialQuery?: string }) {
               <Button onClick={() => setProjectModalOpen(true)}>{t("action.addProject")}</Button>
             </div>
           </CardHeader>
-          <CardContent className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,.9fr)]">
-            <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+          <CardContent className="grid min-w-0 gap-6 grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,.9fr)]">
+            <div className="grid min-w-0 gap-4 grid-cols-1 lg:grid-cols-2">
               {filteredProjects.map((project) => (
                 <ProjectCard
                   key={project.id}
