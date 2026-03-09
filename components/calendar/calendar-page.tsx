@@ -13,6 +13,7 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
+import { AlertTriangle, CheckCircle2, Flag, ListTodo } from "lucide-react";
 
 import { useDashboard } from "@/components/dashboard-provider";
 import { Badge } from "@/components/ui/badge";
@@ -56,19 +57,32 @@ export function CalendarPage() {
     return days;
   }, [interval]);
 
+  const projectNameById = useMemo(
+    () => Object.fromEntries(projects.map((project) => [project.id, project.name])),
+    [projects]
+  );
+
   const eventsByDate = useMemo(() => {
     const entries: Record<
       string,
-      Array<{ id: string; title: string; type: "task" | "milestone"; subtitle: string; tone: "info" | "success" | "danger" }>
+      Array<{
+        id: string;
+        title: string;
+        type: "task" | "milestone";
+        subtitle: string;
+        tone: "info" | "success" | "danger";
+      }>
     > = {};
 
     tasks.forEach((task) => {
       entries[task.dueDate] ??= [];
+      const projectLabel = projectNameById[task.projectId] ?? "";
+      const subtitle = [projectLabel, task.assignee].filter(Boolean).join(" • ");
       entries[task.dueDate].push({
         id: task.id,
         title: task.title,
         type: "task",
-        subtitle: task.assignee,
+        subtitle: subtitle || projectLabel || task.assignee,
         tone: task.status === "blocked" ? "danger" : task.status === "done" ? "success" : "info",
       });
     });
@@ -86,7 +100,7 @@ export function CalendarPage() {
     });
 
     return entries;
-  }, [projects, tasks]);
+  }, [projectNameById, projects, tasks]);
 
   const selectedEvents = eventsByDate[selectedDay] ?? [];
 
@@ -161,7 +175,7 @@ export function CalendarPage() {
                   aria-label={`${formatDateLocalized(dayKey, "d MMM yyyy")} — ${events.length}`}
                   key={dayKey}
                   className={`
-                    flex min-h-[176px] flex-col overflow-hidden rounded-[12px] border p-4 text-left transition-all duration-200
+                    flex min-h-[188px] flex-col overflow-hidden rounded-[12px] border p-4 text-left transition-all duration-200
                     ${isActive ? "border-[var(--brand)] bg-[color:var(--surface-panel)]" : "border-[var(--line)] bg-[var(--panel-soft)]"}
                     ${muted ? "opacity-55" : "opacity-100"}
                   `}
@@ -185,24 +199,35 @@ export function CalendarPage() {
                         key={event.id}
                         className={
                           event.type === "milestone"
-                            ? "min-w-0 rounded-[10px] bg-[var(--brand)] p-3 text-white"
+                            ? "min-w-0 rounded-[10px] border border-[var(--brand)]/25 bg-[color:var(--surface-panel)] p-3"
                             : "min-w-0 rounded-[10px] border border-[var(--line)] bg-[color:var(--surface-panel)] p-3"
                         }
                       >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={
+                              event.tone === "danger"
+                                ? "h-2 w-2 shrink-0 rounded-full bg-rose-500"
+                                : event.tone === "success"
+                                  ? "h-2 w-2 shrink-0 rounded-full bg-emerald-500"
+                                  : "h-2 w-2 shrink-0 rounded-full bg-[var(--brand)]"
+                            }
+                          />
+                          <p
+                            className={
+                              event.type === "milestone"
+                                ? "text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--brand)]"
+                                : "text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-muted)]"
+                            }
+                          >
+                            {event.type === "milestone" ? t("calendar.milestone") : t("calendar.task")}
+                          </p>
+                        </div>
                         <p
                           className={
                             event.type === "milestone"
-                              ? "truncate text-xs uppercase tracking-[0.14em] text-slate-300"
-                              : "truncate text-xs uppercase tracking-[0.14em] text-[var(--ink-muted)]"
-                          }
-                        >
-                          {event.type === "milestone" ? t("calendar.milestone") : t("project.tasks")}
-                        </p>
-                        <p
-                          className={
-                            event.type === "milestone"
-                              ? "mt-1 truncate font-medium text-white"
-                              : "mt-1 truncate font-medium text-[var(--ink)]"
+                              ? "mt-2 overflow-hidden text-[13px] font-semibold leading-5 text-[var(--ink)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
+                              : "mt-2 overflow-hidden text-[13px] font-semibold leading-5 text-[var(--ink)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
                           }
                         >
                           {event.title}
@@ -210,8 +235,8 @@ export function CalendarPage() {
                         <p
                           className={
                             event.type === "milestone"
-                              ? "truncate text-sm text-slate-200"
-                              : "truncate text-sm text-[var(--ink-soft)]"
+                              ? "mt-1 overflow-hidden text-[11px] leading-4 text-[var(--ink-soft)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1]"
+                              : "mt-1 overflow-hidden text-[11px] leading-4 text-[var(--ink-soft)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1]"
                           }
                         >
                           {event.subtitle}
@@ -248,12 +273,23 @@ export function CalendarPage() {
               selectedEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="rounded-[24px] border border-[var(--line)] bg-white/90 p-4 shadow-[0_12px_28px_rgba(15,23,42,.06)]"
+                  className="rounded-[14px] border border-[var(--line)] bg-[color:var(--surface-panel)] p-4"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="font-medium text-[var(--ink)]">{event.title}</p>
-                      <p className="text-sm text-[var(--ink-soft)]">{event.subtitle}</p>
+                      <div className="flex items-center gap-2">
+                        {event.type === "milestone" ? (
+                          <Flag className="h-4 w-4 text-[var(--brand)]" />
+                        ) : event.tone === "danger" ? (
+                          <AlertTriangle className="h-4 w-4 text-rose-500" />
+                        ) : event.tone === "success" ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        ) : (
+                          <ListTodo className="h-4 w-4 text-[var(--brand)]" />
+                        )}
+                        <p className="font-medium text-[var(--ink)]">{event.title}</p>
+                      </div>
+                      <p className="mt-1 text-sm text-[var(--ink-soft)]">{event.subtitle}</p>
                     </div>
                     <Badge
                       variant={
@@ -264,7 +300,7 @@ export function CalendarPage() {
                             : "info"
                       }
                     >
-                      {event.type === "milestone" ? t("calendar.milestone") : t("project.tasks")}
+                      {event.type === "milestone" ? t("calendar.milestone") : t("calendar.task")}
                     </Badge>
                   </div>
                 </div>

@@ -446,6 +446,7 @@ export const messages = {
     "calendar.next": "Вперёд",
     "calendar.openDay": "Открыть день",
     "calendar.milestone": "Этап",
+    "calendar.task": "Задача",
     "calendar.moreEvents": "+ ещё {count}",
     "gantt.title": "Лента сроков",
     "gantt.description":
@@ -1111,6 +1112,7 @@ export const messages = {
     "calendar.next": "Next",
     "calendar.openDay": "Open day",
     "calendar.milestone": "Milestone",
+    "calendar.task": "Task",
     "calendar.moreEvents": "+ {count} more",
     "gantt.title": "Timeline view",
     "gantt.description":
@@ -1747,6 +1749,7 @@ export const messages = {
     "calendar.next": "下一页",
     "calendar.openDay": "打开日期",
     "calendar.milestone": "里程碑",
+    "calendar.task": "任务",
     "calendar.moreEvents": "+ 还有 {count} 条",
     "gantt.title": "时间线视图",
     "gantt.description": "跨项目与里程碑的横向计划控制。",
