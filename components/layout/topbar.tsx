@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { addDays, format } from "date-fns";
-import { Bell, Menu, MessageSquareText, Plus, Search } from "lucide-react";
+import { Menu, MessageSquareText, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 
 import { useDashboard } from "@/components/dashboard-provider";
@@ -13,6 +13,7 @@ import { resolveTitle } from "@/components/layout/navigation-config";
 import { ProjectFormModal } from "@/components/projects/project-form-modal";
 import { TaskFormModal } from "@/components/tasks/task-form-modal";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CardContent, CardTitle } from "@/components/ui/card";
@@ -274,7 +275,7 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
                 }}
               />
 
-              <NotificationsPopover />
+              <NotificationBell />
               <LanguageSwitcher />
               <ThemeSwitcher />
 
@@ -309,7 +310,7 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
               <Button className="flex-1" onClick={() => setProjectModalOpen(true)}>
                 {t("action.addProject")}
               </Button>
-              <NotificationsPopover />
+              <NotificationBell />
               <QuickActionsPopover
                 onAddProject={() => setProjectModalOpen(true)}
                 onAddTask={() => setTaskModalOpen(true)}
