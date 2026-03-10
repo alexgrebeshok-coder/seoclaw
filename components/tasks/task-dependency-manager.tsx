@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +39,10 @@ export const TaskDependencyManager = React.memo(function TaskDependencyManager({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Use ref to avoid stale closure
+  const dependenciesRef = useRef(dependencies);
+  dependenciesRef.current = dependencies;
+
   const fetchDependencies = useCallback(async () => {
     try {
       const response = await fetch(`/api/tasks/${taskId}/dependencies`);
@@ -58,7 +62,8 @@ export const TaskDependencyManager = React.memo(function TaskDependencyManager({
       const response = await fetch(`/api/projects/${projectId}/tasks`);
       const tasks = await response.json();
       // Filter out current task and tasks already in dependencies
-      const depIds = new Set(dependencies.map((d) => d.task.id));
+      // Use ref to avoid stale closure
+      const depIds = new Set(dependenciesRef.current.map((d) => d.task.id));
       const filtered = tasks.filter(
         (t: Task) => t.id !== taskId && !depIds.has(t.id)
       );
@@ -66,7 +71,7 @@ export const TaskDependencyManager = React.memo(function TaskDependencyManager({
     } catch (err) {
       console.error("[TaskDependencyManager] Error fetching tasks:", err);
     }
-  }, [projectId, taskId, dependencies]);
+  }, [projectId, taskId]); // Remove 'dependencies' from deps - use ref instead
 
   useEffect(() => {
     fetchDependencies();
@@ -76,9 +81,9 @@ export const TaskDependencyManager = React.memo(function TaskDependencyManager({
     if (dependencies.length >= 0) {
       fetchAvailableTasks();
     }
-  }, [fetchAvailableTasks]);
+  }, [fetchAvailableTasks, dependencies.length]);
 
-  const handleAddDependency = async () => {
+  const handleAddDependency = useCallback(async () => {
     if (!selectedTaskId) return;
 
     setError(null);
@@ -102,18 +107,26 @@ export const TaskDependencyManager = React.memo(function TaskDependencyManager({
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка добавления");
     }
-  };
+  }, [selectedTaskId, taskId, fetchDependencies]);
 
-  const handleRemoveDependency = async (dependencyId: string) => {
+  const handleRemoveDependency = useCallback(async (dependencyId: string) => {
+    setError(null);
     try {
-      await fetch(`/api/tasks/${taskId}/dependencies/${dependencyId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/tasks/${taskId}/dependencies/${dependencyId}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to remove dependency");
+      }
+
       fetchDependencies();
     } catch (err) {
+      setError("Ошибка удаления зависимости");
       console.error("[TaskDependencyManager] Error removing:", err);
     }
-  };
+  }, [taskId, fetchDependencies]);
 
   if (loading) {
     return (
@@ -159,6 +172,7 @@ export const TaskDependencyManager = React.memo(function TaskDependencyManager({
                   variant="ghost"
                   size="icon"
                   onClick={() => handleRemoveDependency(dep.id)}
+                  aria-label="Удалить зависимость"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -195,6 +209,7 @@ export const TaskDependencyManager = React.memo(function TaskDependencyManager({
             value={selectedTaskId}
             onChange={(e) => setSelectedTaskId(e.target.value)}
             className="flex-1 rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm"
+            aria-label="Выберите задачу для зависимости"
           >
             <option value="">Выберите задачу...</option>
             {availableTasks.map((task) => (
