@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { DndContext, DragOverlay, closestCorners, PointerSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { DndContext, DragOverlay, closestCorners, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
 import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./kanban-column";
 import { KanbanTaskCard } from "./kanban-task-card";
@@ -21,17 +21,14 @@ export function KanbanBoard({ boardId }: KanbanBoardProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 8px movement required to start drag
+        distance: 8,
       },
-    })
+    }),
+    useSensor(KeyboardSensor)
   );
 
   // Fetch board data
-  useEffect(() => {
-    fetchBoard();
-  }, [boardId]);
-
-  async function fetchBoard() {
+  const fetchBoard = useCallback(async () => {
     try {
       const response = await fetch(`/api/boards/${boardId}`);
       const data = await response.json();
@@ -41,7 +38,11 @@ export function KanbanBoard({ boardId }: KanbanBoardProps) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [boardId]);
+
+  useEffect(() => {
+    fetchBoard();
+  }, [fetchBoard]);
 
   async function handleDragStart(event: DragStartEvent) {
     const { active } = event;
@@ -57,7 +58,7 @@ export function KanbanBoard({ boardId }: KanbanBoardProps) {
     }
   }
 
-  async function handleDragEnd(event: DragEndEvent) {
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveTask(null);
 
@@ -78,23 +79,60 @@ export function KanbanBoard({ boardId }: KanbanBoardProps) {
     // Skip if same column and not reordering
     if (currentColumn?.id === targetColumn.id) return;
 
-    // Move task to new column
+    // Optimistic update - update UI immediately
+    const task = currentColumn?.tasks.find((t) => t.id === taskId);
+    if (task) {
+      setBoard((prevBoard) => {
+        if (!prevBoard) return prevBoard;
+        
+        return {
+          ...prevBoard,
+          columns: prevBoard.columns.map((col) => {
+            if (col.id === currentColumn?.id) {
+              // Remove from current column
+              return { ...col, tasks: col.tasks.filter((t) => t.id !== taskId) };
+            }
+            if (col.id === targetColumn.id) {
+              // Add to target column
+              return { ...col, tasks: [...col.tasks, { ...task, columnId: targetColumn.id }] };
+            }
+            return col;
+          }),
+        };
+      });
+    }
+
+    // Move task to new column (API)
     try {
       await fetch(`/api/tasks/${taskId}/move`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           columnId: targetColumn.id,
-          order: targetColumn.tasks.length, // Add to end
+          order: targetColumn.tasks.length,
         }),
       });
-
-      // Refetch board
-      fetchBoard();
+      // No refetch needed - optimistic update already applied
     } catch (error) {
       console.error("[KanbanBoard] Error moving task:", error);
+      // Rollback on error
+      fetchBoard();
     }
-  }
+  }, [board, fetchBoard]);
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const { active } = event;
+    const taskId = active.id as string;
+
+    // Find task in columns
+    const task = board?.columns
+      .flatMap((col) => col.tasks)
+      .find((t) => t.id === taskId);
+
+    if (task) {
+      setActiveTask(task);
+    }
+  }, [board]);
 
   if (loading) {
     return (

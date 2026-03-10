@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Card } from "@/components/ui/card";
@@ -11,7 +12,7 @@ interface KanbanColumnProps {
   tasks: Task[];
 }
 
-export function KanbanColumn({ column, tasks }: KanbanColumnProps) {
+export const KanbanColumn = React.memo(function KanbanColumn({ column, tasks }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
   });
@@ -36,7 +37,7 @@ export function KanbanColumn({ column, tasks }: KanbanColumnProps) {
       </div>
 
       {/* Tasks */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-2" role="list" aria-label={`Задачи в колонке ${column.title}`}>
         <SortableContext
           items={tasks.map((t) => t.id)}
           strategy={verticalListSortingStrategy}

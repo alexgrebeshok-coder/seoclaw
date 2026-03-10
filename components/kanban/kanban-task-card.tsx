@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card } from "@/components/ui/card";
@@ -13,7 +14,15 @@ interface KanbanTaskCardProps {
   isDragging?: boolean;
 }
 
-export function KanbanTaskCard({ task, isDragging }: KanbanTaskCardProps) {
+// Priority colors - memoized outside component
+const PRIORITY_COLORS: Record<string, string> = {
+  low: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+  medium: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+  high: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
+  critical: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+};
+
+export const KanbanTaskCard = React.memo(function KanbanTaskCard({ task, isDragging }: KanbanTaskCardProps) {
   const {
     attributes,
     listeners,
@@ -28,12 +37,7 @@ export function KanbanTaskCard({ task, isDragging }: KanbanTaskCardProps) {
     transition,
   };
 
-  const priorityColor = {
-    low: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-    medium: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
-    high: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
-    critical: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
-  };
+  const priorityColor = PRIORITY_COLORS[task.priority] ?? PRIORITY_COLORS.medium;
 
   const isOverdue =
     task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "done";
@@ -42,10 +46,13 @@ export function KanbanTaskCard({ task, isDragging }: KanbanTaskCardProps) {
     <Card
       ref={setNodeRef}
       style={style}
+      role="listitem"
+      aria-label={`Задача: ${task.title}, приоритет: ${task.priority}`}
+      tabIndex={0}
       {...attributes}
       {...listeners}
       className={cn(
-        "cursor-grab p-3 active:cursor-grabbing",
+        "cursor-grab p-3 active:cursor-grabbing focus:ring-2 focus:ring-[var(--accent)] focus:outline-none",
         (isDragging || isSortableDragging) && "opacity-50",
         isOverdue && "border-l-4 border-l-red-500"
       )}
