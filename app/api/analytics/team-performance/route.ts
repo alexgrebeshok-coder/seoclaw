@@ -24,18 +24,16 @@ export async function GET(request: NextRequest) {
         const completedTasks = memberTasks.filter((t) => t.status === "done").length;
 
         return {
-          memberId: member.id,
-          memberName: member.name,
-          totalTasks: memberTasks.length,
+          id: member.id,
+          name: member.name,
+          initials: member.name.split(" ").map(n => n[0]).join("").slice(0, 2),
           completedTasks,
-          completionRate: memberTasks.length > 0 ? (completedTasks / memberTasks.length) * 100 : 0,
-          avgTaskDuration: 4.5,
-          billableHours: 120,
-          efficiency: 85,
+          totalTasks: memberTasks.length,
+          performance: memberTasks.length > 0 ? Math.round((completedTasks / memberTasks.length) * 100) : 0,
         };
       });
 
-      return NextResponse.json({ performance, summary: { avgEfficiency: 82 } });
+      return NextResponse.json({ members: performance, summary: { avgEfficiency: 82 } });
     }
 
     const { searchParams } = new URL(request.url);
@@ -168,18 +166,16 @@ export async function GET(request: NextRequest) {
       const completedTasks = memberTasks.filter((t) => t.status === "done").length;
 
       return {
-        memberId: member.id,
-        memberName: member.name,
-        totalTasks: memberTasks.length,
+        id: member.id,
+        name: member.name,
+        initials: member.name.split(" ").map(n => n[0]).join("").slice(0, 2),
         completedTasks,
-        completionRate: memberTasks.length > 0 ? (completedTasks / memberTasks.length) * 100 : 0,
-        avgTaskDuration: 4.5,
-        billableHours: 120,
-        efficiency: 85,
+        totalTasks: memberTasks.length,
+        performance: memberTasks.length > 0 ? Math.round((completedTasks / memberTasks.length) * 100) : 0,
       };
     });
 
-    return NextResponse.json({ performance, summary: { avgEfficiency: 82 } });
+    return NextResponse.json({ members: performance, summary: { avgEfficiency: 82 } });
   }
 }
 

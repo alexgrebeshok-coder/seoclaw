@@ -175,15 +175,45 @@ export async function GET(request: NextRequest) {
     const projects = getMockProjects();
     const tasks = getMockTasks();
 
+    // Calculate proper summary matching AnalyticsSummary interface
+    const completedTasks = tasks.filter(t => t.status === "done").length;
+    const activeProjects = projects.filter(p => p.status === "active").length;
+    const completedProjects = projects.filter(p => p.status === "completed").length;
+
     const summary = {
       totalProjects: projects.length,
+      activeProjects,
+      completedProjects,
       totalTasks: tasks.length,
+      completedTasks,
+      overdueTasks: 2,
+      teamSize: 6,
+      averageHealth: 72,
+      // Also include original fields for compatibility
       avgProgress: 45,
       totalOverdue: 2,
       avgHealthScore: 72,
     };
 
-    return NextResponse.json({ summary, projects: [] });
+    // Return project health data
+    const projectHealth = projects.map(project => {
+      const projectTasks = tasks.filter(t => t.projectId === project.id);
+      const projectCompleted = projectTasks.filter(t => t.status === "done").length;
+      const progress = projectTasks.length > 0
+        ? Math.round((projectCompleted / projectTasks.length) * 100)
+        : project.progress;
+
+      return {
+        projectId: project.id,
+        projectName: project.name,
+        healthScore: progress >= 70 ? 85 : progress >= 40 ? 60 : 30,
+        status: progress >= 70 ? "healthy" as const : progress >= 40 ? "at_risk" as const : "critical" as const,
+        progress,
+        overdueTasks: projectTasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== "done").length,
+      };
+    });
+
+    return NextResponse.json({ summary, projects: projectHealth });
   }
 }
 
