@@ -1,217 +1,315 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+  Activity,
+  TrendingUp,
+  TrendingDown,
+  Users,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  Target,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface AnalyticsDashboardProps {
-  projectId?: string;
+interface AnalyticsSummary {
+  totalProjects: number;
+  activeProjects: number;
+  completedProjects: number;
+  totalTasks: number;
+  completedTasks: number;
+  overdueTasks: number;
+  teamSize: number;
+  averageHealth: number;
 }
 
-const COLORS = {
-  todo: "#94a3b8",
-  in_progress: "#3b82f6",
-  review: "#f59e0b",
-  done: "#22c55e",
+interface ProjectHealth {
+  projectId: string;
+  projectName: string;
+  healthScore: number;
+  status: "healthy" | "at_risk" | "critical";
+  progress: number;
+  overdueTasks: number;
+}
+
+interface TeamMember {
+  id: string;
+  name: string;
+  initials: string;
+  completedTasks: number;
+  totalTasks: number;
+  performance: number;
+}
+
+const statusColors = {
+  healthy: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  at_risk: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
+  critical: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
 };
 
-export const AnalyticsDashboard = React.memo(function AnalyticsDashboard({
-  projectId,
-}: AnalyticsDashboardProps) {
-  const [analytics, setAnalytics] = React.useState<any>(null);
-  const [loading, setLoading] = React.useState(true);
+const statusLabels = {
+  healthy: "Здоров",
+  at_risk: "Под угрозой",
+  critical: "Критичен",
+};
 
-  React.useEffect(() => {
-    async function fetchAnalytics() {
-      try {
-        const url = projectId
-          ? `/api/analytics/overview?projectId=${projectId}`
-          : "/api/analytics/overview";
-        const response = await fetch(url);
-        const data = await response.json();
-        setAnalytics(data);
-      } catch (error) {
-        console.error("[AnalyticsDashboard] Error:", error);
-      } finally {
-        setLoading(false);
-      }
+export const AnalyticsDashboard = React.memo(function AnalyticsDashboard() {
+  const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
+  const [projects, setProjects] = useState<ProjectHealth[]>([]);
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"overview" | "team">("overview");
+
+  const fetchData = useCallback(async () => {
+    try {
+      const [overviewRes, teamRes] = await Promise.all([
+        fetch("/api/analytics/overview"),
+        fetch("/api/analytics/team-performance"),
+      ]);
+
+      const overviewData = await overviewRes.json();
+      const teamData = await teamRes.json();
+
+      setSummary(overviewData.summary);
+      setProjects(overviewData.projects || []);
+      setTeam(teamData.members || []);
+    } catch (error) {
+      console.error("[AnalyticsDashboard] Error:", error);
+    } finally {
+      setLoading(false);
     }
+  }, []);
 
-    fetchAnalytics();
-  }, [projectId]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const sortedProjects = useMemo(() => {
+    return [...projects].sort((a, b) => a.healthScore - b.healthScore);
+  }, [projects]);
+
+  const topPerformers = useMemo(() => {
+    return [...team]
+      .sort((a, b) => b.performance - a.performance)
+      .slice(0, 5);
+  }, [team]);
+
+  const handleRefresh = useCallback(() => {
+    setLoading(true);
+    fetchData();
+  }, [fetchData]);
 
   if (loading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="p-6">
-            <div className="h-24 animate-pulse rounded bg-[var(--surface-secondary)]" />
-          </Card>
-        ))}
+      <div className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="p-6">
+              <div className="h-20 animate-pulse rounded bg-[var(--surface-secondary)]" />
+            </Card>
+          ))}
+        </div>
+        <Card className="p-6">
+          <div className="h-64 animate-pulse rounded bg-[var(--surface-secondary)]" />
+        </Card>
       </div>
     );
   }
 
-  if (!analytics) {
+  if (!summary) {
     return (
-      <Card className="p-6 text-center text-[var(--ink-muted)]">
-        No analytics data available
+      <Card className="p-6">
+        <p className="text-center text-[var(--ink-muted)]">
+          Не удалось загрузить аналитику
+        </p>
       </Card>
     );
   }
 
-  const { summary, projects } = analytics;
-
-  // Prepare chart data
-  const statusData = projects.map((p: any) => ({
-    name: p.projectName.slice(0, 10),
-    todo: p.statusBreakdown.todo,
-    inProgress: p.statusBreakdown.inProgress,
-    review: p.statusBreakdown.review,
-    done: p.statusBreakdown.done,
-  }));
-
-  const healthData = projects.map((p: any) => ({
-    name: p.projectName.slice(0, 15),
-    health: p.healthScore,
-  }));
-
-  const pieData = [
-    { name: "To Do", value: summary.totalTasks > 0 ? projects.reduce((sum: number, p: any) => sum + p.statusBreakdown.todo, 0) : 0 },
-    { name: "In Progress", value: projects.reduce((sum: number, p: any) => sum + p.statusBreakdown.inProgress, 0) },
-    { name: "Review", value: projects.reduce((sum: number, p: any) => sum + p.statusBreakdown.review, 0) },
-    { name: "Done", value: projects.reduce((sum: number, p: any) => sum + p.statusBreakdown.done, 0) },
-  ].filter(d => d.value > 0);
+  const completionRate = summary.totalTasks > 0
+    ? Math.round((summary.completedTasks / summary.totalTasks) * 100)
+    : 0;
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Аналитика</h2>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleRefresh}
+          className="transition-all duration-200 hover:scale-105"
+        >
+          <Activity className="mr-2 h-4 w-4" />
+          Обновить
+        </Button>
+      </div>
+
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="p-6">
-          <div className="text-sm font-medium text-[var(--ink-muted)]">
-            Total Projects
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card className="group p-6 transition-all duration-200 hover:shadow-md hover:scale-[1.02]">
+          <div className="flex items-center gap-4">
+            <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900">
+              <Target className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <p className="text-sm text-[var(--ink-muted)]">Проекты</p>
+              <p className="text-2xl font-bold">
+                {summary.activeProjects}/{summary.totalProjects}
+              </p>
+            </div>
           </div>
-          <div className="mt-2 text-3xl font-bold">{summary.totalProjects}</div>
         </Card>
 
-        <Card className="p-6">
-          <div className="text-sm font-medium text-[var(--ink-muted)]">
-            Total Tasks
+        <Card className="group p-6 transition-all duration-200 hover:shadow-md hover:scale-[1.02]">
+          <div className="flex items-center gap-4">
+            <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900">
+              <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <p className="text-sm text-[var(--ink-muted)]">Задачи</p>
+              <p className="text-2xl font-bold">{completionRate}%</p>
+            </div>
           </div>
-          <div className="mt-2 text-3xl font-bold">{summary.totalTasks}</div>
         </Card>
 
-        <Card className="p-6">
-          <div className="text-sm font-medium text-[var(--ink-muted)]">
-            Avg Progress
+        <Card className="group p-6 transition-all duration-200 hover:shadow-md hover:scale-[1.02]">
+          <div className="flex items-center gap-4">
+            <div className="rounded-lg bg-red-100 p-3 dark:bg-red-900">
+              <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <div>
+              <p className="text-sm text-[var(--ink-muted)]">Просрочено</p>
+              <p className="text-2xl font-bold">{summary.overdueTasks}</p>
+            </div>
           </div>
-          <div className="mt-2 text-3xl font-bold">{summary.avgProgress}%</div>
         </Card>
 
-        <Card className="p-6">
-          <div className="text-sm font-medium text-[var(--ink-muted)]">
-            Avg Health Score
+        <Card className="group p-6 transition-all duration-200 hover:shadow-md hover:scale-[1.02]">
+          <div className="flex items-center gap-4">
+            <div className="rounded-lg bg-purple-100 p-3 dark:bg-purple-900">
+              <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div>
+              <p className="text-sm text-[var(--ink-muted)]">Команда</p>
+              <p className="text-2xl font-bold">{summary.teamSize}</p>
+            </div>
           </div>
-          <div className="mt-2 text-3xl font-bold">{summary.avgHealthScore}</div>
         </Card>
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Status Breakdown */}
-        <Card className="p-6">
-          <h3 className="mb-4 text-lg font-semibold">Status by Project</h3>
-          {statusData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={statusData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="todo" stackId="a" fill={COLORS.todo} />
-                <Bar dataKey="inProgress" stackId="a" fill={COLORS.in_progress} />
-                <Bar dataKey="review" stackId="a" fill={COLORS.review} />
-                <Bar dataKey="done" stackId="a" fill={COLORS.done} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex h-[300px] items-center justify-center text-[var(--ink-muted)]">
-              No data available
-            </div>
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-[var(--line)]">
+        <button
+          onClick={() => setActiveTab("overview")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium transition-all duration-200",
+            activeTab === "overview"
+              ? "border-b-2 border-[var(--accent)] text-[var(--accent)]"
+              : "text-[var(--ink-muted)] hover:text-[var(--ink)]"
           )}
-        </Card>
-
-        {/* Health Scores */}
-        <Card className="p-6">
-          <h3 className="mb-4 text-lg font-semibold">Project Health</h3>
-          {healthData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={healthData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Bar dataKey="health" fill="#3b82f6" />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex h-[300px] items-center justify-center text-[var(--ink-muted)]">
-              No data available
-            </div>
+        >
+          Обзор проектов
+        </button>
+        <button
+          onClick={() => setActiveTab("team")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium transition-all duration-200",
+            activeTab === "team"
+              ? "border-b-2 border-[var(--accent)] text-[var(--accent)]"
+              : "text-[var(--ink-muted)] hover:text-[var(--ink)]"
           )}
-        </Card>
+        >
+          Команда
+        </button>
       </div>
 
-      {/* Overall Status Pie */}
-      <Card className="p-6">
-        <h3 className="mb-4 text-lg font-semibold">Overall Task Status</h3>
-        {pieData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="flex h-[250px] items-center justify-center text-[var(--ink-muted)]">
-            No tasks available
+      {/* Tab Content */}
+      {activeTab === "overview" && (
+        <Card className="p-6">
+          <h3 className="mb-4 text-lg font-semibold">Здоровье проектов</h3>
+          <div className="space-y-4">
+            {sortedProjects.length === 0 ? (
+              <p className="text-center text-[var(--ink-muted)] py-8">
+                Нет активных проектов
+              </p>
+            ) : (
+              sortedProjects.map((project) => (
+                <div
+                  key={project.projectId}
+                  className="flex items-center justify-between rounded-lg border border-[var(--line)] p-4 transition-all duration-200 hover:shadow-md"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <h4 className="font-medium">{project.projectName}</h4>
+                      <Badge className={statusColors[project.status]}>
+                        {statusLabels[project.status]}
+                      </Badge>
+                    </div>
+                    <div className="mt-2 flex items-center gap-4 text-sm text-[var(--ink-muted)]">
+                      <span>Прогресс: {project.progress}%</span>
+                      {project.overdueTasks > 0 && (
+                        <span className="text-red-500">
+                          Просрочено: {project.overdueTasks}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold">
+                      {project.healthScore}
+                    </div>
+                    <div className="text-xs text-[var(--ink-muted)]">Health</div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-        )}
-        <div className="mt-4 flex justify-center gap-6">
-          {pieData.map((entry, index) => (
-            <div key={entry.name} className="flex items-center gap-2">
-              <div
-                className="h-3 w-3 rounded-full"
-                style={{ backgroundColor: Object.values(COLORS)[index] }}
-              />
-              <span className="text-sm">{entry.name}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
+        </Card>
+      )}
+
+      {activeTab === "team" && (
+        <Card className="p-6">
+          <h3 className="mb-4 text-lg font-semibold">Топ исполнители</h3>
+          <div className="space-y-4">
+            {topPerformers.length === 0 ? (
+              <p className="text-center text-[var(--ink-muted)] py-8">
+                Нет данных по команде
+              </p>
+            ) : (
+              topPerformers.map((member, index) => (
+                <div
+                  key={member.id}
+                  className="flex items-center gap-4 rounded-lg border border-[var(--line)] p-4 transition-all duration-200 hover:shadow-md"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent)] text-white font-bold">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium">{member.name}</h4>
+                    <div className="text-sm text-[var(--ink-muted)]">
+                      {member.completedTasks}/{member.totalTasks} задач
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {member.performance >= 70 ? (
+                      <TrendingUp className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <TrendingDown className="h-5 w-5 text-red-500" />
+                    )}
+                    <span className="text-lg font-bold">{member.performance}%</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+      )}
     </div>
   );
 });
