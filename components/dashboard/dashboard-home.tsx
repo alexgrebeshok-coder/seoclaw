@@ -23,6 +23,10 @@ import { ProjectFormModal } from "@/components/projects/project-form-modal";
 import { ProjectCard } from "@/components/projects/project-card";
 import { TaskFormModal } from "@/components/tasks/task-form-modal";
 import { EVMMetricsCard } from "@/components/analytics/evm-metrics-card";
+import { AutoRisksCard } from "@/components/analytics/auto-risks-card";
+import { AIInsightsCard } from "@/components/analytics/ai-insights-card";
+import { PortfolioHealthCard } from "@/components/analytics/portfolio-health-card";
+import { RecommendationsCard } from "@/components/analytics/recommendations-card";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ClientChart } from "@/components/ui/client-chart";
@@ -47,6 +51,10 @@ import { useLocale } from "@/contexts/locale-context";
 import { downloadProjectsCsv } from "@/lib/export";
 import { useDashboardSnapshot } from "@/lib/hooks/use-api";
 import { useEVMMetrics } from "@/lib/hooks/use-evm-metrics";
+import { useAutoRisks } from "@/lib/hooks/use-auto-risks";
+import { useAIInsights } from "@/lib/hooks/use-ai-insights";
+import { usePortfolioHealth } from "@/lib/hooks/use-portfolio-health";
+import { useRecommendations } from "@/lib/hooks/use-recommendations";
 import { Project } from "@/lib/types";
 import { safePercent } from "@/lib/utils";
 
@@ -141,9 +149,6 @@ export function DashboardHome() {
   const totalTasks = tasks.length;
   const inProgressTasks = tasks.filter((task) => task.status === "in-progress").length;
   const openRiskCount = notifications.filter((notification) => notification.severity !== "info").length;
-  const portfolioHealth = projects.length
-    ? Math.round(projects.reduce((sum, project) => sum + project.health, 0) / projects.length)
-    : 0;
   const activeProjects = projects.filter((project) => project.status === "active").length;
   const nextMilestones = projects.filter((project) => project.nextMilestone).slice(0, 2);
 
@@ -158,6 +163,41 @@ export function DashboardHome() {
   }, [projects]);
 
   const evmMetrics = useEVMMetrics(evmProject);
+
+  // Auto-detected risks for EVM project
+  const autoRisks = useAutoRisks(
+    evmProject,
+    tasks.filter((t) => t.projectId === evmProject?.id),
+    team.filter((m) => evmProject?.team.includes(m.name)),
+    risks.filter((r) => r.projectId === evmProject?.id)
+  );
+
+  // Portfolio health
+  const portfolioHealth = usePortfolioHealth();
+
+  // AI-powered recommendations
+  const portfolioHealthSummary = useMemo(() => ({
+    overall: portfolioHealth?.overall ?? 0,
+    budgetVariance: 0,
+    critical: projects.filter(p => p.status === "at-risk").length,
+  }), [projects, portfolioHealth]);
+
+  const aiInsights = useMemo(() => ({
+    overall: portfolioHealth?.overall ?? 0,
+    healthy: projects.filter(p => p.status === "active" && p.health > 75).length,
+    atRisk: projects.filter(p => p.status === "at-risk").length,
+    critical: projects.filter(p => p.status === "at-risk" || p.health < 50).length,
+    insights: [],
+  }), [projects, portfolioHealth]);
+
+  // AI Insights
+  const { insights: aiInsightsList } = useAIInsights();
+
+  const { recommendations } = useRecommendations(
+    projects,
+    portfolioHealth,
+    aiInsightsList
+  );
 
   const trendData = buildPortfolioTrend(projects, formatDateLocalized);
   const budgetData = projects.map((project) => ({
@@ -361,18 +401,18 @@ export function DashboardHome() {
             description={t("dashboard.kpi.portfolioStatusDescription")}
             icon={FolderKanban}
             title={t("dashboard.kpi.portfolioStatus")}
-            tone={portfolioHealth >= 70 ? "success" : "warning"}
-            value={`${portfolioHealth}%`}
+            tone={(portfolioHealth?.overall ?? 0) >= 70 ? "success" : "warning"}
+            value={`${portfolioHealth?.overall ?? 0}%`}
             onClick={() => setKpiModalState({
               open: true,
               title: t("dashboard.kpi.portfolioStatus"),
-              value: `${portfolioHealth}%`,
+              value: `${portfolioHealth?.overall ?? 0}%`,
               description: t("dashboard.kpi.portfolioStatusDescription"),
               icon: FolderKanban,
-              tone: portfolioHealth >= 70 ? "success" : "warning",
+              tone: (portfolioHealth?.overall ?? 0) >= 70 ? "success" : "warning",
               breakdown: [
                 { label: t("project.progress"), value: `${Math.round(projects.reduce((s, p) => s + p.progress, 0) / Math.max(projects.length, 1))}%`, tone: "neutral" },
-                { label: t("project.health"), value: `${portfolioHealth}%`, tone: portfolioHealth >= 70 ? "success" : "warning" },
+                { label: t("project.health"), value: `${portfolioHealth?.overall ?? 0}%`, tone: (portfolioHealth?.overall ?? 0) >= 70 ? "success" : "warning" },
                 { label: t("dashboard.budgetVariance"), value: `${budgetUsed}%`, tone: budgetUsed > 90 ? "danger" : budgetUsed > 75 ? "warning" : "success" },
               ],
               actions: [{ label: t("action.openPortfolio"), href: "/projects" }],
@@ -473,6 +513,37 @@ export function DashboardHome() {
               budget={evmProject.budget}
               isLoading={isLoading}
             />
+          </section>
+        )}
+
+        {/* Auto-detected Risks Section */}
+        {autoRisks.length > 0 && (
+          <section className="grid gap-6 xl:grid-cols-[1fr]">
+            <AutoRisksCard risks={autoRisks} maxDisplay={5} />
+          </section>
+        )}
+
+        {/* Portfolio Health Section */}
+        {portfolioHealth && (
+          <section className="grid gap-6 xl:grid-cols-[1fr]">
+            <PortfolioHealthCard
+              healthScore={portfolioHealth}
+              isLoading={isLoading}
+            />
+          </section>
+        )}
+
+        {/* AI Insights Section */}
+        {aiInsightsList.length > 0 && (
+          <section className="grid gap-6 xl:grid-cols-[1fr]">
+            <AIInsightsCard insights={aiInsightsList} maxDisplay={5} />
+          </section>
+        )}
+
+        {/* AI Recommendations Section */}
+        {recommendations.length > 0 && (
+          <section className="grid gap-6 xl:grid-cols-[1fr]">
+            <RecommendationsCard recommendations={recommendations} maxDisplay={5} />
           </section>
         )}
 
