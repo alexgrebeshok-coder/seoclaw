@@ -1,9 +1,12 @@
 import { KanbanBoard } from "@/components/kanban/kanban-board";
 import { prisma } from "@/lib/prisma";
 
+// Force dynamic rendering (requires DATABASE_URL at runtime, not build time)
+export const dynamic = 'force-dynamic';
+
 /**
  * Kanban page — /kanban
- * 
+ *
  * Shows the first available board or prompts to create one
  */
 export default async function KanbanPage() {
