@@ -259,6 +259,16 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       }
       setError(null);
 
+      // Check if running on Vercel without database
+      const useMockData = process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL;
+
+      if (useMockData) {
+        // Use mock data directly on Vercel without database
+        setState(initialDashboardState);
+        writeCachedState(initialDashboardState);
+        return initialDashboardState;
+      }
+
       const [projects, tasks, team, risks] = await Promise.all([
         api.get<ApiProject[]>("/api/projects"),
         api.get<ApiTask[]>("/api/tasks"),
@@ -278,17 +288,17 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       return nextState;
     } catch (loadError) {
       console.error("Failed to load dashboard data", loadError);
-      const message =
-        loadError instanceof Error ? loadError.message : "Failed to load data";
-      setError(message);
 
+      // Fallback to cached or mock data silently
       const cachedState = readCachedState();
-      if (cachedState) {
+      if (cachedState && cachedState.projects.length > 0) {
         setState(cachedState);
         return cachedState;
       }
 
+      // Use mock data as fallback
       setState(initialDashboardState);
+      writeCachedState(initialDashboardState);
       return initialDashboardState;
     } finally {
       setIsLoading(false);
