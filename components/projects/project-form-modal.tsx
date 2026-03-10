@@ -288,17 +288,23 @@ export function ProjectFormModal({
                   return (
                     <label
                       key={memberName}
-                      className="flex items-center gap-3 rounded-2xl border border-white/80 bg-white/90 px-3 py-3 text-sm text-[var(--ink)] shadow-[0_8px_20px_rgba(15,23,42,.04)]"
+                      className={`flex items-center gap-3 rounded-2xl border px-3 py-3 text-sm transition ${
+                        checked
+                          ? "border-[var(--brand)] bg-[color:color-mix(in_srgb,var(--brand)_16%,var(--surface-panel)_84%)] text-[var(--ink)] shadow-[0_10px_24px_rgba(15,23,42,.12)]"
+                          : "border-[var(--line-strong)] bg-[var(--surface-panel)] text-[var(--ink-soft)] hover:bg-[var(--panel-soft)]"
+                      }`}
                       htmlFor={memberId}
                     >
                       <input
                         id={memberId}
                         checked={checked}
-                        className="h-4 w-4 rounded border-slate-300 text-[var(--brand)] focus:ring-[var(--brand)]"
+                        className="h-4 w-4 rounded border-[var(--line-strong)] bg-[var(--panel-soft)] text-[var(--brand)] focus:ring-[var(--brand)]"
                         onChange={() => handleMemberToggle(memberName)}
                         type="checkbox"
                       />
-                      {memberName}
+                      <span className={checked ? "font-medium text-[var(--ink)]" : "text-[var(--ink-soft)]"}>
+                        {memberName}
+                      </span>
                     </label>
                   );
                 })}

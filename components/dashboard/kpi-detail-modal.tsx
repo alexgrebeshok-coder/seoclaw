@@ -40,9 +40,9 @@ interface KpiDetailModalProps {
 
 const toneStyles: Record<NonNullable<KpiDetailModalProps["tone"]>, string> = {
   neutral: "bg-[var(--panel-soft)] text-[var(--brand)]",
-  success: "bg-emerald-500/14 text-emerald-300",
-  warning: "bg-amber-500/14 text-amber-300",
-  danger: "bg-rose-500/14 text-rose-300",
+  success: "bg-emerald-500/18 text-emerald-100",
+  warning: "bg-amber-500/18 text-amber-100",
+  danger: "bg-rose-500/18 text-rose-100",
 };
 
 function TrendIcon({ trend }: { trend: "up" | "down" | "neutral" }) {

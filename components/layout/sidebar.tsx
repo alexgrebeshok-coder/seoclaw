@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -40,11 +40,35 @@ export function Sidebar({
   const { tasks: liveTasks, isLoading: tasksLoading } = useTasks();
   const { activeWorkspace, availableWorkspaces, setWorkspaceId } = usePreferences();
   const { t } = useLocale();
-  const featuredProjects = projects.slice(0, 4);
+  const workspaceProjects = useMemo(() => {
+    switch (activeWorkspace.id) {
+      case "delivery":
+        return projects.filter(
+          (project) => project.status === "active" || project.status === "at-risk"
+        );
+      case "strategy":
+        return projects.filter(
+          (project) =>
+            project.status === "planning" ||
+            project.status === "on-hold" ||
+            project.priority === "critical"
+        );
+      default:
+        return projects;
+    }
+  }, [activeWorkspace.id, projects]);
+  const featuredProjects = workspaceProjects.slice(0, 4);
   const totalRiskCount =
     liveRisks.length > 0 || !risksLoading ? liveRisks.length : cachedRisks.length;
   const totalTaskCount =
     liveTasks.length > 0 || !tasksLoading ? liveTasks.length : cachedTasks.length;
+  const activeProjectCount = workspaceProjects.filter((project) => project.status === "active").length;
+  const atRiskProjectCount = workspaceProjects.filter((project) => project.status === "at-risk").length;
+  const portfolioHealth = workspaceProjects.length
+    ? Math.round(
+        workspaceProjects.reduce((sum, project) => sum + project.health, 0) / workspaceProjects.length
+      )
+    : 0;
 
   useEffect(() => {
     const focusSearch = () => {
@@ -105,6 +129,14 @@ export function Sidebar({
             }
           }}
         >
+          <div className="border-b border-[var(--line)] px-3 py-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-muted)]">
+              {t("sidebar.workspace")}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-[var(--ink-soft)]">
+              {t("sidebar.workspaceHint")}
+            </p>
+          </div>
           <div className="grid max-h-[240px] gap-1 overflow-y-auto" ref={workspaceItemsRef} role="menu">
             {availableWorkspaces.map((workspace) => {
               const active = workspace.id === activeWorkspace.id;
@@ -113,7 +145,9 @@ export function Sidebar({
                   aria-checked={active}
                   className={cn(
                     "flex items-start gap-3 rounded-md px-3 py-2 text-left transition",
-                    active ? "bg-[var(--panel-soft)] text-[var(--ink)]" : "text-[var(--ink-soft)] hover:bg-[var(--panel-soft)]"
+                    active
+                      ? "bg-[var(--panel-soft-strong)] text-[var(--ink)] ring-1 ring-[var(--line-strong)]"
+                      : "text-[var(--ink-soft)] hover:bg-[var(--panel-soft)]"
                   )}
                   data-workspace-item
                   key={workspace.id}
@@ -128,10 +162,17 @@ export function Sidebar({
                     {workspace.initials}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-[var(--ink)]">
-                      {t(workspace.nameKey as MessageKey)}
-                    </p>
-                    <p className="mt-0.5 text-xs leading-4 text-[var(--ink-muted)]">
+                    <div className="flex items-center gap-2">
+                      <p className="truncate text-sm font-semibold text-[var(--ink)]">
+                        {t(workspace.nameKey as MessageKey)}
+                      </p>
+                      {active ? (
+                        <span className="rounded-full border border-[var(--line-strong)] bg-[var(--panel-soft)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--brand)]">
+                          {t("sidebar.workspaceCurrent")}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-0.5 text-xs leading-5 text-[var(--ink-soft)]">
                       {t(workspace.descriptionKey as MessageKey)}
                     </p>
                   </div>
@@ -241,16 +282,31 @@ export function Sidebar({
       <div className="mt-auto grid gap-3 pt-2">
         <div className="rounded-xl border border-[var(--line)] bg-[linear-gradient(180deg,#16233f_0%,#213b74_100%)] p-4 text-white">
           <p className="text-xs uppercase tracking-[0.18em] text-white/70">{t("dashboard.portfolioHealth")}</p>
-          <p className="mt-2 text-5xl font-semibold tracking-[-0.08em]">81%</p>
+          <p className="mt-1 text-xs leading-5 text-white/70">{t("sidebar.portfolioHint")}</p>
+          <p className="mt-3 text-5xl font-semibold tracking-[-0.08em]">{portfolioHealth}%</p>
           <div className="mt-4 grid gap-2 text-sm">
-            <div className="flex items-center justify-between rounded-md border border-white/10 bg-white/6 px-3 py-2">
-              <span className="text-white/75">{t("dashboard.active")}</span>
-              <span className="font-semibold text-white">{projects.filter((project) => project.status === "active").length}</span>
-            </div>
-            <div className="flex items-center justify-between rounded-md border border-white/10 bg-white/6 px-3 py-2">
-              <span className="text-white/75">{t("dashboard.atRisk")}</span>
-              <span className="font-semibold text-white">{projects.filter((project) => project.status === "at-risk").length}</span>
-            </div>
+            <Link
+              className="flex items-center justify-between rounded-md border border-white/10 bg-white/6 px-3 py-2 transition hover:bg-white/10"
+              href="/projects"
+              onClick={onNavigate}
+            >
+              <span className="text-white/80">{t("dashboard.activeProjectsLabel")}</span>
+              <span className="flex items-center gap-2 font-semibold text-white">
+                {activeProjectCount}
+                <ChevronRight className="h-4 w-4 text-white/60" />
+              </span>
+            </Link>
+            <Link
+              className="flex items-center justify-between rounded-md border border-white/10 bg-white/6 px-3 py-2 transition hover:bg-white/10"
+              href="/risks"
+              onClick={onNavigate}
+            >
+              <span className="text-white/80">{t("dashboard.atRiskProjectsLabel")}</span>
+              <span className="flex items-center gap-2 font-semibold text-white">
+                {atRiskProjectCount}
+                <ChevronRight className="h-4 w-4 text-white/60" />
+              </span>
+            </Link>
           </div>
         </div>
 
