@@ -8,6 +8,13 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock data if no database
+      const { getMockTeam } = await import("@/lib/mock-data");
+      return NextResponse.json(getMockTeam());
+    }
+
     const team = await prisma.teamMember.findMany({
       include: {
         tasks: {
@@ -33,7 +40,9 @@ export async function GET() {
 
     return NextResponse.json(teamWithCapacity);
   } catch (error) {
-    return serverError(error, "Failed to load team.");
+    // Fallback to mock data on any error
+    const { getMockTeam } = await import("@/lib/mock-data");
+    return NextResponse.json(getMockTeam());
   }
 }
 

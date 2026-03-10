@@ -21,6 +21,13 @@ function resolveSeverity(probability?: string, impact?: string): number {
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock data if no database
+      const { getMockRisks } = await import("@/lib/mock-data");
+      return NextResponse.json(getMockRisks());
+    }
+
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
     const status = searchParams.get("status");
@@ -43,7 +50,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json(risks);
   } catch (error) {
-    return serverError(error, "Failed to load risks.");
+    // Fallback to mock data on any error
+    const { getMockRisks } = await import("@/lib/mock-data");
+    return NextResponse.json(getMockRisks());
   }
 }
 

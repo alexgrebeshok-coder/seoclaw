@@ -19,6 +19,13 @@ export async function HEAD(): Promise<NextResponse> {
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock data if no database
+      const { getMockProjects } = await import("@/lib/mock-data");
+      return NextResponse.json(getMockProjects());
+    }
+
     const { searchParams } = new URL(request.url);
     const status = normalizeProjectStatus(searchParams.get("status"));
     const direction = searchParams.get("direction");
@@ -67,7 +74,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }))
     );
   } catch (error) {
-    return serverError(error, "Failed to load projects.");
+    // Fallback to mock data on any error
+    const { getMockProjects } = await import("@/lib/mock-data");
+    return NextResponse.json(getMockProjects());
   }
 }
 

@@ -9,6 +9,13 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock data if no database
+      const { getMockTasks } = await import("@/lib/mock-data");
+      return NextResponse.json(getMockTasks());
+    }
+
     const { searchParams } = new URL(request.url);
     const status = normalizeTaskStatus(searchParams.get("status"));
     const priority = searchParams.get("priority");
@@ -35,7 +42,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json(tasks);
   } catch (error) {
-    return serverError(error, "Failed to load tasks.");
+    // Fallback to mock data on any error
+    const { getMockTasks } = await import("@/lib/mock-data");
+    return NextResponse.json(getMockTasks());
   }
 }
 

@@ -485,4 +485,16 @@ export function getMockProjects() {
   return initialDashboardState.projects;
 }
 
+export function getMockTasks() {
+  return initialDashboardState.tasks;
+}
+
+export function getMockTeam() {
+  return initialDashboardState.team;
+}
+
+export function getMockRisks() {
+  return initialDashboardState.risks;
+}
+
 
