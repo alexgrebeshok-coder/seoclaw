@@ -9,7 +9,6 @@ import { useDashboard } from "@/components/dashboard-provider";
 import { footerNavigation, getProjectTone, navigation } from "@/components/layout/navigation-config";
 import { Input } from "@/components/ui/field";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useAIWorkspace } from "@/contexts/ai-context";
 import { useLocale } from "@/contexts/locale-context";
 import { usePreferences } from "@/contexts/preferences-context";
 import { useRisks, useTasks } from "@/lib/hooks/use-api";
@@ -37,7 +36,6 @@ export function Sidebar({
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [search, setSearch] = useState("");
   const { projects, risks: cachedRisks, tasks: cachedTasks } = useDashboard();
-  const { sessions } = useAIWorkspace();
   const { risks: liveRisks, isLoading: risksLoading } = useRisks();
   const { tasks: liveTasks, isLoading: tasksLoading } = useTasks();
   const { activeWorkspace, availableWorkspaces, setWorkspaceId } = usePreferences();
@@ -47,7 +45,6 @@ export function Sidebar({
     liveRisks.length > 0 || !risksLoading ? liveRisks.length : cachedRisks.length;
   const totalTaskCount =
     liveTasks.length > 0 || !tasksLoading ? liveTasks.length : cachedTasks.length;
-  const totalChatCount = sessions.length;
 
   useEffect(() => {
     const focusSearch = () => {
@@ -172,9 +169,7 @@ export function Sidebar({
               ? totalTaskCount
               : item.href === "/risks"
                 ? totalRiskCount
-                : item.href === "/chat"
-                  ? totalChatCount
-                  : 0;
+                : 0;
 
           return (
             <Link

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildMockBoards } from "@/lib/mock-boards";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -8,14 +9,16 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
-    // Check if database is available
-    if (!process.env.DATABASE_URL) {
-      // Return mock data if no database
-      return NextResponse.json([]);
-    }
-
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
+
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      const boards = buildMockBoards();
+      return NextResponse.json(
+        projectId ? boards.filter((board) => board.projectId === projectId) : boards
+      );
+    }
 
     const boards = await prisma.board.findMany({
       where: projectId ? { projectId } : undefined,
@@ -52,14 +55,24 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if database is available
-    if (!process.env.DATABASE_URL) {
-      // Return success mock response
-      return NextResponse.json({ success: true, id: "mock-id" });
-    }
-
     const body = await request.json();
     const { name, projectId } = body;
+
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      const boards = buildMockBoards();
+      const createdBoard =
+        boards.find((board) => board.projectId === projectId) ?? boards[0] ?? null;
+
+      if (!createdBoard) {
+        return NextResponse.json(
+          { error: "Cannot create board without projects" },
+          { status: 400 }
+        );
+      }
+
+      return NextResponse.json(createdBoard, { status: 201 });
+    }
 
     if (!name || !projectId) {
       return NextResponse.json(

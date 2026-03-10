@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { findMockBoardById } from "@/lib/mock-boards";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -12,8 +13,14 @@ export async function GET(
   try {
     // Check if database is available
     if (!process.env.DATABASE_URL) {
-      // Return mock data if no database
-      return NextResponse.json({});
+      const { id } = await params;
+      const board = findMockBoardById(id);
+
+      if (!board) {
+        return NextResponse.json({ error: "Board not found" }, { status: 404 });
+      }
+
+      return NextResponse.json(board);
     }
 
     const { id } = await params;
