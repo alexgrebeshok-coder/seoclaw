@@ -1,7 +1,7 @@
-# SEOClaw API Documentation (OpenAPI 3.0)
+# CEOClaw API Documentation (OpenAPI 3.0)
 
 ## Overview
-SEOClaw API предоставляет доступ к функциональности дашборда для внешних агентов и интеграций.
+CEOClaw API предоставляет доступ к функциональности дашборда для внешних агентов и интеграций.
 
 ### Authentication
 Требуется Bearer Token (DASHBOARD_API_KEY) в заголовке `Authorization`.

@@ -3,7 +3,7 @@
 import type { AIRunRecord } from "@/lib/ai/types";
 import type { ChatSession, PersistedChatState } from "@/lib/chat/types";
 
-const CHAT_STORAGE_KEY = "seoclaw-chat-sessions-v1";
+const CHAT_STORAGE_KEY = "ceoclaw-chat-sessions-v1";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

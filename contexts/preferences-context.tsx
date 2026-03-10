@@ -11,7 +11,7 @@ import {
 
 import type { Locale, MessageKey } from "@/lib/translations";
 
-export const PREFERENCES_STORAGE_KEY = "seoclaw-settings";
+export const PREFERENCES_STORAGE_KEY = "ceoclaw-settings";
 
 export interface WorkspaceOption {
   id: string;

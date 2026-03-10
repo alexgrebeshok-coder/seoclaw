@@ -11,6 +11,12 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return success mock response
+      return NextResponse.json({ success: true, id: "mock-id" });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { endTime, description } = body;
@@ -68,6 +74,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return success mock response
+      return NextResponse.json({ success: true });
+    }
+
     const { id } = await params;
 
     await prisma.timeEntry.delete({

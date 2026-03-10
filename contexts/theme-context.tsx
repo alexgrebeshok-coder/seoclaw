@@ -17,7 +17,7 @@ interface ThemeContextValue {
   setTheme: (theme: Theme) => void;
 }
 
-const STORAGE_KEY = "seoclaw-theme";
+const STORAGE_KEY = "ceoclaw-theme";
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function getSystemTheme() {

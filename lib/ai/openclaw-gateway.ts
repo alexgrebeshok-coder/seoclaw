@@ -410,7 +410,7 @@ function buildGatewayPrompt(input: AIRunInput, runId: string) {
         : "Russian";
 
   return `
-You are SEOClaw AI Workspace inside a project management dashboard.
+You are CEOClaw AI Workspace inside a project management dashboard.
 Return valid raw JSON only. Do not use markdown. Do not wrap the response in code fences.
 Language: ${localeLabel}
 Run ID: ${runId}

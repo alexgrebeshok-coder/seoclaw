@@ -110,7 +110,7 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
     const listener = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        window.dispatchEvent(new Event("seoclaw:focus-search"));
+        window.dispatchEvent(new Event("ceoclaw:focus-search"));
       }
     };
 
@@ -184,7 +184,7 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
             <div className="hidden items-center gap-3 lg:flex">
               <Button
                 aria-label={t("topbar.searchPlaceholder")}
-                onClick={() => window.dispatchEvent(new Event("seoclaw:focus-search"))}
+                onClick={() => window.dispatchEvent(new Event("ceoclaw:focus-search"))}
                 variant="secondary"
               >
                 ⌘K

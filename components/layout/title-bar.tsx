@@ -10,7 +10,7 @@ export function TitleBar() {
         <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-[var(--brand)] text-[10px] font-semibold text-white">
           S
         </span>
-        SEOClaw — PM Dashboard
+        CEOClaw — PM Dashboard
       </div>
       <div className="w-12" />
     </div>

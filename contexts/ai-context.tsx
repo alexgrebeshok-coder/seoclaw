@@ -66,8 +66,8 @@ interface AIWorkspaceContextValue {
 const AIWorkspaceContext = createContext<AIWorkspaceContextValue | null>(null);
 const terminalStatuses = new Set(["done", "failed", "needs_approval"]);
 const MIN_TIME_BETWEEN_RUNS = 3000;
-const MODE_STORAGE_KEY = "seoclaw-ai-mode";
-const AGENT_STORAGE_KEY = "seoclaw-ai-agent";
+const MODE_STORAGE_KEY = "ceoclaw-ai-mode";
+const AGENT_STORAGE_KEY = "ceoclaw-ai-agent";
 
 const portfolioContextByPath = {
   "/": {

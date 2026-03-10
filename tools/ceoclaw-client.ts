@@ -1,7 +1,7 @@
 const SEOCLAW_API_BASE =
   process.env.SEOCLAW_API_BASE ?? "http://localhost:3002/api";
 
-export interface SEOClawProject {
+export interface CEOClawProject {
   id: string;
   name: string;
   description?: string | null;
@@ -19,7 +19,7 @@ export interface SEOClawProject {
   updatedAt: string;
 }
 
-export interface SEOClawTask {
+export interface CEOClawTask {
   id: string;
   title: string;
   description?: string | null;
@@ -34,7 +34,7 @@ export interface SEOClawTask {
   updatedAt: string;
 }
 
-export interface SEOClawRisk {
+export interface CEOClawRisk {
   id: string;
   title: string;
   description?: string | null;
@@ -48,7 +48,7 @@ export interface SEOClawRisk {
   updatedAt: string;
 }
 
-export interface SEOClawTeamMember {
+export interface CEOClawTeamMember {
   id: string;
   name: string;
   initials?: string | null;
@@ -82,7 +82,7 @@ async function request<T>(input: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export class SEOClawClient {
+export class CEOClawClient {
   constructor(private readonly baseUrl: string = SEOCLAW_API_BASE) {}
 
   async getProjects(filters?: { status?: string; direction?: string }) {
@@ -90,13 +90,13 @@ export class SEOClawClient {
     if (filters?.status) params.set("status", filters.status);
     if (filters?.direction) params.set("direction", filters.direction);
     const query = params.toString();
-    return request<SEOClawProject[]>(
+    return request<CEOClawProject[]>(
       `${this.baseUrl}/projects${query ? `?${query}` : ""}`
     );
   }
 
   async getProject(id: string) {
-    return request<SEOClawProject>(`${this.baseUrl}/projects/${id}`);
+    return request<CEOClawProject>(`${this.baseUrl}/projects/${id}`);
   }
 
   async createProject(data: {
@@ -114,7 +114,7 @@ export class SEOClawClient {
     health?: string;
     teamIds?: string[];
   }) {
-    return request<SEOClawProject>(`${this.baseUrl}/projects`, {
+    return request<CEOClawProject>(`${this.baseUrl}/projects`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -139,7 +139,7 @@ export class SEOClawClient {
       teamIds: string[];
     }>
   ) {
-    return request<SEOClawProject>(`${this.baseUrl}/projects/${id}`, {
+    return request<CEOClawProject>(`${this.baseUrl}/projects/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -164,13 +164,13 @@ export class SEOClawClient {
     if (filters?.projectId) params.set("projectId", filters.projectId);
     if (filters?.assigneeId) params.set("assigneeId", filters.assigneeId);
     const query = params.toString();
-    return request<SEOClawTask[]>(
+    return request<CEOClawTask[]>(
       `${this.baseUrl}/tasks${query ? `?${query}` : ""}`
     );
   }
 
   async getTask(id: string) {
-    return request<SEOClawTask>(`${this.baseUrl}/tasks/${id}`);
+    return request<CEOClawTask>(`${this.baseUrl}/tasks/${id}`);
   }
 
   async createTask(data: {
@@ -183,7 +183,7 @@ export class SEOClawClient {
     priority?: string;
     order?: number;
   }) {
-    return request<SEOClawTask>(`${this.baseUrl}/tasks`, {
+    return request<CEOClawTask>(`${this.baseUrl}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -202,7 +202,7 @@ export class SEOClawClient {
       order: number;
     }>
   ) {
-    return request<SEOClawTask>(`${this.baseUrl}/tasks/${id}`, {
+    return request<CEOClawTask>(`${this.baseUrl}/tasks/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -231,13 +231,13 @@ export class SEOClawClient {
     if (filters?.projectId) params.set("projectId", filters.projectId);
     if (filters?.status) params.set("status", filters.status);
     const query = params.toString();
-    return request<SEOClawRisk[]>(
+    return request<CEOClawRisk[]>(
       `${this.baseUrl}/risks${query ? `?${query}` : ""}`
     );
   }
 
   async getRisk(id: string) {
-    return request<SEOClawRisk>(`${this.baseUrl}/risks/${id}`);
+    return request<CEOClawRisk>(`${this.baseUrl}/risks/${id}`);
   }
 
   async createRisk(data: {
@@ -249,7 +249,7 @@ export class SEOClawClient {
     impact?: string;
     status?: string;
   }) {
-    return request<SEOClawRisk>(`${this.baseUrl}/risks`, {
+    return request<CEOClawRisk>(`${this.baseUrl}/risks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -268,7 +268,7 @@ export class SEOClawClient {
       impact: string;
     }>
   ) {
-    return request<SEOClawRisk>(`${this.baseUrl}/risks/${id}`, {
+    return request<CEOClawRisk>(`${this.baseUrl}/risks/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -282,11 +282,11 @@ export class SEOClawClient {
   }
 
   async getTeam() {
-    return request<SEOClawTeamMember[]>(`${this.baseUrl}/team`);
+    return request<CEOClawTeamMember[]>(`${this.baseUrl}/team`);
   }
 
   async getTeamMember(id: string) {
-    return request<SEOClawTeamMember>(`${this.baseUrl}/team/${id}`);
+    return request<CEOClawTeamMember>(`${this.baseUrl}/team/${id}`);
   }
 
   async createTeamMember(data: {
@@ -297,7 +297,7 @@ export class SEOClawClient {
     avatar?: string;
     capacity?: number;
   }) {
-    return request<SEOClawTeamMember>(`${this.baseUrl}/team`, {
+    return request<CEOClawTeamMember>(`${this.baseUrl}/team`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -315,7 +315,7 @@ export class SEOClawClient {
       capacity: number;
     }>
   ) {
-    return request<SEOClawTeamMember>(`${this.baseUrl}/team/${id}`, {
+    return request<CEOClawTeamMember>(`${this.baseUrl}/team/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -332,4 +332,4 @@ export class SEOClawClient {
   }
 }
 
-export const seoclaw = new SEOClawClient();
+export const ceoclaw = new CEOClawClient();

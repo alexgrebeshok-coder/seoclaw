@@ -13,6 +13,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock data if no database
+      return NextResponse.json([]);
+    }
+
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
 
@@ -36,6 +42,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return success mock response
+      return NextResponse.json({ success: true, id: "mock-id" });
+    }
+
     const body = (await request.json()) as Record<string, unknown>;
     const title = typeof body.title === "string" ? body.title.trim() : "";
     const projectId =

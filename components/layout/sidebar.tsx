@@ -47,8 +47,8 @@ export function Sidebar({
       searchRef.current?.select();
     };
 
-    window.addEventListener("seoclaw:focus-search", focusSearch);
-    return () => window.removeEventListener("seoclaw:focus-search", focusSearch);
+    window.addEventListener("ceoclaw:focus-search", focusSearch);
+    return () => window.removeEventListener("ceoclaw:focus-search", focusSearch);
   }, []);
 
   const handleSearch = (): void => {

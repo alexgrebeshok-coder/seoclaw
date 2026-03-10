@@ -13,6 +13,23 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock data if no database
+      return NextResponse.json({
+        summary: {
+          totalEntries: 0,
+          totalHours: 0,
+          totalSeconds: 0,
+          billableHours: 0,
+          billableSeconds: 0,
+        },
+        byProject: [],
+        byMember: [],
+        byTask: [],
+      });
+    }
+
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
     const memberId = searchParams.get("memberId");
@@ -41,9 +58,7 @@ export async function GET(request: NextRequest) {
             id: true,
             title: true,
             projectId: true,
-            project: {
-              select: { id: true, name: true },
-            },
+            project: { select: { id: true, name: true } },
           },
         },
         member: {

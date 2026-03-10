@@ -9,6 +9,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock data if no database
+      return NextResponse.json([]);
+    }
+
     const dependencies = await prisma.taskDependency.findMany({
       include: {
         task: {

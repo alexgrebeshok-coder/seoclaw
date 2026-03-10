@@ -8,7 +8,7 @@ test.describe("Critical Flows", () => {
   });
 
   test("Homepage loads successfully", async ({ page }) => {
-    await expect(page).toHaveTitle(/SEOClaw|Dashboard/);
+    await expect(page).toHaveTitle(/CEOClaw|Dashboard/);
     await expect(page.locator("h1")).toBeVisible();
   });
 

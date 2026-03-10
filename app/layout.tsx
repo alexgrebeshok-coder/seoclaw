@@ -19,7 +19,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SEOClaw Dashboard",
+  title: "CEOClaw Dashboard",
   description: "Multilingual project portfolio control panel.",
 };
 
@@ -34,10 +34,10 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Перейти к основному содержимому
         </a>
-        <Script id="seoclaw-theme-bootstrap" strategy="beforeInteractive">
+        <Script id="ceoclaw-theme-bootstrap" strategy="beforeInteractive">
           {`
             try {
-              var savedTheme = localStorage.getItem("seoclaw-theme") || "dark";
+              var savedTheme = localStorage.getItem("ceoclaw-theme") || "dark";
               var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
               var resolvedTheme = savedTheme === "dark" || (savedTheme === "system" && prefersDark)
                 ? "dark"
@@ -50,10 +50,10 @@ export default function RootLayout({
             }
           `}
         </Script>
-        <Script id="seoclaw-locale-bootstrap" strategy="beforeInteractive">
+        <Script id="ceoclaw-locale-bootstrap" strategy="beforeInteractive">
           {`
             try {
-              var savedLocale = localStorage.getItem("seoclaw-locale");
+              var savedLocale = localStorage.getItem("ceoclaw-locale");
               var htmlLang = savedLocale === "zh" ? "zh-CN" : savedLocale === "en" ? "en" : "ru";
               document.documentElement.lang = htmlLang;
               document.documentElement.dataset.scrollBehavior = "smooth";
@@ -63,10 +63,10 @@ export default function RootLayout({
             }
           `}
         </Script>
-        <Script id="seoclaw-preferences-bootstrap" strategy="beforeInteractive">
+        <Script id="ceoclaw-preferences-bootstrap" strategy="beforeInteractive">
           {`
             try {
-              var rawPreferences = localStorage.getItem("seoclaw-settings");
+              var rawPreferences = localStorage.getItem("ceoclaw-settings");
               var parsedPreferences = rawPreferences ? JSON.parse(rawPreferences) : null;
               document.documentElement.dataset.density =
                 parsedPreferences && parsedPreferences.compactMode === false ? "comfortable" : "compact";

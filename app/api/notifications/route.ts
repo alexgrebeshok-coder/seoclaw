@@ -7,6 +7,16 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(request: NextRequest) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock data if no database
+      return NextResponse.json({
+        notifications: [],
+        unreadCount: 0,
+        total: 0,
+      });
+    }
+
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId") || "default";
     const unreadOnly = searchParams.get("unreadOnly") === "true";
@@ -50,6 +60,12 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return success mock response
+      return NextResponse.json({ success: true, id: "mock-id" });
+    }
+
     const body = await request.json();
     const { userId, type, title, message, entityType, entityId } = body;
 

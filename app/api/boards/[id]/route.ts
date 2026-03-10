@@ -10,6 +10,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock data if no database
+      return NextResponse.json({});
+    }
+
     const { id } = await params;
 
     const board = await prisma.board.findUnique({

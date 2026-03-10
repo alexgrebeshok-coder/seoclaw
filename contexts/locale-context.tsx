@@ -27,7 +27,7 @@ interface LocaleContextValue {
   formatDateLocalized: (date: string, pattern?: string) => string;
 }
 
-const STORAGE_KEY = "seoclaw-locale";
+const STORAGE_KEY = "ceoclaw-locale";
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {

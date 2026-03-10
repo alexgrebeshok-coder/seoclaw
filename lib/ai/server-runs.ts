@@ -17,7 +17,7 @@ type GatewayRunEntry = {
   run: AIRunRecord;
 };
 
-const RUN_CACHE_DIR = path.join(process.cwd(), ".seoclaw-cache", "ai-runs");
+const RUN_CACHE_DIR = path.join(process.cwd(), ".ceoclaw-cache", "ai-runs");
 const mockAdapter = createMockAIAdapter();
 
 function cloneRun(run: AIRunRecord) {

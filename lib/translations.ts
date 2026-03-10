@@ -16,7 +16,7 @@ export const dateLocales = {
 
 export const messages = {
   ru: {
-    "app.name": "SEOClaw",
+    "app.name": "CEOClaw",
     "app.subtitle": "Центр управления",
     "nav.dashboard": "Панель управления",
     "nav.projects": "Проекты",
@@ -635,7 +635,7 @@ export const messages = {
     "sidebar.projectsTitle": "Проекты под рукой",
     "sidebar.projectsDescription": "Короткий список активных контуров в текущем workspace.",
     "sidebar.noProjects": "Проекты появятся здесь после первой синхронизации.",
-    "workspace.executive.name": "SEOClaw HQ",
+    "workspace.executive.name": "CEOClaw HQ",
     "workspace.executive.description": "Executive-контур для обзора портфеля и решений.",
     "workspace.delivery.name": "Delivery Office",
     "workspace.delivery.description": "Операционный слой по срокам, задачам и recovery-пакетам.",
@@ -692,7 +692,7 @@ export const messages = {
     "settings.resetButton": "Сбросить и перезагрузить",
     "settings.resetConfirm":
       "Сбросить локальное состояние приложения и перезагрузить страницу?",
-    "settings.notificationPreviewTitle": "SEOClaw готов",
+    "settings.notificationPreviewTitle": "CEOClaw готов",
     "settings.notificationPreviewBody":
       "Desktop notifications работают корректно для этого окружения.",
     "settings.mode.auto": "Auto",
@@ -748,7 +748,7 @@ export const messages = {
     "misc.defaultAssignee": "Исполнитель",
   },
   en: {
-    "app.name": "SEOClaw",
+    "app.name": "CEOClaw",
     "app.subtitle": "Control Tower",
     "nav.dashboard": "Dashboard",
     "nav.projects": "Projects",
@@ -1367,7 +1367,7 @@ export const messages = {
     "sidebar.projectsTitle": "Projects at hand",
     "sidebar.projectsDescription": "Short list of active tracks in the current workspace.",
     "sidebar.noProjects": "Projects will appear here after the first sync.",
-    "workspace.executive.name": "SEOClaw HQ",
+    "workspace.executive.name": "CEOClaw HQ",
     "workspace.executive.description": "Executive surface for portfolio review and decisions.",
     "workspace.delivery.name": "Delivery Office",
     "workspace.delivery.description": "Operational layer for timelines, tasks and recovery packages.",
@@ -1423,7 +1423,7 @@ export const messages = {
     "settings.testNotification": "Test notification",
     "settings.resetButton": "Reset and reload",
     "settings.resetConfirm": "Reset local app state and reload the page?",
-    "settings.notificationPreviewTitle": "SEOClaw is ready",
+    "settings.notificationPreviewTitle": "CEOClaw is ready",
     "settings.notificationPreviewBody":
       "Desktop notifications are working correctly in this environment.",
     "settings.mode.auto": "Auto",
@@ -1479,7 +1479,7 @@ export const messages = {
     "misc.defaultAssignee": "Owner",
   },
   zh: {
-    "app.name": "SEOClaw",
+    "app.name": "CEOClaw",
     "app.subtitle": "控制中心",
     "nav.dashboard": "仪表板",
     "nav.projects": "项目",
@@ -2071,7 +2071,7 @@ export const messages = {
     "sidebar.projectsTitle": "常用项目",
     "sidebar.projectsDescription": "当前工作空间中的活跃项目快捷列表。",
     "sidebar.noProjects": "首次同步后项目会出现在这里。",
-    "workspace.executive.name": "SEOClaw HQ",
+    "workspace.executive.name": "CEOClaw HQ",
     "workspace.executive.description": "用于组合视图与管理决策的高层工作台。",
     "workspace.delivery.name": "Delivery Office",
     "workspace.delivery.description": "关注时间线、任务与恢复方案的执行层。",
@@ -2123,7 +2123,7 @@ export const messages = {
     "settings.testNotification": "测试通知",
     "settings.resetButton": "重置并重新加载",
     "settings.resetConfirm": "要重置应用的本地状态并重新加载页面吗？",
-    "settings.notificationPreviewTitle": "SEOClaw 已就绪",
+    "settings.notificationPreviewTitle": "CEOClaw 已就绪",
     "settings.notificationPreviewBody": "此环境中的桌面通知工作正常。",
     "settings.mode.auto": "Auto",
     "settings.mode.mock": "Mock",

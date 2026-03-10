@@ -26,12 +26,12 @@ import { localeOptions, type MessageKey } from "@/lib/translations";
 import { buttonVariants } from "@/components/ui/button";
 
 const RESET_KEYS = [
-  "seoclaw_cache",
+  "ceoclaw_cache",
   "pm-dashboard-state-v1",
-  "seoclaw-chat-sessions-v1",
-  "seoclaw-chat-sidebar-sections-v1",
-  "seoclaw-ai-agent",
-  "seoclaw-ai-mode",
+  "ceoclaw-chat-sessions-v1",
+  "ceoclaw-chat-sidebar-sections-v1",
+  "ceoclaw-ai-agent",
+  "ceoclaw-ai-mode",
 ];
 
 export function SettingsPage() {
@@ -69,7 +69,7 @@ export function SettingsPage() {
         preferences,
         storage: Object.fromEntries(
           Object.keys(window.localStorage)
-            .filter((key) => key.startsWith("seoclaw") || key.startsWith("pm-dashboard"))
+            .filter((key) => key.startsWith("ceoclaw") || key.startsWith("pm-dashboard"))
             .map((key) => [key, window.localStorage.getItem(key)])
         ),
       };
@@ -79,7 +79,7 @@ export function SettingsPage() {
       });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `seoclaw-local-state-${new Date().toISOString().slice(0, 10)}.json`;
+      link.download = `ceoclaw-local-state-${new Date().toISOString().slice(0, 10)}.json`;
       link.click();
       URL.revokeObjectURL(link.href);
 
@@ -129,8 +129,8 @@ export function SettingsPage() {
 
     RESET_KEYS.forEach((key) => window.localStorage.removeItem(key));
     window.localStorage.removeItem(PREFERENCES_STORAGE_KEY);
-    window.localStorage.removeItem("seoclaw-theme");
-    window.localStorage.removeItem("seoclaw-locale");
+    window.localStorage.removeItem("ceoclaw-theme");
+    window.localStorage.removeItem("ceoclaw-locale");
 
     toast.success(t("toast.localStateReset"), {
       description: t("toast.localStateResetDesc"),

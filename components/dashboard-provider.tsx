@@ -39,7 +39,7 @@ import {
 } from "@/lib/types";
 import { getRiskSeverity } from "@/lib/utils";
 
-const CACHE_KEY = "seoclaw_cache";
+const CACHE_KEY = "ceoclaw_cache";
 const LEGACY_STORAGE_KEY = "pm-dashboard-state-v1";
 
 const emptyDashboardState: DashboardState = {

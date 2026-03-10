@@ -19,7 +19,7 @@ const modeLabelKey: Record<AIWorkspaceMode, "ai.mode.auto" | "ai.mode.mock" | "a
   gateway: "ai.mode.gateway",
 };
 
-const SIDEBAR_SECTIONS_STORAGE_KEY = "seoclaw-chat-sidebar-sections-v1";
+const SIDEBAR_SECTIONS_STORAGE_KEY = "ceoclaw-chat-sidebar-sections-v1";
 const defaultSections = {
   actions: false,
   agent: true,
