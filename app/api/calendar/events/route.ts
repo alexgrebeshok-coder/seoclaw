@@ -11,6 +11,34 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return mock calendar events if no database
+      const { getMockTasks, getMockProjects } = await import("@/lib/mock-data");
+      const tasks = getMockTasks();
+      const projects = getMockProjects();
+
+      const events = tasks
+        .filter((t) => t.dueDate)
+        .map((t) => {
+          const project = projects.find((p) => p.id === t.projectId);
+          return {
+            id: t.id,
+            title: t.title,
+            start: t.dueDate,
+            end: t.dueDate,
+            allDay: true,
+            color: getStatusColor(t.status),
+            resource: {
+              projectId: t.projectId,
+              projectName: project?.name || "Unknown",
+            },
+          };
+        });
+
+      return NextResponse.json(events);
+    }
+
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
@@ -53,10 +81,30 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(events);
   } catch (error) {
     console.error("[Calendar API] Error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch calendar events" },
-      { status: 500 }
-    );
+    // Fallback to mock data on any error
+    const { getMockTasks, getMockProjects } = await import("@/lib/mock-data");
+    const tasks = getMockTasks();
+    const projects = getMockProjects();
+
+    const events = tasks
+      .filter((t) => t.dueDate)
+      .map((t) => {
+        const project = projects.find((p) => p.id === t.projectId);
+        return {
+          id: t.id,
+          title: t.title,
+          start: t.dueDate,
+          end: t.dueDate,
+          allDay: true,
+          color: getStatusColor(t.status),
+          resource: {
+            projectId: t.projectId,
+            projectName: project?.name || "Unknown",
+          },
+        };
+      });
+
+    return NextResponse.json(events);
   }
 }
 
