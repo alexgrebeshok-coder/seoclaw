@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -29,6 +29,8 @@ export const CalendarView = React.memo(function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const animationRef = useRef<number>(0);
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -46,7 +48,7 @@ export const CalendarView = React.memo(function CalendarView() {
     fetchEvents();
   }, [fetchEvents]);
 
-  const getDaysInMonth = (date: Date) => {
+  const getDaysInMonth = useCallback((date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
     const firstDay = new Date(year, month, 1);
@@ -72,27 +74,50 @@ export const CalendarView = React.memo(function CalendarView() {
     }
     
     return days;
-  };
+  }, []);
 
-  const getEventsForDay = (date: Date) => {
+  const getEventsForDay = useCallback((date: Date) => {
     const dateStr = date.toISOString().split("T")[0];
     return events.filter((e) => {
       const eventDate = new Date(e.start).toISOString().split("T")[0];
       return eventDate === dateStr;
     });
-  };
+  }, [events]);
 
-  const handlePrevMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  };
-
-  const handleNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-  };
+  const handleMonthChange = useCallback((direction: 'prev' | 'next') => {
+    if (isAnimating) return;
+    
+    setIsAnimating(true);
+    
+    // Cancel any pending animation
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+    
+    const newDate = direction === 'prev'
+      ? new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+      : new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    
+    setCurrentDate(newDate);
+    
+    // Reset animation state after transition
+    animationRef.current = requestAnimationFrame(() => {
+      setTimeout(() => setIsAnimating(false), 300);
+    });
+  }, [currentDate, isAnimating]);
 
   const days = getDaysInMonth(currentDate);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  // Cleanup animation frame on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -106,20 +131,30 @@ export const CalendarView = React.memo(function CalendarView() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-2xl font-bold transition-all duration-300">
           {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
         </h2>
         <div className="flex gap-2">
           <button
-            onClick={handlePrevMonth}
-            className="rounded-lg border border-[var(--line)] p-2 hover:bg-[var(--surface-secondary)]"
+            onClick={() => handleMonthChange('prev')}
+            disabled={isAnimating}
+            className={cn(
+              "rounded-lg border border-[var(--line)] p-2 transition-all duration-200",
+              "hover:bg-[var(--surface-secondary)] hover:scale-105",
+              "active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            )}
             aria-label="Previous month"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
-            onClick={handleNextMonth}
-            className="rounded-lg border border-[var(--line)] p-2 hover:bg-[var(--surface-secondary)]"
+            onClick={() => handleMonthChange('next')}
+            disabled={isAnimating}
+            className={cn(
+              "rounded-lg border border-[var(--line)] p-2 transition-all duration-200",
+              "hover:bg-[var(--surface-secondary)] hover:scale-105",
+              "active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            )}
             aria-label="Next month"
           >
             <ChevronRight className="h-5 w-5" />
@@ -141,8 +176,13 @@ export const CalendarView = React.memo(function CalendarView() {
           ))}
         </div>
 
-        {/* Days grid */}
-        <div className="grid grid-cols-7">
+        {/* Days grid with animation */}
+        <div 
+          className={cn(
+            "grid grid-cols-7 transition-opacity duration-300",
+            isAnimating && "opacity-50"
+          )}
+        >
           {days.map((date, index) => {
             const dayEvents = getEventsForDay(date);
             const isCurrentMonth = date.getMonth() === currentDate.getMonth();
@@ -153,14 +193,15 @@ export const CalendarView = React.memo(function CalendarView() {
                 key={index}
                 className={cn(
                   "min-h-[100px] border-b border-r border-[var(--line)] p-2",
+                  "transition-all duration-200 hover:bg-[var(--surface-secondary)]/50",
                   !isCurrentMonth && "bg-[var(--surface-secondary)]/50"
                 )}
               >
                 <div
                   className={cn(
-                    "mb-1 text-sm font-medium",
+                    "mb-1 text-sm font-medium transition-all duration-200",
                     !isCurrentMonth && "text-[var(--ink-muted)]",
-                    isToday && "flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent)] text-white"
+                    isToday && "flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent)] text-white scale-110"
                   )}
                 >
                   {date.getDate()}
@@ -171,7 +212,7 @@ export const CalendarView = React.memo(function CalendarView() {
                   {dayEvents.slice(0, 3).map((event) => (
                     <div
                       key={event.id}
-                      className="truncate rounded px-1 py-0.5 text-xs"
+                      className="truncate rounded px-1 py-0.5 text-xs transition-all duration-200 hover:scale-105 cursor-pointer"
                       style={{ backgroundColor: event.color + "20", color: event.color }}
                       title={event.title}
                     >
