@@ -225,7 +225,7 @@ export function TasksPage() {
                       {enumLabel("taskStatus", task.status)}
                     </Badge>
                   </TableCell>
-                  <TableCell>{task.assignee}</TableCell>
+                  <TableCell>{task.assignee?.name || "-"}</TableCell>
                   <TableCell>{formatDateLocalized(task.dueDate, "d MMM yyyy")}</TableCell>
                   <TableCell>
                     <Badge className={priorityMeta[task.priority].className}>

@@ -163,7 +163,7 @@ export const TaskDependencyManager = React.memo(function TaskDependencyManager({
                 className="flex items-center justify-between rounded-md bg-[var(--surface-secondary)] p-2"
               >
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="neutral" className="text-xs">
                     {dep.type.replace("_", " ")}
                   </Badge>
                   <span className="text-sm">{dep.task.title}</span>

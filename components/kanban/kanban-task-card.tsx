@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card } from "@/components/ui/card";
@@ -53,12 +53,12 @@ export const KanbanTaskCard = React.memo(function KanbanTaskCard({ task, isDragg
     <Card
       ref={setNodeRef}
       style={style}
+      {...attributes}
+      {...listeners}
       role="listitem"
       aria-label={`Задача: ${task.title}, приоритет: ${task.priority}`}
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      {...attributes}
-      {...listeners}
       className={cn(
         "cursor-grab p-3 transition-all duration-200",
         "active:cursor-grabbing focus:ring-2 focus:ring-[var(--accent)] focus:outline-none",
@@ -73,8 +73,8 @@ export const KanbanTaskCard = React.memo(function KanbanTaskCard({ task, isDragg
       {/* Priority Badge */}
       <div className="mb-2 flex items-center gap-2">
         <Badge
-          variant="secondary"
-          className={priorityColor[task.priority as keyof typeof priorityColor] || priorityColor.medium}
+          variant="neutral"
+          className={priorityColor}
         >
           {task.priority}
         </Badge>

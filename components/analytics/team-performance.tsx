@@ -137,10 +137,10 @@ export const TeamPerformance = React.memo(function TeamPerformance({
                 <Badge
                   variant={
                     member.performanceScore >= 70
-                      ? "default"
+                      ? "success"
                       : member.performanceScore >= 40
-                      ? "secondary"
-                      : "destructive"
+                      ? "warning"
+                      : "danger"
                   }
                 >
                   {member.performanceScore}

@@ -251,7 +251,11 @@ export function normalizeTask(task: ApiTask): Task {
     description: task.description ?? "",
     status,
     order: task.order ?? 0,
-    assignee: task.assignee?.name ?? "Unassigned",
+    assignee: task.assignee ? {
+      id: task.assignee.id,
+      name: task.assignee.name,
+      initials: task.assignee.initials,
+    } : null,
     dueDate: asDateOnly(task.dueDate),
     priority: (task.priority as Task["priority"]) ?? "medium",
     tags: [],

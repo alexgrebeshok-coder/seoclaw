@@ -7,10 +7,10 @@ import { prisma } from "@/lib/prisma";
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const notificationId = params.id;
+    const { id: notificationId } = await params;
 
     const notification = await prisma.notification.update({
       where: { id: notificationId },

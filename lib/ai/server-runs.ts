@@ -49,7 +49,7 @@ function createQueuedGatewayRun(input: AIRunInput, runId: string): AIRunRecord {
 }
 
 function shouldUseGateway() {
-  const mode = process.env.NEXT_PUBLIC_SEOCLAW_AI_MODE;
+  const mode = process.env.SEOCLAW_AI_MODE;
   if (mode && mode !== "gateway") {
     return false;
   }

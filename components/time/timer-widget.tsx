@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Play, Square, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -107,7 +107,7 @@ export const TimerWidget = React.memo(function TimerWidget({
             </span>
             <Button
               size="sm"
-              variant="destructive"
+              variant="danger"
               onClick={handleStopTimer}
               aria-label="Stop timer"
             >

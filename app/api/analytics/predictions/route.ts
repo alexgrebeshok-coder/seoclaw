@@ -62,18 +62,18 @@ export async function GET(request: NextRequest) {
       // Check if predicted finish is after due date
       const isOverdue =
         predictedFinishDate &&
-        project.endDate &&
-        predictedFinishDate > new Date(project.endDate);
+        project.end &&
+        predictedFinishDate > new Date(project.end);
 
       // Budget overrun risk (simplified - based on task completion rate)
       const completionRate = totalTasks > 0 ? completedTasks / totalTasks : 0;
       const timeElapsed =
-        project.endDate && project.startDate
+        project.end && project.start
           ? Math.min(
               1,
-              (Date.now() - new Date(project.startDate).getTime()) /
-                (new Date(project.endDate).getTime() -
-                  new Date(project.startDate).getTime())
+              (Date.now() - new Date(project.start).getTime()) /
+                (new Date(project.end).getTime() -
+                  new Date(project.start).getTime())
             )
           : 0;
 

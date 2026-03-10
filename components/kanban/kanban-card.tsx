@@ -51,7 +51,7 @@ function KanbanCardBody({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
-        <span className="rounded-[8px] bg-[color:var(--surface-panel)] px-2.5 py-1">{task.assignee}</span>
+        <span className="rounded-[8px] bg-[color:var(--surface-panel)] px-2.5 py-1">{task.assignee?.name || "-"}</span>
         <span className="inline-flex items-center gap-1 rounded-[8px] bg-[color:var(--surface-panel)] px-2.5 py-1">
           <CalendarClock className="h-3.5 w-3.5" />
           {formatDateLocalized(task.dueDate, "d MMM")}

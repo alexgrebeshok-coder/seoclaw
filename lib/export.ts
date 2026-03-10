@@ -87,7 +87,10 @@ export function downloadProjectsCsv(projects: Project[]) {
     project.nextMilestone?.name ?? "",
   ]);
   const csv = [header, ...rows]
-    .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(","))
+    .map((row) => row.map((cell) => {
+      const cellStr = cell ?? "";
+      return `"${cellStr.replace(/"/g, '""')}"`;
+    }).join(","))
     .join("\n");
 
   downloadBlob(
@@ -117,7 +120,10 @@ export function downloadTasksCsv(tasks: Task[]) {
     task.priority,
   ]);
   const csv = [header, ...rows]
-    .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(","))
+    .map((row) => row.map((cell) => {
+      const cellStr = cell == null ? "" : typeof cell === "object" ? JSON.stringify(cell) : String(cell);
+      return `"${cellStr.replace(/"/g, '""')}"`;
+    }).join(","))
     .join("\n");
 
   downloadBlob("pm-dashboard-tasks.csv", `\uFEFF${csv}`, "text/csv;charset=utf-8;");

@@ -83,7 +83,11 @@ export interface Task {
   description: string;
   status: TaskStatus;
   order: number;
-  assignee: string;
+  assignee: {
+    id: string;
+    name: string;
+    initials?: string | null;
+  } | null;
   dueDate: string;
   priority: Priority;
   tags: string[];

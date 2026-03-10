@@ -39,7 +39,7 @@ export function AIProposalCard({
   const { formatDateLocalized, t } = useLocale();
   const { applyProposal, applyingProposalIds, dismissProposal } = useAIWorkspace();
   const isApplying = applyingProposalIds.includes(proposal.id);
-  const assigneeCount = new Set(proposal.tasks.map((task) => task.assignee)).size;
+  const assigneeCount = new Set(proposal.tasks.map((task) => task.assignee).filter(Boolean)).size;
   const sortedDates = proposal.tasks
     .map((task) => task.dueDate)
     .sort((left, right) => left.localeCompare(right));
@@ -107,7 +107,7 @@ export function AIProposalCard({
               </Badge>
             </div>
             <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
-              <span className="rounded-full bg-[var(--panel-soft)] px-3 py-1">{task.assignee}</span>
+              <span className="rounded-full bg-[var(--panel-soft)] px-3 py-1">{task.assignee || "-"}</span>
               <span className="inline-flex items-center gap-1 rounded-full bg-[var(--panel-soft)] px-3 py-1">
                 <Clock3 className="h-3 w-3" />
                 {formatDateLocalized(task.dueDate, "d MMM")}

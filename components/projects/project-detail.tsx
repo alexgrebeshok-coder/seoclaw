@@ -506,7 +506,7 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
                             </Badge>
                           </div>
                           <div className="mt-4 text-sm text-[var(--ink-soft)]">
-                            <div>{task.assignee}</div>
+                            <div>{task.assignee?.name || "-"}</div>
                             <div>
                               {t("tasks.dueDate")}{" "}
                               {formatDateLocalized(task.dueDate, "d MMM yyyy")}

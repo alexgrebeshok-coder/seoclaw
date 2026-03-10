@@ -125,7 +125,7 @@ async function handleListProjects(
   const projectList = projects
     .map((p, i) => {
       const progress = p.progress || 0;
-      const status = p.status === "active" ? "🟢" : p.status === "at_risk" ? "🔴" : "🟡";
+      const status = p.status === "active" ? "🟢" : p.status === "at-risk" ? "🔴" : "🟡";
       return `${i + 1}. ${status} ${p.name} (${progress}%)`;
     })
     .join("\n");
@@ -168,7 +168,7 @@ async function handleShowStatus(
   const totalTasks = tasks.length;
 
   // Format status
-  const statusEmoji = project.status === "active" ? "🟢" : project.status === "at_risk" ? "🔴" : "🟡";
+  const statusEmoji = project.status === "active" ? "🟢" : project.status === "at-risk" ? "🔴" : "🟡";
   const progress = project.progress || 0;
   const budget = project.budget || { planned: 0, actual: 0 };
   const budgetUsed = budget.actual > 0 && budget.planned > 0 

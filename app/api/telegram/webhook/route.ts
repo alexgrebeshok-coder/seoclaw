@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     console.log(`[Telegram] Received from ${message.from.first_name}: ${text}`);
 
     // Execute command via CommandHandler
-    const result = await executeCommand(text);
+    const result = await executeCommand(text ?? "");
 
     // Send response to Telegram
     await sendTelegramMessage(chatId, result.message);

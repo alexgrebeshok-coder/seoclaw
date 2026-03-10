@@ -186,7 +186,11 @@ function createOptimisticTask(payload: AddTaskPayload, id: string, fallbackOrder
     description: payload.description ?? "Quick action task",
     status: payload.status ?? "todo",
     order: payload.order ?? fallbackOrder,
-    assignee: payload.assignee,
+    assignee: payload.assignee ? {
+      id: `temp-${Date.now()}`,
+      name: payload.assignee,
+      initials: payload.assignee.split(" ").map(n => n[0]).join("").toUpperCase(),
+    } : null,
     dueDate: payload.dueDate,
     priority: payload.priority ?? "medium",
     tags: payload.tags?.length ? payload.tags : ["quick-action"],
@@ -216,7 +220,7 @@ function buildNotifications(
     .map((task) => ({
       id: `task-${task.id}`,
       title: t("notification.overdueTitle", { name: task.title }),
-      description: t("notification.overdueDesc", { assignee: task.assignee }),
+      description: t("notification.overdueDesc", { assignee: task.assignee?.name || "Unassigned" }),
       severity: task.priority === "critical" ? "critical" : "warning",
       createdAt: task.dueDate,
       projectId: task.projectId,

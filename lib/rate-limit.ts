@@ -11,7 +11,7 @@ interface RateLimitEntry {
  * Limits: 100 requests per minute per IP
  */
 const rateLimiter = new LRUCache<string, RateLimitEntry>({
-  max: 1000 // Track up to 100 IPs
+  max: 1000, // Track up to 100 IPs
   ttl: 60000, // 1 minute TTL
 });
 

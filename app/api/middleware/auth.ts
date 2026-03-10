@@ -9,7 +9,8 @@ const API_KEY = process.env.DASHBOARD_API_KEY || "dev-key-12345";
 export function withAuth(
   req: NextRequest,
   res: NextResponse,
-  next: () => {
+  next: () => void
+) {
   const authHeader = req.headers.get("authorization");
   
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

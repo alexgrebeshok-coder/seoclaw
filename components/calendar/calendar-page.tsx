@@ -78,12 +78,12 @@ export function CalendarPage() {
     tasks.forEach((task) => {
       entries[task.dueDate] ??= [];
       const projectLabel = projectNameById[task.projectId] ?? "";
-      const subtitle = [projectLabel, task.assignee].filter(Boolean).join(" • ");
+      const subtitle = [projectLabel, task.assignee?.name].filter(Boolean).join(" • ");
       entries[task.dueDate].push({
         id: task.id,
         title: task.title,
         type: "task",
-        subtitle: subtitle || projectLabel || task.assignee,
+        subtitle: subtitle || projectLabel || task.assignee?.name || "",
         tone: task.status === "blocked" ? "danger" : task.status === "done" ? "success" : "info",
       });
     });

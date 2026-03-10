@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
     // Sort by priority
     const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
     recommendations.sort(
-      (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
+      (a, b) => priorityOrder[a.priority as keyof typeof priorityOrder] - priorityOrder[b.priority as keyof typeof priorityOrder]
     );
 
     return NextResponse.json({
