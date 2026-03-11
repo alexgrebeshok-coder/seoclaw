@@ -36,6 +36,23 @@ const telegramConnector: ConnectorStatus = {
   missingSecrets: [],
 };
 
+const emailConnector: ConnectorStatus = {
+  id: "email",
+  name: "Email",
+  description: "Email connector",
+  direction: "outbound",
+  sourceSystem: "SMTP",
+  operations: ["delivery"],
+  credentials: [],
+  apiSurface: [],
+  stub: false,
+  status: "ok",
+  configured: true,
+  checkedAt: "2026-03-11T00:00:00.000Z",
+  message: "ok",
+  missingSecrets: [],
+};
+
 const demoRuntime: ServerRuntimeState = {
   dataMode: "demo",
   databaseConfigured: true,
@@ -114,8 +131,10 @@ const briefsTruth = buildBriefsRuntimeTruth({
   projectBriefCount: 2,
   runtime: demoRuntime,
   telegramConnector,
+  emailConnector,
 });
 assert.equal(briefsTruth.status, "mixed");
+assert.equal(briefsTruth.facts.find((fact) => fact.label === "Email delivery")?.value, "Live connector");
 
 const degradedTruth = buildWorkReportsRuntimeTruth({
   queue: null,
@@ -130,6 +149,7 @@ const liveBriefsTruth = buildBriefsRuntimeTruth({
   projectBriefCount: 1,
   runtime: liveRuntime,
   telegramConnector,
+  emailConnector,
 });
 assert.equal(liveBriefsTruth.status, "live");
 

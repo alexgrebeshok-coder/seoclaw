@@ -37,6 +37,7 @@
     "lru-cache": "^11.2.6",
     "lucide-react": "^0.577.0",
     "next": "^15.5.10",
+    "nodemailer": "^8.0.2",
     "prisma": "^5.22.0",
     "react": "^18",
     "react-dom": "^18",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.11",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",

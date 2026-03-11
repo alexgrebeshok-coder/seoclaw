@@ -1,3 +1,4 @@
+import { EmailBriefDeliveryPanel } from "@/components/briefs/email-brief-delivery-panel";
 import { TelegramBriefPolicyPanel } from "@/components/briefs/telegram-brief-policy-panel";
 import { TelegramBriefDeliveryPanel } from "@/components/briefs/telegram-brief-delivery-panel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,7 +18,7 @@ export function BriefRequestForm({
       <CardHeader>
         <CardTitle>Delivery preview</CardTitle>
         <CardDescription>
-          Форматы вывода, которые уже генерирует brief engine: dashboard highlights, Telegram digest и email body.
+          Форматы вывода, которые уже генерирует brief engine: dashboard highlights, Telegram digest и SMTP email body.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
@@ -43,7 +44,20 @@ export function BriefRequestForm({
         </div>
 
         <div className="rounded-[14px] border border-[var(--line)] bg-[var(--panel-soft)] p-4">
-          <div className="text-sm font-medium text-[var(--ink)]">Project email preview</div>
+          <div className="text-sm font-medium text-[var(--ink)]">Email delivery preview</div>
+          <div className="mt-3 text-xs uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+            Portfolio email
+          </div>
+          <div className="mt-2 text-sm text-[var(--ink-soft)]">
+            {portfolioBrief.formats.emailDigest.subject}
+          </div>
+          <pre className="mt-2 whitespace-pre-wrap text-xs leading-6 text-[var(--ink-muted)]">
+            {portfolioBrief.formats.emailDigest.body}
+          </pre>
+
+          <div className="mt-4 text-xs uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+            Project email
+          </div>
           {projectBrief ? (
             <>
               <div className="mt-2 text-sm text-[var(--ink-soft)]">
@@ -58,6 +72,7 @@ export function BriefRequestForm({
               Пока нет проекта, для которого можно собрать project brief.
             </div>
           )}
+          <EmailBriefDeliveryPanel projectOptions={projectOptions} />
         </div>
       </CardContent>
     </Card>

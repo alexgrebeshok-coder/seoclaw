@@ -28,9 +28,10 @@ As of 2026-03-11:
 - Session 18 1C live read connector is complete in the lead branch.
 - Session 19 operator escalation queue and SLA layer is complete in the lead branch.
 - Session 20 live-vs-demo truth in operator UX is complete in the lead branch.
+- Session 21 outbound email delivery channel is complete in the lead branch.
 - Wave 1 foundation services are complete. Wave 2 fact capture and connector shell is complete. Wave 3 platform access model is complete through Session 08. Wave 4 vertical pilot now has Session 09, Session 10, Session 11, Session 12, Session 13, and Session 14 complete.
 - Wave 5 evidence and runtime modernization is complete on the lead branch.
-- Wave 6 integration truth expansion is complete on the lead branch through Session 20, with Session 21 next.
+- Wave 6 integration truth expansion is complete on the lead branch through Session 21, with Session 22 next.
 
 ## 1. Product Direction
 
@@ -444,8 +445,8 @@ A worker session should:
 ### Best option right now
 
 1. Keep this session on the lead integration track for Wave 6.
-2. Land Session 21 next to add the first honest outbound email channel.
-3. Reassess Session 22 only after email delivery semantics are coherent.
+2. Land Session 22 next to add the first visual evidence loop.
+3. Reassess Session 23 only after visual evidence semantics are coherent.
 
 ### Why this is best
 
@@ -461,10 +462,11 @@ That is more valuable now than broadening the UI or adding another shallow conne
 ## 11. Immediate Next Actions
 
 1. Keep Wave 0 closed and stable; it is no longer the active bottleneck.
-2. Land Session 21:
-   - outbound email delivery;
-   - operator-safe preview/send semantics.
-3. Reassess Session 22 through Session 24 after the post-Wave-6 baseline is stable.
+2. Land Session 22:
+   - first visual evidence ingestion path;
+   - one operator-facing evidence summary;
+   - one verification rule tied to existing signals.
+3. Reassess Session 23 through Session 25 after the post-Wave-6 baseline is stable.
 
 ## 12. Definition of Alpha
 

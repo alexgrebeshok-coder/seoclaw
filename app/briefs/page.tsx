@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function BriefsRoute() {
   const runtimeState = getServerRuntimeState();
-  const [snapshot, telegramConnector] = await Promise.all([
+  const [snapshot, telegramConnector, emailConnector] = await Promise.all([
     runtimeState.healthStatus === "degraded"
       ? Promise.resolve({
           generatedAt: new Date().toISOString(),
@@ -27,6 +27,7 @@ export default async function BriefsRoute() {
         })
       : loadExecutiveSnapshot(),
     getConnectorRegistry().getStatus("telegram"),
+    getConnectorRegistry().getStatus("email"),
   ]);
   const portfolioBrief = generatePortfolioBriefFromSnapshot(snapshot, { locale: "ru" });
 
@@ -62,6 +63,7 @@ export default async function BriefsRoute() {
     projectBriefCount: projectBriefs.length,
     runtime: runtimeState,
     telegramConnector,
+    emailConnector,
   });
 
   return (

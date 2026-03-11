@@ -181,8 +181,8 @@
 - `live/demo truth layer`
 
 Следующий рекомендованный ход:
-- `email outbound channel`
-- `next non-Telegram outbound proof`
+- `Video Fact MVP`
+- `cross-source confidence fusion`
 
 ## Definition of Done по релизу Alpha
 

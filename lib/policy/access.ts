@@ -5,6 +5,7 @@ export type PlatformWorkspaceId = "executive" | "delivery" | "strategy";
 export type PlatformPermission =
   | "VIEW_EXECUTIVE_BRIEFS"
   | "SEND_TELEGRAM_DIGESTS"
+  | "SEND_EMAIL_DIGESTS"
   | "RUN_SCHEDULED_DIGESTS"
   | "VIEW_CONNECTORS"
   | "MANAGE_IMPORTS"
@@ -50,6 +51,7 @@ const rolePermissions: Record<PlatformRole, PlatformPermission[]> = {
   EXEC: [
     "VIEW_EXECUTIVE_BRIEFS",
     "SEND_TELEGRAM_DIGESTS",
+    "SEND_EMAIL_DIGESTS",
     "RUN_SCHEDULED_DIGESTS",
     "VIEW_CONNECTORS",
     "MANAGE_IMPORTS",
@@ -62,6 +64,7 @@ const rolePermissions: Record<PlatformRole, PlatformPermission[]> = {
   PM: [
     "VIEW_EXECUTIVE_BRIEFS",
     "SEND_TELEGRAM_DIGESTS",
+    "SEND_EMAIL_DIGESTS",
     "RUN_SCHEDULED_DIGESTS",
     "VIEW_CONNECTORS",
     "MANAGE_IMPORTS",

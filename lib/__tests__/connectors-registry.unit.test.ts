@@ -6,6 +6,7 @@ import {
   createTelegramConnector,
   summarizeConnectorStatuses,
 } from "../connectors";
+import { setEmailTransportFactoryForTests } from "../connectors/email-client";
 
 type MockResponse = {
   body: unknown;
@@ -97,6 +98,12 @@ function installTelegramFetchMock() {
 
 async function run() {
   const restoreFetch = installTelegramFetchMock();
+  setEmailTransportFactoryForTests(() => ({
+    async verify() {},
+    async sendMail() {
+      throw new Error("sendMail should not be called in registry tests");
+    },
+  }));
 
   try {
     const fullyConfiguredEnv = {
@@ -142,9 +149,11 @@ async function run() {
     assert.equal(oneCStatus?.stub, false);
     assert.equal(oneCStatus?.metadata?.projectCount, 1);
 
-    for (const connector of statuses.filter((item) => item.id === "email")) {
-      assert.equal(connector.stub, true);
-    }
+    const emailStatus = statuses.find((connector) => connector.id === "email");
+    assert.ok(emailStatus);
+    assert.equal(emailStatus?.stub, false);
+    assert.equal(emailStatus?.metadata?.host, "smtp.example.com");
+    assert.equal(emailStatus?.metadata?.sender, "ceoclaw@example.com");
 
     const telegram = await registry.getStatus("telegram");
     assert.ok(telegram);
@@ -184,6 +193,7 @@ async function run() {
 
     console.log("PASS connectors-registry.unit");
   } finally {
+    setEmailTransportFactoryForTests(null);
     restoreFetch();
   }
 }

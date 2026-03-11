@@ -2,15 +2,18 @@ import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
 
 import { GET as getConnectorById } from "../../app/api/connectors/[id]/route";
+import { POST as postEmailBrief } from "../../app/api/connectors/email/briefs/route";
 import { GET as getGpsSample } from "../../app/api/connectors/gps/sample/route";
 import { GET as getOneCSample } from "../../app/api/connectors/one-c/sample/route";
 import { GET as getConnectors } from "../../app/api/connectors/route";
 import { GET as getHealth } from "../../app/api/health/route";
+import { setEmailTransportFactoryForTests } from "../../lib/connectors/email-client";
 
 const CONNECTOR_ENV_KEYS = [
   "APP_DATA_MODE",
   "TELEGRAM_BOT_TOKEN",
   "EMAIL_FROM",
+  "EMAIL_DEFAULT_TO",
   "SMTP_HOST",
   "SMTP_USER",
   "SMTP_PASSWORD",
@@ -167,6 +170,22 @@ function withEnv(
 
 async function run() {
   const restoreFetch = installConnectorFetchMock();
+  const sentEmailPayloads: Array<{
+    from: string;
+    to: string;
+    subject: string;
+    text: string;
+  }> = [];
+
+  setEmailTransportFactoryForTests(() => ({
+    async verify() {},
+    async sendMail(input) {
+      sentEmailPayloads.push(input);
+      return {
+        messageId: "email-route-77",
+      };
+    },
+  }));
 
   try {
     const accessRequest = new NextRequest("http://localhost/api/connectors", {
@@ -180,6 +199,11 @@ async function run() {
       {
         APP_DATA_MODE: "demo",
         TELEGRAM_BOT_TOKEN: "telegram-token",
+        EMAIL_FROM: "ceoclaw@example.com",
+        EMAIL_DEFAULT_TO: "hq@example.com",
+        SMTP_HOST: "smtp.example.com",
+        SMTP_USER: "smtp-user",
+        SMTP_PASSWORD: "smtp-password",
         GPS_API_URL: "https://gps.example.com/api/v1",
         GPS_API_KEY: "gps-api-key",
         ONE_C_BASE_URL: "https://1c.example.com/api/v1",
@@ -190,10 +214,10 @@ async function run() {
         const connectorsBody = await connectorsResponse.json();
 
         assert.equal(connectorsResponse.status, 200);
-        assert.equal(connectorsBody.status, "pending");
+        assert.equal(connectorsBody.status, "ok");
         assert.equal(connectorsBody.summary.total, 4);
-        assert.equal(connectorsBody.summary.configured, 3);
-        assert.equal(connectorsBody.summary.pending, 1);
+        assert.equal(connectorsBody.summary.configured, 4);
+        assert.equal(connectorsBody.summary.pending, 0);
         assert.equal(connectorsBody.connectors.length, 4);
 
         const telegramResponse = await getConnectorById(accessRequest, {
@@ -205,6 +229,17 @@ async function run() {
         assert.equal(telegramBody.status, "ok");
         assert.equal(telegramBody.stub, false);
         assert.equal(telegramBody.metadata.webhookConfigured, true);
+
+        const emailResponse = await getConnectorById(accessRequest, {
+          params: Promise.resolve({ id: "email" }),
+        });
+        const emailBody = await emailResponse.json();
+        assert.equal(emailResponse.status, 200);
+        assert.equal(emailBody.id, "email");
+        assert.equal(emailBody.status, "ok");
+        assert.equal(emailBody.stub, false);
+        assert.equal(emailBody.metadata.host, "smtp.example.com");
+        assert.equal(emailBody.metadata.defaultRecipient, "hq@example.com");
 
         const gpsResponse = await getConnectorById(accessRequest, {
           params: Promise.resolve({ id: "gps" }),
@@ -252,20 +287,46 @@ async function run() {
         assert.equal(missingResponse.status, 404);
         assert.match(missingBody.error, /Unknown connector/);
 
+        const emailBriefRequest = new NextRequest(
+          "http://localhost/api/connectors/email/briefs",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              "x-ceoclaw-role": "PM",
+              "x-ceoclaw-workspace": "executive",
+            },
+            body: JSON.stringify({
+              scope: "portfolio",
+              locale: "ru",
+            }),
+          }
+        );
+        const emailBriefResponse = await postEmailBrief(emailBriefRequest);
+        const emailBriefBody = await emailBriefResponse.json();
+        assert.equal(emailBriefResponse.status, 201);
+        assert.equal(emailBriefBody.delivered, true);
+        assert.equal(emailBriefBody.recipient, "hq@example.com");
+        assert.equal(emailBriefBody.messageId, "email-route-77");
+        assert.equal(sentEmailPayloads.length, 1);
+        assert.equal(sentEmailPayloads[0]?.to, "hq@example.com");
+        assert.ok((sentEmailPayloads[0]?.subject ?? "").length > 0);
+
         const healthResponse = await getHealth();
         const healthBody = await healthResponse.json();
 
         assert.equal(healthResponse.status, 200);
         assert.equal(healthBody.status, "ok");
-        assert.equal(healthBody.connectors.status, "pending");
+        assert.equal(healthBody.connectors.status, "ok");
         assert.equal(healthBody.connectors.total, 4);
-        assert.equal(healthBody.connectors.configured, 3);
+        assert.equal(healthBody.connectors.configured, 4);
         assert.equal(healthBody.connectors.endpoint, "/api/connectors");
       }
     );
 
     console.log("PASS connectors-routes.unit");
   } finally {
+    setEmailTransportFactoryForTests(null);
     restoreFetch();
   }
 }

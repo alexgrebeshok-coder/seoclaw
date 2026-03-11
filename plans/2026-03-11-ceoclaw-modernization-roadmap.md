@@ -124,6 +124,9 @@ Deliver:
 - operator-visible send target and delivery status;
 - policy-safe outbound behavior consistent with the Telegram brief model.
 
+Status:
+- complete on 2026-03-11 in the lead branch.
+
 ### Session 22: Video Fact MVP
 
 Goal:

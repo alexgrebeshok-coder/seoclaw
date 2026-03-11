@@ -35,6 +35,11 @@ const expectedEndpoints = [
     path: "/api/connectors/telegram/briefs",
   },
   {
+    method: "POST" as const,
+    note: "Preview или отправка executive brief по email через live SMTP connector.",
+    path: "/api/connectors/email/briefs",
+  },
+  {
     method: "GET" as const,
     note: "Получить сохранённые scheduled delivery policies для Telegram digests.",
     path: "/api/connectors/telegram/briefs/policies",
@@ -72,10 +77,11 @@ export function BriefsPage({
           { label: runtimeBadge.label, variant: runtimeBadge.variant },
           { label: `${portfolioBrief.topAlerts.length} top alerts`, variant: portfolioBrief.topAlerts.length > 0 ? "warning" : "success" },
           { label: "ru/en formats", variant: "info" },
-          { label: "Telegram delivery", variant: "success" },
+          { label: "Telegram delivery", variant: "info" },
+          { label: "Email delivery", variant: "info" },
           { label: "Scheduled digests", variant: "info" },
         ]}
-        description="Страница executive briefs уже опирается на реальный brief engine: портфельный summary, project-level briefs и delivery formats без внешнего AI."
+        description="Страница executive briefs уже опирается на реальный brief engine: портфельный summary, project-level briefs и delivery formats для Telegram и email без внешнего AI."
         eyebrow="Executive comms"
         title="Executive Briefs"
       />

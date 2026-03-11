@@ -179,17 +179,23 @@ export function buildBriefsRuntimeTruth(input: {
   projectBriefCount: number;
   runtime: ServerRuntimeState;
   telegramConnector: ConnectorStatus | null;
+  emailConnector: ConnectorStatus | null;
 }): OperatorRuntimeTruth {
-  const { portfolioAlertCount, projectBriefCount, runtime, telegramConnector } = input;
-  const telegramLive =
-    telegramConnector !== null &&
-    !telegramConnector.stub &&
-    telegramConnector.status === "ok";
+  const {
+    portfolioAlertCount,
+    projectBriefCount,
+    runtime,
+    telegramConnector,
+    emailConnector,
+  } = input;
+  const hasLiveOutboundChannel = [telegramConnector, emailConnector].some(
+    (connector) => connector !== null && !connector.stub && connector.status === "ok"
+  );
   const status: OperatorTruthStatus =
     runtime.healthStatus === "degraded"
       ? "degraded"
       : runtime.usingMockData
-        ? telegramLive
+        ? hasLiveOutboundChannel
           ? "mixed"
           : "demo"
         : "live";
@@ -198,9 +204,9 @@ export function buildBriefsRuntimeTruth(input: {
     status,
     description:
       status === "live"
-        ? "Executive briefs are generated from live portfolio facts, and Telegram delivery remains an external live channel when configured."
+        ? "Executive briefs are generated from live portfolio facts, while Telegram and email delivery channels are verified separately as live outbound connectors."
         : status === "mixed"
-          ? "Brief content is generated from demo portfolio facts, but Telegram delivery still points to a live outbound connector. Preview the facts before sending."
+          ? "Brief content is generated from demo portfolio facts, but at least one outbound delivery channel is live. Preview the facts before sending."
           : status === "degraded"
             ? "Live brief generation was requested, but database-backed portfolio facts are unavailable. Delivery channels may still be configured separately."
             : "Executive briefs are running on demo portfolio facts, and no live outbound channel is currently confirmed for this view.",
@@ -218,6 +224,17 @@ export function buildBriefsRuntimeTruth(input: {
             : telegramConnector.status === "ok"
               ? "Live connector"
               : telegramConnector.status === "degraded"
+                ? "Degraded connector"
+                : "Pending configuration",
+      },
+      {
+        label: "Email delivery",
+        value:
+          emailConnector === null
+            ? "Not loaded"
+            : emailConnector.status === "ok"
+              ? "Live connector"
+              : emailConnector.status === "degraded"
                 ? "Degraded connector"
                 : "Pending configuration",
       },
