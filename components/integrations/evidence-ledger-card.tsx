@@ -43,7 +43,7 @@ export function EvidenceLedgerCard({
           <div className="min-w-0">
             <CardTitle>Evidence ledger</CardTitle>
             <CardDescription>
-              Первый provenance-слой поверх work reports и GPS sample. Он разделяет `reported`, `observed` и `verified` факты в одной operator view.
+              Первый provenance-слой поверх work reports, GPS sample и visual facts. Он разделяет `reported`, `observed` и `verified` факты в одной operator view.
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">

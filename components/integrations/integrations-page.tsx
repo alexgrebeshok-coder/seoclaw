@@ -104,7 +104,7 @@ export function IntegrationsPage({
           { label: oneCSampleLabel, variant: oneCSample.status === "ok" ? "success" : oneCSample.status === "degraded" ? "danger" : "warning" },
           { label: evidence.summary.total > 0 ? `${evidence.summary.total} evidence record${evidence.summary.total === 1 ? "" : "s"}` : "Evidence pending", variant: evidence.summary.total > 0 ? "info" : "warning" },
         ]}
-        description="Раздел интеграций подключён к реальному connector registry. Здесь видно, какие коннекторы уже дают live probes, каких secrets не хватает, какой API surface уже подготовлен, какие read-only samples реально приходят из GPS и 1C и как эти факты попадают в evidence ledger."
+        description="Раздел интеграций подключён к реальному connector registry. Здесь видно, какие коннекторы уже дают live probes, каких secrets не хватает, какой API surface уже подготовлен, какие read-only samples реально приходят из GPS и 1C и как эти факты вместе с visual evidence попадают в evidence ledger."
         eyebrow="Platform trust"
         title="Connector Health"
       />

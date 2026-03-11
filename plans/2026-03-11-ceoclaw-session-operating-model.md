@@ -42,7 +42,7 @@ Reason:
 
 Prefer lead-first sequencing for the active sessions defined in the master execution plan.
 
-As of 2026-03-11 after Session 21 landed, that means Session 22 and Session 23.
+As of 2026-03-11 after Session 22 landed, that means Session 23 and Session 24.
 
 Recommended concurrency:
 - 1 lead session for schema or cross-cutting evidence/runtime work;
@@ -191,8 +191,8 @@ Right now:
 1. Wave 0 no longer blocks parallel execution.
 2. Sessions 01 through 20 are complete on the lead branch.
 3. Keep exact active session selection in the master execution plan, not here.
-4. Current likely next batch is Session 22 and Session 23.
-5. Avoid broad new feature waves until the first visual evidence loop is landed.
+4. Current likely next batch is Session 23 and Session 24.
+5. Avoid broad new feature waves until cross-source confidence fusion is landed.
 
 ## 11. Success Condition for This Operating Model
 

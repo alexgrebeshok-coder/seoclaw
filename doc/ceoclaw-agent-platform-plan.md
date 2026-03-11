@@ -181,8 +181,8 @@
 - `live/demo truth layer`
 
 Следующий рекомендованный ход:
-- `Video Fact MVP`
 - `cross-source confidence fusion`
+- `action safety and compensation layer`
 
 ## Definition of Done по релизу Alpha
 

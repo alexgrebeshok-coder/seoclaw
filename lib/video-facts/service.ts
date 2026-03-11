@@ -1,0 +1,473 @@
+import { prisma } from "@/lib/prisma";
+import type { EvidenceVerificationStatus } from "@/lib/evidence";
+
+import type {
+  CreateVideoFactInput,
+  VideoFactListResult,
+  VideoFactObservationType,
+  VideoFactQuery,
+  VideoFactSummary,
+  VideoFactView,
+} from "./types";
+
+interface VideoFactDocumentRecord {
+  id: string;
+  title: string;
+  description: string | null;
+  filename: string;
+  url: string;
+  type: string;
+  size: number | null;
+  projectId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface VideoFactEvidenceRecord {
+  id: string;
+  sourceType: string;
+  sourceRef: string | null;
+  entityType: string;
+  entityRef: string;
+  projectId: string | null;
+  title: string;
+  summary: string | null;
+  observedAt: Date;
+  reportedAt: Date | null;
+  confidence: number;
+  verificationStatus: string;
+  metadataJson: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface VideoFactReportRecord {
+  id: string;
+  reportNumber: string;
+  projectId: string;
+  section: string;
+  reportDate: Date;
+  status: string;
+  project: {
+    id: string;
+    name: string;
+  };
+}
+
+interface VideoFactDocumentStore {
+  create(args: {
+    data: {
+      title: string;
+      description?: string | null;
+      filename: string;
+      url: string;
+      type: string;
+      size?: number | null;
+      projectId: string;
+    };
+  }): Promise<VideoFactDocumentRecord>;
+}
+
+interface VideoFactEvidenceStore {
+  create(args: {
+    data: {
+      sourceType: string;
+      sourceRef?: string | null;
+      entityType: string;
+      entityRef: string;
+      projectId?: string | null;
+      title: string;
+      summary?: string | null;
+      observedAt: Date;
+      reportedAt?: Date | null;
+      confidence: number;
+      verificationStatus: string;
+      metadataJson?: string | null;
+    };
+  }): Promise<VideoFactEvidenceRecord>;
+  findMany(args: {
+    orderBy: { observedAt: "desc" };
+    take: number;
+    where?: {
+      entityType?: string;
+      projectId?: string;
+    };
+  }): Promise<VideoFactEvidenceRecord[]>;
+}
+
+interface VideoFactReportStore {
+  findUnique(args: {
+    where: { id: string };
+    include: { project: { select: { id: true; name: true } } };
+  }): Promise<VideoFactReportRecord | null>;
+}
+
+interface VideoFactServiceDeps {
+  documentStore?: VideoFactDocumentStore;
+  evidenceStore?: VideoFactEvidenceStore;
+  reportStore?: VideoFactReportStore;
+  now?: () => Date;
+}
+
+const defaultDocumentStore: VideoFactDocumentStore = {
+  create(args) {
+    return prisma.document.create(args);
+  },
+};
+
+const defaultEvidenceStore: VideoFactEvidenceStore = {
+  create(args) {
+    return prisma.evidenceRecord.create(args);
+  },
+  findMany(args) {
+    return prisma.evidenceRecord.findMany(args);
+  },
+};
+
+const defaultReportStore: VideoFactReportStore = {
+  findUnique(args) {
+    return prisma.workReport.findUnique(args);
+  },
+};
+
+type VerificationDecision = {
+  confidence: number;
+  reason: string;
+  verificationStatus: EvidenceVerificationStatus;
+};
+
+export async function createVideoFact(
+  input: CreateVideoFactInput,
+  deps: VideoFactServiceDeps = {}
+): Promise<VideoFactView> {
+  const now = deps.now ?? (() => new Date());
+  const documentStore = deps.documentStore ?? defaultDocumentStore;
+  const evidenceStore = deps.evidenceStore ?? defaultEvidenceStore;
+  const reportStore = deps.reportStore ?? defaultReportStore;
+
+  const report = await reportStore.findUnique({
+    where: { id: input.reportId },
+    include: {
+      project: {
+        select: { id: true, name: true },
+      },
+    },
+  });
+
+  if (!report) {
+    throw new Error("Work report not found");
+  }
+
+  const capturedAt = new Date(input.capturedAt);
+  const title = normalizeTitle(input.title, input.observationType, report);
+  const summary = normalizeSummary(input.summary, input.observationType, report);
+  const filename = buildVideoFactFilename(title, input.url, input.mimeType);
+  const verification = evaluateVideoFactVerification(report, capturedAt);
+  const reportedAt = now();
+
+  const document = await documentStore.create({
+    data: {
+      title,
+      description: summary,
+      filename,
+      url: input.url,
+      type: "video_fact",
+      size: input.size ?? null,
+      projectId: report.projectId,
+    },
+  });
+
+  const evidence = await evidenceStore.create({
+    data: {
+      sourceType: "video_document:intake",
+      sourceRef: document.id,
+      entityType: "video_fact",
+      entityRef: document.id,
+      projectId: report.projectId,
+      title,
+      summary,
+      observedAt: capturedAt,
+      reportedAt,
+      confidence: verification.confidence,
+      verificationStatus: verification.verificationStatus,
+      metadataJson: JSON.stringify({
+        documentId: document.id,
+        filename: document.filename,
+        projectName: report.project.name,
+        reportId: report.id,
+        reportNumber: report.reportNumber,
+        reportStatus: report.status,
+        reportDate: report.reportDate.toISOString(),
+        section: report.section,
+        url: input.url,
+        mimeType: input.mimeType ?? null,
+        size: input.size ?? null,
+        observationType: input.observationType,
+        verificationRule: verification.reason,
+      }),
+    },
+  });
+
+  return serializeVideoFactRecord(evidence);
+}
+
+export async function getVideoFactOverview(
+  query: VideoFactQuery = {},
+  deps: Pick<VideoFactServiceDeps, "evidenceStore" | "now"> = {}
+): Promise<VideoFactListResult> {
+  const now = deps.now ?? (() => new Date());
+  const evidenceStore = deps.evidenceStore ?? defaultEvidenceStore;
+  const records = await evidenceStore.findMany({
+    where: {
+      entityType: "video_fact",
+      ...(query.projectId ? { projectId: query.projectId } : {}),
+    },
+    orderBy: { observedAt: "desc" },
+    take: sanitizeLimit(query.limit),
+  });
+  const items = records.map(serializeVideoFactRecord);
+
+  return {
+    syncedAt: now().toISOString(),
+    summary: summarizeVideoFacts(items),
+    items,
+  };
+}
+
+function normalizeTitle(
+  value: string | undefined,
+  observationType: VideoFactObservationType,
+  report: VideoFactReportRecord
+) {
+  const trimmed = value?.trim();
+  if (trimmed) {
+    return trimmed;
+  }
+
+  return `${formatObservationType(observationType)} · ${report.reportNumber}`;
+}
+
+function normalizeSummary(
+  value: string | undefined,
+  observationType: VideoFactObservationType,
+  report: VideoFactReportRecord
+) {
+  const trimmed = value?.trim();
+  if (trimmed) {
+    return trimmed;
+  }
+
+  return `${formatObservationType(observationType)} linked to ${report.reportNumber} · ${report.section}`;
+}
+
+function buildVideoFactFilename(
+  title: string,
+  url: string,
+  mimeType?: string | null
+) {
+  const safeTitle = title
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9а-яё]+/gi, "-")
+    .replace(/^-+|-+$/g, "");
+  const extension = resolveVideoFactExtension(url, mimeType);
+
+  return `${safeTitle || "video-fact"}.${extension}`;
+}
+
+function resolveVideoFactExtension(url: string, mimeType?: string | null) {
+  if (mimeType?.includes("/")) {
+    const candidate = mimeType.split("/")[1]?.trim().toLowerCase();
+    if (candidate) {
+      return candidate.replace(/[^a-z0-9]+/g, "");
+    }
+  }
+
+  try {
+    const pathname = new URL(url).pathname;
+    const extension = pathname.split(".").pop()?.trim().toLowerCase();
+    if (extension && extension.length <= 8) {
+      return extension.replace(/[^a-z0-9]+/g, "");
+    }
+  } catch {
+    return "mp4";
+  }
+
+  return "mp4";
+}
+
+function evaluateVideoFactVerification(
+  report: VideoFactReportRecord,
+  capturedAt: Date
+): VerificationDecision {
+  const sameUtcDay = report.reportDate.toISOString().slice(0, 10) === capturedAt.toISOString().slice(0, 10);
+
+  if (report.status === "approved" && sameUtcDay) {
+    return {
+      verificationStatus: "verified",
+      confidence: 0.91,
+      reason: "Linked to an approved work report from the same UTC reporting day.",
+    };
+  }
+
+  if (report.status === "approved") {
+    return {
+      verificationStatus: "observed",
+      confidence: 0.78,
+      reason: "Linked to an approved work report, but capture time is outside the report day.",
+    };
+  }
+
+  if (report.status === "submitted") {
+    return {
+      verificationStatus: "observed",
+      confidence: 0.72,
+      reason: "Linked to a submitted work report that is still waiting for review.",
+    };
+  }
+
+  return {
+    verificationStatus: "observed",
+    confidence: 0.61,
+    reason: "Linked report is not approved, so the visual fact remains observed only.",
+  };
+}
+
+function serializeVideoFactRecord(record: VideoFactEvidenceRecord): VideoFactView {
+  const metadata = parseMetadata(record.metadataJson);
+
+  return {
+    id: record.id,
+    documentId: readString(metadata.documentId) ?? record.entityRef,
+    reportId: readString(metadata.reportId) ?? "unknown-report",
+    reportNumber: readString(metadata.reportNumber),
+    reportStatus: readString(metadata.reportStatus),
+    projectId: record.projectId,
+    projectName: readString(metadata.projectName),
+    section: readString(metadata.section),
+    title: record.title,
+    summary: record.summary,
+    url: readString(metadata.url),
+    mimeType: readString(metadata.mimeType),
+    size: readNumber(metadata.size),
+    observationType: normalizeObservationType(readString(metadata.observationType)),
+    capturedAt: record.observedAt.toISOString(),
+    reportedAt: record.reportedAt?.toISOString() ?? null,
+    confidence: round(record.confidence, 2),
+    verificationStatus: normalizeVerificationStatus(record.verificationStatus),
+    verificationRule: readString(metadata.verificationRule),
+  };
+}
+
+function summarizeVideoFacts(items: VideoFactView[]): VideoFactSummary {
+  if (items.length === 0) {
+    return {
+      total: 0,
+      observed: 0,
+      verified: 0,
+      averageConfidence: null,
+      lastCapturedAt: null,
+    };
+  }
+
+  const summary = items.reduce(
+    (accumulator, item) => {
+      accumulator.total += 1;
+      accumulator[item.verificationStatus] += 1;
+      accumulator.confidenceTotal += item.confidence;
+
+      if (!accumulator.lastCapturedAt || accumulator.lastCapturedAt < item.capturedAt) {
+        accumulator.lastCapturedAt = item.capturedAt;
+      }
+
+      return accumulator;
+    },
+    {
+      total: 0,
+      observed: 0,
+      verified: 0,
+      confidenceTotal: 0,
+      lastCapturedAt: null as string | null,
+    }
+  );
+
+  return {
+    total: summary.total,
+    observed: summary.observed,
+    verified: summary.verified,
+    averageConfidence: round(summary.confidenceTotal / summary.total, 2),
+    lastCapturedAt: summary.lastCapturedAt,
+  };
+}
+
+function parseMetadata(value: string | null): Record<string, string | number | boolean | null> {
+  if (!value) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(value) as Record<string, string | number | boolean | null>;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function readString(value: string | number | boolean | null | undefined) {
+  return typeof value === "string" && value.trim() ? value : null;
+}
+
+function readNumber(value: string | number | boolean | null | undefined) {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function normalizeObservationType(value: string | null): VideoFactObservationType {
+  switch (value) {
+    case "blocked_area":
+    case "idle_equipment":
+    case "safety_issue":
+    case "progress_visible":
+      return value;
+    default:
+      return "progress_visible";
+  }
+}
+
+function normalizeVerificationStatus(
+  value: string
+): Extract<EvidenceVerificationStatus, "observed" | "verified"> {
+  switch (value) {
+    case "verified":
+      return "verified";
+    case "observed":
+    default:
+      return "observed";
+  }
+}
+
+function sanitizeLimit(value: number | undefined) {
+  if (!value || !Number.isFinite(value)) {
+    return 6;
+  }
+
+  return Math.max(1, Math.min(Math.round(value), 24));
+}
+
+function round(value: number, decimals = 2) {
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
+}
+
+export function formatObservationType(value: VideoFactObservationType) {
+  switch (value) {
+    case "blocked_area":
+      return "Blocked area";
+    case "idle_equipment":
+      return "Idle equipment";
+    case "safety_issue":
+      return "Safety issue";
+    case "progress_visible":
+    default:
+      return "Progress visible";
+  }
+}

@@ -3,6 +3,7 @@ import { WorkReportsPage } from "@/components/work-reports/work-reports-page";
 import { getEscalationQueueOverview } from "@/lib/escalations";
 import { prisma } from "@/lib/prisma";
 import { canReadLiveOperatorData, getServerRuntimeState } from "@/lib/server/runtime-mode";
+import { getVideoFactOverview } from "@/lib/video-facts/service";
 import { buildWorkReportsRuntimeTruth } from "@/lib/server/runtime-truth";
 import { listWorkReports } from "@/lib/work-reports/service";
 
@@ -15,7 +16,7 @@ export default async function WorkReportsRoute() {
 
   const reports = liveWorkflowReady ? await listWorkReports({ limit: 20 }) : [];
 
-  const [projects, members, escalationQueue] = liveWorkflowReady
+  const [projects, members, escalationQueue, videoFacts] = liveWorkflowReady
     ? await Promise.all([
         prisma.project.findMany({
           select: { id: true, name: true },
@@ -28,8 +29,24 @@ export default async function WorkReportsRoute() {
           take: 50,
         }),
         getEscalationQueueOverview({ limit: 8 }),
+        getVideoFactOverview({ limit: 6 }),
       ])
-    : [[], [], null];
+    : [
+        [],
+        [],
+        null,
+        {
+          syncedAt: new Date().toISOString(),
+          summary: {
+            total: 0,
+            observed: 0,
+            verified: 0,
+            averageConfidence: null,
+            lastCapturedAt: null,
+          },
+          items: [],
+        },
+      ];
   const runtimeTruth = buildWorkReportsRuntimeTruth({
     queue: escalationQueue,
     reportCount: reports.length,
@@ -45,6 +62,7 @@ export default async function WorkReportsRoute() {
         projects={projects}
         reports={reports}
         runtimeTruth={runtimeTruth}
+        videoFacts={videoFacts}
       />
     </ErrorBoundary>
   );

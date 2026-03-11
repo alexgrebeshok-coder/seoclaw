@@ -137,6 +137,9 @@ Deliver:
 - one operator-facing evidence summary;
 - one narrow verification rule linking visual fact to existing signals.
 
+Status:
+- complete on 2026-03-11 in the lead branch.
+
 ### Session 23: Cross-Source Confidence Fusion
 
 Goal:

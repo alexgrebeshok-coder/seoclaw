@@ -8,6 +8,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { EscalationQueueCard } from "@/components/work-reports/escalation-queue-card";
 import { ReportBuilderForm } from "@/components/work-reports/report-builder-form";
 import { ReportRunsTable } from "@/components/work-reports/report-runs-table";
+import { VideoFactIntakeForm } from "@/components/work-reports/video-fact-intake-form";
+import { VideoFactSummaryCard } from "@/components/work-reports/video-fact-summary-card";
 import { WorkReportActionPilot } from "@/components/work-reports/work-report-action-pilot";
 import { WorkReportsOverviewCard } from "@/components/work-reports/work-reports-overview-card";
 import type { EscalationListResult } from "@/lib/escalations";
@@ -15,6 +17,7 @@ import {
   getOperatorTruthBadge,
   type OperatorRuntimeTruth,
 } from "@/lib/server/runtime-truth";
+import type { VideoFactListResult } from "@/lib/video-facts/types";
 import type {
   WorkReportMemberOption,
   WorkReportProjectOption,
@@ -49,6 +52,16 @@ const expectedEndpoints = [
   },
   {
     method: "GET" as const,
+    note: "Получить visual evidence summary, собранный из video facts поверх work-report domain.",
+    path: "/api/work-reports/video-facts",
+  },
+  {
+    method: "POST" as const,
+    note: "Зарегистрировать metadata-only video fact и проверить его against linked work report.",
+    path: "/api/work-reports/video-facts",
+  },
+  {
+    method: "GET" as const,
     note: "Посмотреть provenance/trace summary для конкретного AI run из signal packet.",
     path: "/api/ai/runs/:runId/trace",
   },
@@ -71,6 +84,7 @@ export function WorkReportsPage({
   projects,
   reports,
   runtimeTruth,
+  videoFacts,
 }: {
   escalationQueue: EscalationListResult | null;
   liveWorkflowReady: boolean;
@@ -78,6 +92,7 @@ export function WorkReportsPage({
   projects: WorkReportProjectOption[];
   reports: WorkReportView[];
   runtimeTruth: OperatorRuntimeTruth;
+  videoFacts: VideoFactListResult;
 }) {
   const pendingReports = reports.filter((report) => report.status === "submitted").length;
   const approvedReports = reports.filter((report) => report.status === "approved").length;
@@ -97,9 +112,10 @@ export function WorkReportsPage({
           { label: liveWorkflowReady ? "Live workflow" : "Safe preview", variant: liveWorkflowReady ? "success" : "warning" },
           { label: "Submit/review flow", variant: "info" },
           { label: "Telegram-ready", variant: "success" },
+          { label: videoFacts.summary.total > 0 ? `${videoFacts.summary.total} video facts` : "Video facts pending", variant: videoFacts.summary.total > 0 ? "info" : "warning" },
           { label: escalationQueue && escalationQueue.summary.total > 0 ? `${escalationQueue.summary.total} escalation items` : "Escalation queue idle", variant: escalationQueue && escalationQueue.summary.total > 0 ? "warning" : "success" },
         ]}
-        description="Раздел уже подключён к живому work-reports backend: можно создавать отчёты, видеть проектную ленту, собирать signal packets и управлять escalation queue по approval-gated или failed AI actions."
+        description="Раздел уже подключён к живому work-reports backend: можно создавать отчёты, фиксировать visual facts, видеть проектную ленту, собирать signal packets и управлять escalation queue по approval-gated или failed AI actions."
         eyebrow="Delivery cadence"
         title="Work Reports"
       />
@@ -117,8 +133,13 @@ export function WorkReportsPage({
         <>
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
             <ReportRunsTable reports={reports} />
-            <ReportBuilderForm members={members} projects={projects} />
+            <div className="grid gap-6">
+              <ReportBuilderForm members={members} projects={projects} />
+              <VideoFactIntakeForm reports={reports} />
+            </div>
           </div>
+
+          <VideoFactSummaryCard videoFacts={videoFacts} />
 
           <WorkReportActionPilot reports={reports} />
 

@@ -16,7 +16,7 @@
 Актуально:
 
 1. продукт движется из `AI-powered PM dashboard` в `AI operating layer`;
-2. уже есть proposal/apply, work reports, executive briefs, plan-vs-fact, policy/workspace model, Telegram delivery, SMTP email delivery, GPS telemetry sample, 1C finance sample, evidence ledger, AI trace/evals, operator escalation queue и live/demo truth layer;
+2. уже есть proposal/apply, work reports, executive briefs, plan-vs-fact, policy/workspace model, Telegram delivery, SMTP email delivery, GPS telemetry sample, 1C finance sample, evidence ledger, visual facts, AI trace/evals, operator escalation queue и live/demo truth layer;
 3. следующий этап не про новые страницы, а про enterprise truth expansion и operator control.
 
 Единственный канонический источник текущего execution-state:
