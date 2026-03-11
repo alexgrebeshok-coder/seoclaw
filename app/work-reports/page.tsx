@@ -1,5 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { WorkReportsPage } from "@/components/work-reports/work-reports-page";
+import { getEscalationQueueOverview } from "@/lib/escalations";
 import { prisma } from "@/lib/prisma";
 import { getServerRuntimeState } from "@/lib/server/runtime-mode";
 import { listWorkReports } from "@/lib/work-reports/service";
@@ -15,7 +16,7 @@ export default async function WorkReportsRoute() {
       ? await listWorkReports({ limit: 20 })
       : [];
 
-  const [projects, members] = runtimeState.databaseConfigured
+  const [projects, members, escalationQueue] = runtimeState.databaseConfigured
     ? await Promise.all([
         prisma.project.findMany({
           select: { id: true, name: true },
@@ -27,13 +28,15 @@ export default async function WorkReportsRoute() {
           orderBy: { name: "asc" },
           take: 50,
         }),
+        getEscalationQueueOverview({ limit: 8 }),
       ])
-    : [[], []];
+    : [[], [], null];
 
   return (
     <ErrorBoundary resetKey="work-reports">
       <WorkReportsPage
         databaseReady={runtimeState.databaseConfigured}
+        escalationQueue={escalationQueue}
         members={members}
         projects={projects}
         reports={reports}

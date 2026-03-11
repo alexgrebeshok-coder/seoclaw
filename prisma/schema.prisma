@@ -493,6 +493,39 @@ model EvidenceRecord {
   @@index([observedAt])
 }
 
+model EscalationItem {
+  id              String   @id @default(cuid())
+  sourceType      String
+  sourceRef       String?
+  entityType      String
+  entityRef       String
+  projectId       String?
+  projectName     String?
+  title           String
+  summary         String?
+  purpose         String?
+  urgency         String
+  queueStatus     String   @default("open")
+  sourceStatus    String
+  ownerId         String?
+  ownerName       String?
+  ownerRole       String?
+  firstObservedAt DateTime
+  lastObservedAt  DateTime
+  acknowledgedAt  DateTime?
+  resolvedAt      DateTime?
+  slaTargetAt     DateTime
+  metadataJson    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([sourceType, entityType, entityRef])
+  @@index([queueStatus, urgency])
+  @@index([projectId])
+  @@index([ownerId])
+  @@index([slaTargetAt])
+}
+
 // ============================================
 // TASK MODEL (updated)
 // ============================================

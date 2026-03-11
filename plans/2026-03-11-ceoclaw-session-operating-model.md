@@ -42,7 +42,7 @@ Reason:
 
 Prefer lead-first sequencing for the active sessions defined in the master execution plan.
 
-As of 2026-03-11 after the Wave 5 base landed, that means Session 18 through Session 20.
+As of 2026-03-11 after Session 19 landed, that means Session 20 and Session 21.
 
 Recommended concurrency:
 - 1 lead session for schema or cross-cutting evidence/runtime work;
@@ -107,6 +107,8 @@ Use exactly one of the files from:
 - [session-15-gps-telemetry-ingestion.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-15-gps-telemetry-ingestion.md)
 - [session-16-evidence-ledger.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-16-evidence-ledger.md)
 - [session-17-ai-trace-evals.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-17-ai-trace-evals.md)
+- [session-18-1c-live-read-connector.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-18-1c-live-read-connector.md)
+- [session-19-operator-escalation-queue.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-19-operator-escalation-queue.md)
 
 Do not combine prompt files in one worker session.
 
@@ -157,7 +159,7 @@ Status: complete on 2026-03-11. Lead track landed shared plan-vs-fact services, 
 ### Stage 7
 
 Repeat the same pattern for the next wave: workers implement in isolated zones, lead session integrates and verifies.
-Status: Sessions 09 through 17 are complete on 2026-03-11. Meeting-to-action, work-report signal packets, Telegram live probing, Telegram brief delivery, scheduled Telegram digests, GPS telemetry sample reads, evidence ledger, and AI trace/eval coverage now work on the lead branch.
+Status: Sessions 09 through 19 are complete on 2026-03-11. Meeting-to-action, work-report signal packets, Telegram live probing, Telegram brief delivery, scheduled Telegram digests, GPS telemetry sample reads, evidence ledger, AI trace/eval coverage, the first 1C live finance read, and the operator escalation queue now work on the lead branch.
 
 ## 8. When Not to Parallelize
 
@@ -186,10 +188,10 @@ That means:
 Right now:
 
 1. Wave 0 no longer blocks parallel execution.
-2. Sessions 01 through 17 are complete on the lead branch.
+2. Sessions 01 through 19 are complete on the lead branch.
 3. Keep exact active session selection in the master execution plan, not here.
-4. Current likely next batch is Session 18 through Session 20.
-5. Avoid broad new feature waves until the 1C read, escalation queue, and demo/live truth slices are landed.
+4. Current likely next batch is Session 20 and Session 21.
+5. Avoid broad new feature waves until the demo/live truth slice is landed.
 
 ## 11. Success Condition for This Operating Model
 

@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { applyAIProposal, hasPendingProposal } from "@/lib/ai/action-engine";
@@ -75,6 +75,21 @@ async function readEntry(runId: string) {
     const message = error instanceof Error ? error.message : String(error);
     if (message.includes("ENOENT")) {
       return null;
+    }
+    throw error;
+  }
+}
+
+async function listRunIds() {
+  try {
+    const filenames = await readdir(RUN_CACHE_DIR, { withFileTypes: true });
+    return filenames
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+      .map((entry) => entry.name.replace(/\.json$/, ""));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("ENOENT")) {
+      return [];
     }
     throw error;
   }
@@ -179,6 +194,24 @@ export async function getServerAIRun(runId: string) {
 export async function getServerAIRunEntry(runId: string) {
   const entry = await resolveServerAIRunEntry(runId);
   return cloneEntry(entry);
+}
+
+export async function listServerAIRunEntries() {
+  const runIds = await listRunIds();
+  const entries = await Promise.all(
+    runIds.map(async (runId) => {
+      try {
+        return await resolveServerAIRunEntry(runId);
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  return entries
+    .filter((entry): entry is ServerAIRunEntry => entry !== null)
+    .sort((left, right) => right.run.createdAt.localeCompare(left.run.createdAt))
+    .map(cloneEntry);
 }
 
 export async function applyServerAIProposal(input: AIApplyProposalInput) {

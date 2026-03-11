@@ -70,6 +70,23 @@ function installTelegramFetchMock() {
       });
     }
 
+    if (url.includes("1c.example.com") && url.includes("/project-financials")) {
+      return createJsonResponse({
+        body: {
+          provider: "1C:ERP",
+          projects: [
+            {
+              project_id: "proj-yanao-001",
+              project_name: "Yamal Earthwork Package",
+              planned_budget: 125000000,
+              actual_budget: 118000000,
+              payments_actual: 79000000,
+            },
+          ],
+        },
+      });
+    }
+
     throw new Error(`Unexpected fetch call: ${url}`);
   }) as typeof fetch;
 
@@ -120,7 +137,12 @@ async function run() {
     assert.equal(gpsStatus?.stub, false);
     assert.equal(gpsStatus?.metadata?.equipmentCount, 68);
 
-    for (const connector of statuses.filter((item) => item.id !== "telegram" && item.id !== "gps")) {
+    const oneCStatus = statuses.find((connector) => connector.id === "one-c");
+    assert.ok(oneCStatus);
+    assert.equal(oneCStatus?.stub, false);
+    assert.equal(oneCStatus?.metadata?.projectCount, 1);
+
+    for (const connector of statuses.filter((item) => item.id === "email")) {
       assert.equal(connector.stub, true);
     }
 

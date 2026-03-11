@@ -3,10 +3,12 @@ import Link from "next/link";
 import { DomainApiCard } from "@/components/layout/domain-api-card";
 import { DomainPageHeader } from "@/components/layout/domain-page-header";
 import { buttonVariants } from "@/components/ui/button";
+import { EscalationQueueCard } from "@/components/work-reports/escalation-queue-card";
 import { ReportBuilderForm } from "@/components/work-reports/report-builder-form";
 import { ReportRunsTable } from "@/components/work-reports/report-runs-table";
 import { WorkReportActionPilot } from "@/components/work-reports/work-report-action-pilot";
 import { WorkReportsOverviewCard } from "@/components/work-reports/work-reports-overview-card";
+import type { EscalationListResult } from "@/lib/escalations";
 import type {
   WorkReportMemberOption,
   WorkReportProjectOption,
@@ -44,15 +46,27 @@ const expectedEndpoints = [
     note: "Посмотреть provenance/trace summary для конкретного AI run из signal packet.",
     path: "/api/ai/runs/:runId/trace",
   },
+  {
+    method: "GET" as const,
+    note: "Синхронизировать operator escalation queue поверх work-report signal runs.",
+    path: "/api/escalations",
+  },
+  {
+    method: "PATCH" as const,
+    note: "Назначить owner или обновить status для escalation item.",
+    path: "/api/escalations/:escalationId",
+  },
 ];
 
 export function WorkReportsPage({
   databaseReady,
+  escalationQueue,
   members,
   projects,
   reports,
 }: {
   databaseReady: boolean;
+  escalationQueue: EscalationListResult | null;
   members: WorkReportMemberOption[];
   projects: WorkReportProjectOption[];
   reports: WorkReportView[];
@@ -73,8 +87,9 @@ export function WorkReportsPage({
           { label: databaseReady ? "Live DB" : "DB required", variant: databaseReady ? "success" : "warning" },
           { label: "Submit/review flow", variant: "info" },
           { label: "Telegram-ready", variant: "success" },
+          { label: escalationQueue && escalationQueue.summary.total > 0 ? `${escalationQueue.summary.total} escalation items` : "Escalation queue idle", variant: escalationQueue && escalationQueue.summary.total > 0 ? "warning" : "success" },
         ]}
-        description="Раздел уже подключён к живому work-reports backend: можно создавать отчёты, видеть проектную ленту и работать по циклу submitted/approved/rejected."
+        description="Раздел уже подключён к живому work-reports backend: можно создавать отчёты, видеть проектную ленту, собирать signal packets и управлять escalation queue по approval-gated или failed AI actions."
         eyebrow="Delivery cadence"
         title="Work Reports"
       />
@@ -93,8 +108,12 @@ export function WorkReportsPage({
 
       <WorkReportActionPilot reports={reports} />
 
+      {escalationQueue ? (
+        <EscalationQueueCard initialQueue={escalationQueue} members={members} />
+      ) : null}
+
       <DomainApiCard
-        description="UI уже привязана к реальным backend-контрактам для create/list/review и теперь умеет собирать action packet из полевого отчёта."
+        description="UI уже привязана к реальным backend-контрактам для create/list/review, signal packets, trace inspection и операторской escalation queue."
         endpoints={expectedEndpoints}
         title="Backend Endpoints"
       />

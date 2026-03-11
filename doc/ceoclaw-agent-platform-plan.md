@@ -165,20 +165,22 @@
 - `Session 14` интегрирована в lead branch;
 - `/meetings` и `/api/meetings/to-action` уже дают pilot flow;
 - `/work-reports` и `/api/work-reports/:id/signal-packet` уже дают evidence-to-action flow;
-- `/api/connectors` и `/integrations` уже показывают два live connector probe: Telegram и GPS/GLONASS;
+- `/api/connectors` и `/integrations` уже показывают три live connector probe/read slice: Telegram, GPS/GLONASS и 1C;
 - `/api/connectors/telegram/briefs` и `/briefs` уже дают outbound delivery flow для executive digests;
 - `/api/connectors/telegram/briefs/policies` и cron-safe `run-due` route уже дают scheduled Telegram digest flow;
+- `/api/escalations` и `/work-reports` уже дают operator escalation queue с owner, urgency и SLA;
 - task / risk / status packets проходят через existing proposal/apply engine.
 
 Фактически этот modernization chain уже закрыт на lead branch:
 - `GPS read`
 - `evidence ledger`
 - `AI trace/evals`
-
-Следующий рекомендованный ход:
 - `1C live read`
 - `operator escalation queue`
+
+Следующий рекомендованный ход:
 - `demo/live truth in operator UX`
+- `email outbound channel`
 
 ## Definition of Done по релизу Alpha
 
@@ -237,3 +239,5 @@
 - `doc/session-prompts/session-15-gps-telemetry-ingestion.md`
 - `doc/session-prompts/session-16-evidence-ledger.md`
 - `doc/session-prompts/session-17-ai-trace-evals.md`
+- `doc/session-prompts/session-18-1c-live-read-connector.md`
+- `doc/session-prompts/session-19-operator-escalation-queue.md`

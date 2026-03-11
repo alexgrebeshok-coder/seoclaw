@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 
 import { GET as getConnectorById } from "../../app/api/connectors/[id]/route";
 import { GET as getGpsSample } from "../../app/api/connectors/gps/sample/route";
+import { GET as getOneCSample } from "../../app/api/connectors/one-c/sample/route";
 import { GET as getConnectors } from "../../app/api/connectors/route";
 import { GET as getHealth } from "../../app/api/health/route";
 
@@ -82,6 +83,49 @@ function installConnectorFetchMock() {
       });
     }
 
+    if (url.includes("1c.example.com") && url.includes("/project-financials")) {
+      if (url.includes("page_size=1")) {
+        return createJsonResponse({
+          provider: "1C:ERP",
+          projects: [
+            {
+              project_id: "proj-yanao-001",
+              project_name: "Yamal Earthwork Package",
+              report_date: "2026-03-11",
+              planned_budget: 125000000,
+              actual_budget: 118000000,
+              payments_actual: 79000000,
+              acts_actual: 71000000,
+            },
+          ],
+        });
+      }
+
+      return createJsonResponse({
+        provider: "1C:ERP",
+        projects: [
+          {
+            project_id: "proj-yanao-001",
+            project_name: "Yamal Earthwork Package",
+            report_date: "2026-03-11",
+            planned_budget: 125000000,
+            actual_budget: 118000000,
+            payments_actual: 79000000,
+            acts_actual: 71000000,
+          },
+          {
+            project_id: "proj-yanao-002",
+            project_name: "Northern Logistics Hub",
+            report_date: "2026-03-11",
+            planned_budget: 62000000,
+            actual_budget: 65500000,
+            payments_actual: 40200000,
+            acts_actual: 38800000,
+          },
+        ],
+      });
+    }
+
     throw new Error(`Unexpected fetch call: ${url}`);
   }) as typeof fetch;
 
@@ -138,6 +182,8 @@ async function run() {
         TELEGRAM_BOT_TOKEN: "telegram-token",
         GPS_API_URL: "https://gps.example.com/api/v1",
         GPS_API_KEY: "gps-api-key",
+        ONE_C_BASE_URL: "https://1c.example.com/api/v1",
+        ONE_C_API_KEY: "1c-api-key",
       },
       async () => {
         const connectorsResponse = await getConnectors(accessRequest);
@@ -146,8 +192,8 @@ async function run() {
         assert.equal(connectorsResponse.status, 200);
         assert.equal(connectorsBody.status, "pending");
         assert.equal(connectorsBody.summary.total, 4);
-        assert.equal(connectorsBody.summary.configured, 2);
-        assert.equal(connectorsBody.summary.pending, 2);
+        assert.equal(connectorsBody.summary.configured, 3);
+        assert.equal(connectorsBody.summary.pending, 1);
         assert.equal(connectorsBody.connectors.length, 4);
 
         const telegramResponse = await getConnectorById(accessRequest, {
@@ -170,6 +216,17 @@ async function run() {
         assert.equal(gpsBody.stub, false);
         assert.equal(gpsBody.metadata.equipmentCount, 68);
 
+        const oneCResponse = await getConnectorById(accessRequest, {
+          params: Promise.resolve({ id: "one-c" }),
+        });
+        const oneCBody = await oneCResponse.json();
+        assert.equal(oneCResponse.status, 200);
+        assert.equal(oneCBody.id, "one-c");
+        assert.equal(oneCBody.status, "ok");
+        assert.equal(oneCBody.stub, false);
+        assert.equal(oneCBody.metadata.projectCount, 1);
+        assert.equal(oneCBody.metadata.totalActualBudget, 118000000);
+
         const gpsSampleResponse = await getGpsSample(accessRequest);
         const gpsSampleBody = await gpsSampleResponse.json();
         assert.equal(gpsSampleResponse.status, 200);
@@ -178,6 +235,15 @@ async function run() {
         assert.equal(gpsSampleBody.samples.length, 1);
         assert.equal(gpsSampleBody.samples[0].equipmentId, "EXC-KOM-01");
         assert.equal(gpsSampleBody.samples[0].status, "work");
+
+        const oneCSampleResponse = await getOneCSample(accessRequest);
+        const oneCSampleBody = await oneCSampleResponse.json();
+        assert.equal(oneCSampleResponse.status, 200);
+        assert.equal(oneCSampleBody.id, "one-c");
+        assert.equal(oneCSampleBody.status, "ok");
+        assert.equal(oneCSampleBody.samples.length, 2);
+        assert.equal(oneCSampleBody.samples[0].projectId, "proj-yanao-001");
+        assert.equal(oneCSampleBody.samples[1].status, "over_budget");
 
         const missingResponse = await getConnectorById(accessRequest, {
           params: Promise.resolve({ id: "missing" }),
@@ -193,7 +259,7 @@ async function run() {
         assert.equal(healthBody.status, "ok");
         assert.equal(healthBody.connectors.status, "pending");
         assert.equal(healthBody.connectors.total, 4);
-        assert.equal(healthBody.connectors.configured, 2);
+        assert.equal(healthBody.connectors.configured, 3);
         assert.equal(healthBody.connectors.endpoint, "/api/connectors");
       }
     );

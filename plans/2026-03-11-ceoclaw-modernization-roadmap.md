@@ -15,7 +15,7 @@ CEOClaw has already crossed the alpha threshold for an AI operating layer:
 - AI can generate proposals;
 - humans can review and apply changes;
 - executive briefs and alerts exist;
-- Telegram and GPS/GLONASS are no longer pure stubs.
+- Telegram, GPS/GLONASS, and 1C are no longer pure stubs.
 
 The next stage should not be "more surfaces." It should be:
 
@@ -48,19 +48,20 @@ As of 2026-03-11 the lead branch already has:
 9. live GPS/GLONASS readiness probe;
 10. GPS read-only telemetry sample path;
 11. evidence ledger with `reported / observed / verified` states;
-12. AI trace, provenance, and eval coverage for one live operator workflow.
+12. AI trace, provenance, and eval coverage for one live operator workflow;
+13. 1C live read-only finance sample path.
 
 ## 4. Gaps Still Open
 
 The following high-value gaps remain open:
 
-1. 1C remains a stub connector and has no live read-only truth slice yet.
-2. Email remains a stub outbound channel.
-3. Demo mode versus live mode is not surfaced consistently across operator views.
-4. Video Fact and cross-source verification have not been ported from AI-PMO ideas into product reality.
-5. Action safety stops at approval; there is no compensation or rollback model yet.
-6. The current evidence layer is intentionally narrow and still needs multi-source fusion.
-7. Operator workload management still lacks escalation queue, SLA, and aging controls.
+1. Email remains a stub outbound channel.
+2. Demo mode versus live mode is not surfaced consistently across operator views.
+3. Video Fact and cross-source verification have not been ported from AI-PMO ideas into product reality.
+4. Action safety stops at approval; there is no compensation or rollback model yet.
+5. The current evidence layer is intentionally narrow and still needs multi-source fusion.
+6. 1C currently exposes one narrow finance slice, not broader enterprise truth coverage.
+7. Live-vs-demo truth is still not surfaced consistently in operator-facing UX.
 
 ## 5. 30-Day Plan
 
@@ -69,23 +70,10 @@ The first modernization foundation is already landed on the lead branch:
 1. Session 15: GPS read-only telemetry ingestion.
 2. Session 16: evidence ledger and verification status.
 3. Session 17: AI trace, provenance, and eval harness.
+4. Session 18: 1C live read connector.
+5. Session 19: operator escalation queue and SLA layer.
 
 That changes the active next 30-day plan to the next truth-expansion wave.
-
-### Session 18: 1C Live Read Connector
-
-Goal:
-- replace the 1C stub with a safe read-only enterprise truth slice.
-
-Deliver:
-- real probe and one read path for budgets, acts, or payment status;
-- operator-visible live/stub state;
-- explicit missing-credential and degraded handling.
-
-Exit criteria:
-- 1C is no longer represented as marketing-live or permanent stub ambiguity;
-- operators can inspect one real 1C-backed fact surface;
-- connector failures remain honest and localized.
 
 ### Session 19: Operator Escalation Queue and SLA Layer
 
@@ -101,6 +89,9 @@ Exit criteria:
 - unresolved signals become managed workload instead of passive lists;
 - aging and urgency are visible without opening each item;
 - operator follow-through becomes measurable.
+
+Status:
+- complete on 2026-03-11 in the lead branch.
 
 ### Session 20: Live-vs-Demo Truth in Operator UX
 
@@ -199,10 +190,12 @@ This modernization is working if:
 
 1. connector health is no longer the primary integration signal;
 2. operators can inspect evidence and provenance for key facts;
-3. at least one AI workflow is traceable and regression-tested;
+3. at least one AI workflow is traceable, queue-backed, and regression-tested;
 4. live versus demo state is obvious to non-technical users;
 5. external truth sources start to outrank manually reported facts when confidence is higher;
-6. the next active sessions can be chosen from the master plan without contradicting this roadmap.
+6. the next active sessions can be chosen from the master plan without contradicting this roadmap;
+7. 1C no longer appears as a permanent stub in operator-facing connector views;
+8. unresolved signal packets now become owned operator workload with SLA context.
 
 ## 10. What We Still Have Not Done
 

@@ -25,9 +25,11 @@ As of 2026-03-11:
 - Session 15 GPS read-only telemetry ingestion is complete in the lead branch.
 - Session 16 evidence ledger and verification status is complete in the lead branch.
 - Session 17 AI trace, provenance, and eval harness is complete in the lead branch.
+- Session 18 1C live read connector is complete in the lead branch.
+- Session 19 operator escalation queue and SLA layer is complete in the lead branch.
 - Wave 1 foundation services are complete. Wave 2 fact capture and connector shell is complete. Wave 3 platform access model is complete through Session 08. Wave 4 vertical pilot now has Session 09, Session 10, Session 11, Session 12, Session 13, and Session 14 complete.
 - Wave 5 evidence and runtime modernization is complete on the lead branch.
-- Wave 6 integration truth expansion is the active next wave.
+- Wave 6 integration truth expansion is active on the lead branch through Session 19, with Session 20 next.
 
 ## 1. Product Direction
 
@@ -176,7 +178,7 @@ This is better than:
 1. Field facts enter the product.
    Current state: `WorkReport` Prisma model, CRUD API, approve/reject flow, AI-PMO Telegram bot mapper, and smoke-tested project-scoped retrieval exist on the lead branch.
 2. Connector registry and health model exist.
-   Current state: `/api/connectors`, `/api/connectors/:id`, `/api/health`, stub adapters for Telegram, email, GPS, and 1C, plus registry-backed integrations UI exist on the lead branch.
+   Current state: `/api/connectors`, `/api/connectors/:id`, `/api/health`, adapters for Telegram, email, GPS, and 1C, plus registry-backed integrations UI exist on the lead branch.
 3. New surfaces exist for imports, briefs, work reports, and integrations.
    Current state: `/imports`, `/briefs`, `/work-reports`, and `/integrations` are wired to live backend contracts instead of placeholder endpoints.
 
@@ -243,8 +245,8 @@ Current state:
 2. `/api/meetings/to-action` launches a packet of AI runs on one project context.
 3. Tasks, risks, and status draft proposals can be reviewed and applied through the existing AI proposal engine.
 4. `/work-reports` now provides a work report signal packet pilot with live packet creation, run polling, and proposal apply.
-5. `/api/connectors` now exposes real Telegram and GPS live probes instead of pure stubs.
-6. `/integrations` now shows two live connectors and two remaining stubs.
+5. `/api/connectors` now exposes real Telegram, GPS, and 1C live probes instead of pure stubs.
+6. `/integrations` now shows three live connectors and one remaining stub.
 7. Runtime health now surfaces token, webhook, and GPS probe problems honestly; on the current machine Telegram resolves as `degraded` because Bot API returns `HTTP 404` on `getMe`, while GPS resolves as `ok` against the configured `/session-stats` probe.
 8. `/api/connectors/telegram/briefs` now supports dry-run preview and outbound Telegram delivery for portfolio or project briefs.
 9. `/briefs` now exposes a Telegram delivery panel with preview/send flow on top of the live brief generator.
@@ -294,9 +296,9 @@ into:
 ### Sessions
 
 1. Session 18: 1C Live Read Connector
-   Status: planned.
+   Status: complete on lead branch.
 2. Session 19: Operator Escalation Queue and SLA Layer
-   Status: planned.
+   Status: complete on lead branch.
 3. Session 20: Live-vs-Demo Truth in Operator UX
    Status: planned.
 
@@ -305,6 +307,14 @@ into:
 1. Extend enterprise truth beyond GPS and work reports.
 2. Turn signals into managed operator workload.
 3. Remove ambiguity between live and simulated product states.
+
+### Current state
+
+1. 1C now has a live project finance sample read path, not only a stub descriptor.
+2. `/api/connectors/one-c/sample` exposes normalized project finance records for operators.
+3. `/integrations` now shows a live 1C finance sample alongside GPS telemetry evidence.
+4. `/api/escalations` and `/api/escalations/:id` now turn work-report signal runs into operator-managed queue items.
+5. `/work-reports` now surfaces owner assignment, acknowledgment state, urgency, aging, and SLA context for unresolved signal items.
 
 ### 30/60/90-day direction
 
@@ -431,9 +441,8 @@ A worker session should:
 ### Best option right now
 
 1. Keep this session on the lead integration track for Wave 6.
-2. Land Session 18 first, because the next truth gain should come from a second real enterprise read source.
-3. Land Session 19 next so signals and evidence can turn into managed operator workload.
-4. Land Session 20 after that so operators stop guessing what is live and what is simulated.
+2. Land Session 20 next so operators stop guessing what is live and what is simulated.
+3. Reassess Session 21 only after the operator queue and live/demo truth are coherent.
 
 ### Why this is best
 
@@ -449,15 +458,9 @@ That is more valuable now than broadening the UI or adding another shallow conne
 ## 11. Immediate Next Actions
 
 1. Keep Wave 0 closed and stable; it is no longer the active bottleneck.
-2. Land Session 18:
-   - 1C live read connector;
-   - first operator-visible finance or ERP truth slice.
-3. Land Session 19:
-   - escalation queue;
-   - owner, aging, and SLA visibility.
-4. Land Session 20:
+2. Land Session 20:
    - explicit live/demo truth badges and messaging in operator UX.
-5. Reassess Session 21 through Session 24 after the Wave 6 baseline is stable.
+3. Reassess Session 21 through Session 24 after the Wave 6 baseline is stable.
 
 ## 12. Definition of Alpha
 
