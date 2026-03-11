@@ -30,9 +30,10 @@ As of 2026-03-11:
 - Session 20 live-vs-demo truth in operator UX is complete in the lead branch.
 - Session 21 outbound email delivery channel is complete in the lead branch.
 - Session 22 Video Fact MVP is complete in the lead branch.
+- Session 23 cross-source confidence fusion is complete in the lead branch.
 - Wave 1 foundation services are complete. Wave 2 fact capture and connector shell is complete. Wave 3 platform access model is complete through Session 08. Wave 4 vertical pilot now has Session 09, Session 10, Session 11, Session 12, Session 13, and Session 14 complete.
 - Wave 5 evidence and runtime modernization is complete on the lead branch.
-- Wave 6 integration truth expansion is complete on the lead branch through Session 22, with Session 23 next.
+- Wave 6 integration truth expansion is complete on the lead branch through Session 23, with Session 24 next.
 
 ## 1. Product Direction
 
@@ -291,6 +292,7 @@ into:
 1. GPS now has a live sample read path, not only a readiness probe.
 2. Evidence is now surfaced with `reported / observed / verified` states.
 3. One AI operating loop now exposes a trace route, provenance panel, and repeatable eval coverage.
+4. Cross-source confidence fusion now rolls work reports, GPS telemetry, and linked visual evidence into one explainable operator view and `/api/evidence/fusion`.
 
 ## Wave 6: Integration Truth Expansion
 
@@ -446,8 +448,8 @@ A worker session should:
 ### Best option right now
 
 1. Keep this session on the lead integration track for Wave 6.
-2. Land Session 23 next to merge confidence across work reports, GPS, and visual evidence.
-3. Reassess Session 24 only after cross-source confidence semantics are coherent.
+2. Land Session 24 next to add explicit action-safety and compensation boundaries.
+3. Reassess Session 25 only after applied-action safety semantics are coherent.
 
 ### Why this is best
 
@@ -463,11 +465,11 @@ That is more valuable now than broadening the UI or adding another shallow conne
 ## 11. Immediate Next Actions
 
 1. Keep Wave 0 closed and stable; it is no longer the active bottleneck.
-2. Land Session 23:
-   - confidence merge rules for at least two independent sources;
-   - visible provenance and confidence rollup;
-   - one UI/API surface explaining why a fact is verified or not.
-3. Reassess Session 24 through Session 25 after the post-Wave-6 baseline is stable.
+2. Land Session 24:
+   - explicit compensation model for applied actions;
+   - operator-visible safety state before and after apply;
+   - one route/UI slice that shows rollback or guarded failure posture.
+3. Reassess Session 25 after the post-Wave-6 baseline is stable.
 
 ## 12. Definition of Alpha
 

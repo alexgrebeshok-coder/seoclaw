@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ConnectorHealthTable } from "@/components/integrations/connector-health-table";
+import { EvidenceFusionCard } from "@/components/integrations/evidence-fusion-card";
 import { ConnectorPolicyForm } from "@/components/integrations/connector-policy-form";
 import { EvidenceLedgerCard } from "@/components/integrations/evidence-ledger-card";
 import { GpsTelemetrySampleCard } from "@/components/integrations/gps-telemetry-sample-card";
@@ -13,7 +14,7 @@ import { buttonVariants } from "@/components/ui/button";
 import type { ConnectorStatus, ConnectorStatusSummary } from "@/lib/connectors";
 import type { GpsTelemetrySampleSnapshot } from "@/lib/connectors/gps-client";
 import type { OneCFinanceSampleSnapshot } from "@/lib/connectors/one-c-client";
-import type { EvidenceListResult } from "@/lib/evidence";
+import type { EvidenceFusionOverview, EvidenceListResult } from "@/lib/evidence";
 import {
   getOperatorTruthBadge,
   type OperatorRuntimeTruth,
@@ -47,6 +48,11 @@ const expectedEndpoints = [
   },
   {
     method: "GET" as const,
+    note: "Посмотреть fused confidence rollup по work reports, GPS telemetry и visual evidence.",
+    path: "/api/evidence/fusion",
+  },
+  {
+    method: "GET" as const,
     note: "Получить один evidence record по id.",
     path: "/api/evidence/:evidenceId",
   },
@@ -60,6 +66,7 @@ const expectedEndpoints = [
 export function IntegrationsPage({
   connectors,
   evidence,
+  fusion,
   gpsSample,
   oneCSample,
   runtimeTruth,
@@ -67,6 +74,7 @@ export function IntegrationsPage({
 }: {
   connectors: ConnectorStatus[];
   evidence: EvidenceListResult;
+  fusion: EvidenceFusionOverview;
   gpsSample: GpsTelemetrySampleSnapshot;
   oneCSample: OneCFinanceSampleSnapshot;
   runtimeTruth: OperatorRuntimeTruth;
@@ -118,6 +126,7 @@ export function IntegrationsPage({
         <div className="grid gap-6">
           <GpsTelemetrySampleCard snapshot={gpsSample} />
           <OneCFinanceSampleCard snapshot={oneCSample} />
+          <EvidenceFusionCard fusion={fusion} />
           <EvidenceLedgerCard evidence={evidence} />
           <ConnectorPolicyForm connectors={connectors} />
         </div>

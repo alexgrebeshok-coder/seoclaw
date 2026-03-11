@@ -150,6 +150,9 @@ Deliver:
 - visible provenance and confidence rollup;
 - one UI/API surface showing why a fact is treated as verified or not.
 
+Status:
+- complete on 2026-03-11 in the lead branch.
+
 ## 7. 90-Day Plan
 
 ### Session 24: Action Safety and Compensation Layer

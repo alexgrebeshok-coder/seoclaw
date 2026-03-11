@@ -179,10 +179,11 @@
 - `1C live read`
 - `operator escalation queue`
 - `live/demo truth layer`
+- `cross-source confidence fusion`
 
 Следующий рекомендованный ход:
-- `cross-source confidence fusion`
 - `action safety and compensation layer`
+- `knowledge and benchmark loop`
 
 ## Definition of Done по релизу Alpha
 

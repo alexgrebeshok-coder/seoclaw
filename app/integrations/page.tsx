@@ -6,7 +6,7 @@ import {
 } from "@/lib/connectors";
 import { getGpsTelemetrySampleSnapshot } from "@/lib/connectors/gps-client";
 import { getOneCFinanceSampleSnapshot } from "@/lib/connectors/one-c-client";
-import { getEvidenceLedgerOverview } from "@/lib/evidence";
+import { getEvidenceFusionOverview, getEvidenceLedgerOverview } from "@/lib/evidence";
 import { getServerRuntimeState } from "@/lib/server/runtime-mode";
 import { buildIntegrationsRuntimeTruth } from "@/lib/server/runtime-truth";
 
@@ -23,7 +23,7 @@ export default async function IntegrationsRoute() {
   const summary = summarizeConnectorStatuses(connectors);
   const evidence = runtimeState.databaseConfigured
     ? await getEvidenceLedgerOverview(
-        { limit: 6 },
+        { limit: 24 },
         {
           gpsSnapshot: gpsSample,
           listReports: runtimeState.usingMockData ? async () => [] : undefined,
@@ -41,6 +41,25 @@ export default async function IntegrationsRoute() {
         },
         records: [],
       };
+  const fusion = runtimeState.databaseConfigured
+    ? await getEvidenceFusionOverview(
+        { limit: 4 },
+        {
+          evidence,
+        }
+      )
+    : {
+        syncedAt: new Date().toISOString(),
+        summary: {
+          total: 0,
+          reported: 0,
+          observed: 0,
+          verified: 0,
+          averageConfidence: null,
+          strongestFactTitle: null,
+        },
+        facts: [],
+      };
   const runtimeTruth = buildIntegrationsRuntimeTruth({
     connectorSummary: summary,
     evidenceCount: evidence.summary.total,
@@ -54,6 +73,7 @@ export default async function IntegrationsRoute() {
       <IntegrationsPage
         connectors={connectors}
         evidence={evidence}
+        fusion={fusion}
         gpsSample={gpsSample}
         oneCSample={oneCSample}
         runtimeTruth={runtimeTruth}

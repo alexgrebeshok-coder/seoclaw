@@ -187,10 +187,14 @@ export function mapWorkReportToEvidenceInput(
     confidence: verificationStatus === "verified" ? 0.82 : 0.58,
     verificationStatus,
     metadata: {
+      equipment: report.equipment,
       projectName: report.project.name,
+      reportDate: report.reportDate,
+      reportNumber: report.reportNumber,
       reportStatus: report.status,
       section: report.section,
       source: report.source,
+      workDescription: truncate(report.workDescription, 200),
     },
   };
 }

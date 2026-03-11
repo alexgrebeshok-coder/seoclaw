@@ -36,6 +36,8 @@ export function EvidenceLedgerCard({
 }: {
   evidence: EvidenceListResult;
 }) {
+  const visibleRecords = evidence.records.slice(0, 6);
+
   return (
     <Card className="min-w-0">
       <CardHeader>
@@ -73,9 +75,9 @@ export function EvidenceLedgerCard({
           </div>
         </div>
 
-        {evidence.records.length > 0 ? (
+        {visibleRecords.length > 0 ? (
           <div className="grid gap-3">
-            {evidence.records.map((record) => (
+            {visibleRecords.map((record) => (
               <div
                 className="rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] p-4"
                 key={record.id}
