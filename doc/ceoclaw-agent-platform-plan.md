@@ -196,11 +196,12 @@
 - `tenant readiness checklist with explicit cutover blockers, warnings, and drillback links`
 - `pilot review scorecards with deterministic weekly governance markdown export`
 - `recurring governance review delivery with persisted weekly schedules and governance-scoped ledger entries`
+- `durable cutover decision register for approvals, warning waivers, and rollback state`
 
 Следующий рекомендованный ход:
-- keep Sessions 01 through 39 as the locked baseline;
-- start Session 40 to make cutover approvals and accepted warnings durable on top of readiness and review;
-- widen worker help only inside isolated Wave 11 follow-up zones now that Session 39 has fixed the review-scheduling boundary.
+- keep Sessions 01 through 40 as the locked baseline;
+- start Session 41 to make tenant onboarding and rollout preparation repeatable on top of readiness, review, and cutover decisions;
+- widen worker help only inside isolated Wave 11 follow-up zones now that governance cadence and decision state are explicit.
 
 ## Definition of Done по релизу Alpha
 
