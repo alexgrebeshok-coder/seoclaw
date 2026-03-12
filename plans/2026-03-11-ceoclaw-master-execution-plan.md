@@ -54,7 +54,8 @@ As of 2026-03-12:
 - Wave 11 governance automation and controlled widening is now active on the lead branch.
 - Session 39 governance review scheduling and delivery is complete on the lead branch.
 - Session 40 cutover decision register and warning waivers is complete on the lead branch.
-- The next canonical session is Session 41 inside Wave 11 governance automation and controlled widening.
+- Session 41 tenant onboarding runbook and rollout templates is complete on the lead branch.
+- The next canonical session is Session 42 inside Wave 11 governance automation and controlled widening.
 
 ## 1. Product Direction
 
@@ -488,6 +489,8 @@ The detailed roadmap for post-alpha modernization is tracked in:
 2. Session 40: Cutover Decision Register and Warning Waivers
    Status: complete.
 3. Session 41: Tenant Onboarding Runbook and Rollout Templates
+   Status: complete.
+4. Session 42: Tenant Rollout Packet and Handoff Export
    Status: planned.
 
 ### Goals
@@ -498,7 +501,7 @@ The detailed roadmap for post-alpha modernization is tracked in:
 
 ### Target outcome
 
-`scheduled governance review + explicit cutover decisions + repeatable tenant widening`
+`scheduled governance review + explicit cutover decisions + repeatable tenant widening handoff`
 
 ### Why this wave follows Wave 10
 
@@ -644,9 +647,9 @@ A worker session should:
 
 ### Best option right now
 
-1. Keep Sessions 01 through 40 as the locked lead-branch baseline.
-2. Start Session 41 to make tenant onboarding and rollout preparation repeatable on top of readiness, review, and cutover decisions.
-3. Keep worker help constrained to isolated Wave 11 follow-up zones while the new onboarding state settles.
+1. Keep Sessions 01 through 41 as the locked lead-branch baseline.
+2. Start Session 42 to package onboarding, readiness, review, and decisions into one deterministic rollout handoff artifact.
+3. Keep worker help constrained to isolated Wave 11 handoff-export zones while the new onboarding state settles.
 
 ### Why this is best
 
@@ -663,11 +666,11 @@ That is more valuable now than broadening the UI or adding another shallow conne
 ## 11. Immediate Next Actions
 
 1. Keep Wave 0 closed and stable; it is no longer the active bottleneck.
-2. Keep Sessions 01 through 40 as the locked baseline.
-3. Start Session 41:
-   - make tenant onboarding and rollout preparation repeatable on top of readiness, review, and cutover decisions;
-   - keep the slice narrow by avoiding a broad tenant-control-plane rewrite.
-4. Use Session 41 to decide how much broader rollout templating Wave 11 should still own.
+2. Keep Sessions 01 through 41 as the locked baseline.
+3. Start Session 42:
+   - turn onboarding, readiness, review, and decisions into one deterministic rollout packet or handoff export;
+   - keep the slice narrow by avoiding a broad rollout workflow engine.
+4. Use Session 42 to decide whether Wave 11 needs anything beyond a bounded handoff/export layer.
 
 ## 12. Definition of Alpha
 

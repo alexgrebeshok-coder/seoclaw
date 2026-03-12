@@ -197,11 +197,12 @@
 - `pilot review scorecards with deterministic weekly governance markdown export`
 - `recurring governance review delivery with persisted weekly schedules and governance-scoped ledger entries`
 - `durable cutover decision register for approvals, warning waivers, and rollback state`
+- `persisted tenant onboarding runbook surface with target-tenant scope, handoff notes, and rollback posture`
 
 Следующий рекомендованный ход:
-- keep Sessions 01 through 40 as the locked baseline;
-- start Session 41 to make tenant onboarding and rollout preparation repeatable on top of readiness, review, and cutover decisions;
-- widen worker help only inside isolated Wave 11 follow-up zones now that governance cadence and decision state are explicit.
+- keep Sessions 01 through 41 as the locked baseline;
+- start Session 42 to turn onboarding, readiness, review, and decisions into one deterministic rollout packet or handoff export;
+- keep worker help constrained to isolated Wave 11 handoff-export zones while the new onboarding surface settles.
 
 ## Definition of Done по релизу Alpha
 

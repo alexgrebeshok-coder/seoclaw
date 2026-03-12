@@ -10,7 +10,7 @@ This roadmap explains the modernization direction and 30/60/90-day shape. It is 
 
 ## 1. Why This Roadmap Exists
 
-CEOClaw has already crossed the alpha threshold for an AI operating layer. Sessions 01 through 40 are complete on the lead branch, and Wave 11 is now the active follow-up on top of that baseline. The product already spans:
+CEOClaw has already crossed the alpha threshold for an AI operating layer. Sessions 01 through 41 are complete on the lead branch, and Wave 11 is now the active follow-up on top of that baseline. The product already spans:
 - enterprise fact intake;
 - evidence and verification;
 - proposal and apply;
@@ -224,7 +224,7 @@ Deliver across the 90-day horizon:
 Wave 9 status:
 - complete on 2026-03-12 in the lead branch through Session 35.
 - Wave 10 followed and completed on 2026-03-12 through Session 38.
-- Wave 11 is now the active canonical continuation, with Session 41 next.
+- Wave 11 is now the active canonical continuation, with Session 42 next.
 
 ## 8. Next Canonical Execution Wave
 
@@ -313,13 +313,27 @@ Deliver:
 - no tenant-control-plane rewrite.
 
 Status:
+- complete on 2026-03-12 in the lead branch.
+
+#### Session 42: Tenant Rollout Packet and Handoff Export
+
+Goal:
+- turn onboarding, readiness, review, and decisions into one deterministic rollout handoff artifact.
+
+Deliver:
+- one rollout packet or handoff export surface for the latest tenant-preparation state;
+- reuse of onboarding runbook, readiness, review, and decision boundaries from prior sessions;
+- no broad rollout workflow engine.
+
+Status:
 - planned.
 
 Wave 11 status:
 - active on 2026-03-12 in the lead branch.
 - Session 39 is complete on 2026-03-12 in the lead branch.
 - Session 40 is complete on 2026-03-12 in the lead branch.
-- the next canonical session is Session 41.
+- Session 41 is complete on 2026-03-12 in the lead branch.
+- the next canonical session is Session 42.
 
 ## 10. Research Principles Behind This Roadmap
 

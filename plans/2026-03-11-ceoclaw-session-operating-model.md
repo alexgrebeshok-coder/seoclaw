@@ -42,11 +42,11 @@ Reason:
 
 Prefer lead-first sequencing for the active sessions defined in the master execution plan.
 
-As of 2026-03-12 after Session 40 landed, Wave 11 remains active and Session 41 is the next lead-first step.
+As of 2026-03-12 after Session 41 landed, Wave 11 remains active and Session 42 is the next lead-first step.
 
 Recommended concurrency:
-- 1 lead session for Session 41 because it will cross rollout preparation, runbook state, and tenant-widening guardrails;
-- 1 worker session maximum only for isolated onboarding-template or runbook sub-slices after Session 41 lands;
+- 1 lead session for Session 42 because it will cross onboarding state, rollout handoff packaging, and export boundaries;
+- 1 worker session maximum only for isolated rollout-packet or export-only sub-slices after Session 42 lands;
 - 2 worker sessions maximum only after Wave 11 has clearly isolated domains;
 - 3 sessions maximum per wave for now.
 
@@ -184,7 +184,7 @@ Status: Sessions 09 through 26 are complete on 2026-03-11. Meeting-to-action, wo
 ### Stage 8
 
 Start the next sequence only after the previous one is canonically fixed in the master plan.
-Status: Sessions 27 through 40 are complete, Wave 9 and Wave 10 are complete, and Wave 11 is now active with Session 41 next.
+Status: Sessions 27 through 41 are complete, Wave 9 and Wave 10 are complete, and Wave 11 is now active with Session 42 next.
 
 ## 8. When Not to Parallelize
 
@@ -216,7 +216,7 @@ Right now:
 2. Sessions 01 through 40 are complete on the lead branch.
 3. Keep exact active session selection in the master execution plan, not here.
 4. Wave 7, Wave 8, Wave 9, and Wave 10 are complete on the lead branch.
-5. The active sequence is now Wave 11 governance automation and controlled widening, with Session 41 next.
+5. The active sequence is now Wave 11 governance automation and controlled widening, with Session 42 next.
 
 ## 11. Success Condition for This Operating Model
 
