@@ -7,7 +7,7 @@ import { isDatabaseConfigured } from "@/lib/server/runtime-mode";
 
 export type BriefDeliveryChannel = "telegram" | "email";
 export type BriefDeliveryMode = "manual" | "scheduled";
-export type BriefDeliveryScope = "portfolio" | "project";
+export type BriefDeliveryScope = "governance" | "portfolio" | "project";
 export type BriefDeliveryLedgerStatus = "pending" | "preview" | "delivered" | "failed";
 export type BriefDeliveryRetryPosture = "preview_only" | "sealed" | "retryable";
 
@@ -64,6 +64,12 @@ export interface BriefDeliveryExecutionOutcome {
   ledger: BriefDeliveryLedgerRecord | null;
   replayed: boolean;
   providerMessageId: string | null;
+}
+
+export interface BriefDeliveryLedgerQuery {
+  limit?: number;
+  scheduledPolicyId?: string;
+  scope?: BriefDeliveryScope;
 }
 
 type DeliveryLedgerRow = {
@@ -389,15 +395,23 @@ export async function executeBriefDelivery(input: BriefDeliveryExecutionInput) {
   }
 }
 
-export async function listRecentBriefDeliveryLedger(limit = 8) {
+export async function listBriefDeliveryLedger(query: BriefDeliveryLedgerQuery = {}) {
   if (!isDatabaseConfigured()) {
     return [] as BriefDeliveryLedgerRecord[];
   }
 
   const rows = await prisma.deliveryLedger.findMany({
+    where: {
+      ...(query.scheduledPolicyId ? { scheduledPolicyId: query.scheduledPolicyId } : {}),
+      ...(query.scope ? { scope: query.scope } : {}),
+    },
     orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
-    take: limit,
+    take: query.limit ?? 8,
   });
 
   return rows.map(serializeLedger);
+}
+
+export async function listRecentBriefDeliveryLedger(limit = 8) {
+  return listBriefDeliveryLedger({ limit });
 }

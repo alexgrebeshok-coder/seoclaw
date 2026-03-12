@@ -426,6 +426,27 @@ model TelegramBriefDeliveryPolicy {
   @@index([deliveryHour, active])
 }
 
+model PilotReviewDeliveryPolicy {
+  id              String   @id @default(cuid())
+  workspaceId     String   @default("executive")
+  channel         String   @default("email")
+  recipient       String?
+  timezone        String   @default("UTC")
+  deliveryHour    Int
+  deliveryWeekday Int      @default(1)
+  active          Boolean  @default(true)
+  createdByUserId String?
+  updatedByUserId String?
+  lastAttemptAt   DateTime?
+  lastDeliveredAt DateTime?
+  lastError       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([workspaceId, active])
+  @@index([deliveryWeekday, deliveryHour, active])
+}
+
 model DeliveryLedger {
   id                String   @id @default(cuid())
   channel           String

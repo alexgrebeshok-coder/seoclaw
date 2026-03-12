@@ -4,8 +4,10 @@ import type { ExceptionInboxResult } from "@/lib/command-center";
 import type { GpsTelemetrySampleSnapshot } from "@/lib/connectors/gps-client";
 import type { OneCFinanceSampleSnapshot } from "@/lib/connectors/one-c-client";
 import type { EscalationListResult } from "@/lib/escalations";
+import type { PilotReviewScorecard } from "@/lib/pilot-review";
 import type { PilotFeedbackListResult } from "@/lib/pilot-feedback";
 import { getPilotControlState, getPilotStageLabel, type PilotControlState } from "@/lib/server/pilot-controls";
+import type { TenantReadinessReport } from "@/lib/tenant-readiness";
 import type { DerivedSyncStatus } from "@/lib/sync-state";
 
 import type { ServerRuntimeState } from "./runtime-mode";
@@ -76,6 +78,15 @@ function resolveVariant(status: OperatorTruthStatus): TruthBadgeVariant {
     default:
       return "info";
   }
+}
+
+function formatAvailabilityCount(input: {
+  runtime: ServerRuntimeState;
+  value: number;
+}) {
+  return input.runtime.healthStatus === "degraded" || input.runtime.usingMockData
+    ? "Unavailable"
+    : String(input.value);
 }
 
 export function getOperatorTruthBadge(runtimeTruth: OperatorRuntimeTruth): {
@@ -448,6 +459,116 @@ export function buildPilotFeedbackRuntimeTruth(input: {
         value: String(feedback.summary.workflowRuns + feedback.summary.exceptionItems + feedback.summary.reconciliationTargets),
       },
       { label: "Pilot rollout", value: formatPilotFact(pilot) },
+    ],
+  };
+}
+
+export function buildTenantReadinessRuntimeTruth(input: {
+  readiness: TenantReadinessReport;
+  runtime: ServerRuntimeState;
+}): OperatorRuntimeTruth {
+  const { readiness, runtime } = input;
+  const status: OperatorTruthStatus =
+    runtime.healthStatus === "degraded"
+      ? "degraded"
+      : runtime.usingMockData
+        ? "demo"
+        : readiness.outcome === "ready"
+          ? "live"
+          : "mixed";
+
+  return {
+    status,
+    description:
+      status === "degraded"
+        ? "Live tenant promotion is blocked because the server runtime is degraded and cannot guarantee trustworthy portfolio facts."
+        : status === "demo"
+          ? "Tenant readiness is visible, but demo or unavailable portfolio facts keep this cutover posture blocked until live operator data is enabled."
+          : readiness.outcome === "blocked"
+            ? "Portfolio runtime is live, but rollout, connector, or operator follow-through blockers still make this tenant unsafe to promote."
+            : readiness.outcome === "guarded"
+              ? "Portfolio runtime is live and explicit, but this tenant remains inside a controlled rollout posture before broader cutover."
+              : readiness.outcome === "ready_with_warnings"
+                ? "Portfolio runtime is live and promotion is close, but remaining warnings still need an explicit acceptance decision."
+                : "Portfolio runtime, connector truth, and operator follow-through are aligned for tenant promotion.",
+    facts: [
+      { label: "Runtime mode", value: describeMode(runtime.dataMode) },
+      { label: "Readiness outcome", value: readiness.outcomeLabel },
+      { label: "Tenant scope", value: readiness.tenant.slug },
+      {
+        label: "Pilot posture",
+        value: readiness.posture.tenantSlug
+          ? `${readiness.posture.stageLabel} · ${readiness.posture.tenantSlug}`
+          : readiness.posture.stageLabel,
+      },
+      {
+        label: "Connector health",
+        value: `${readiness.summary.connectorsOk}/${readiness.connectors.length} ok`,
+      },
+      {
+        label: "Open concerns",
+        value: formatAvailabilityCount({
+          runtime,
+          value:
+            readiness.summary.unresolvedExceptions + readiness.summary.unresolvedFeedback,
+        }),
+      },
+    ],
+  };
+}
+
+export function buildPilotReviewRuntimeTruth(input: {
+  runtime: ServerRuntimeState;
+  scorecard: PilotReviewScorecard;
+}): OperatorRuntimeTruth {
+  const { runtime, scorecard } = input;
+  const status: OperatorTruthStatus =
+    runtime.healthStatus === "degraded"
+      ? "degraded"
+      : runtime.usingMockData
+        ? "demo"
+        : scorecard.outcome === "ready"
+          ? "live"
+          : "mixed";
+
+  const activeConcerns = scorecard.summary.openExceptions + scorecard.summary.openFeedback;
+
+  return {
+    status,
+    description:
+      status === "degraded"
+        ? "Live pilot review is degraded because the server runtime cannot guarantee trustworthy operator data."
+        : status === "demo"
+          ? "Pilot review remains deterministic, but it is aggregating demo or unavailable operator layers and should be treated as a blocked rehearsal."
+          : scorecard.outcome === "blocked"
+            ? "Pilot review is backed by live runtime state, but blocked backlog, freshness, delivery, or readiness signals still prevent a clean governance posture."
+            : scorecard.outcome === "guarded"
+              ? "Pilot review is live and exportable, but the tenant still remains inside an explicit controlled rollout posture."
+              : scorecard.outcome === "ready_with_warnings"
+                ? "Pilot review is live and deterministic, but lingering warnings still need explicit acceptance before it becomes a clean baseline."
+                : "Pilot review is aggregating live runtime, backlog, delivery, and freshness signals into a clean recurring governance baseline.",
+    facts: [
+      { label: "Runtime mode", value: describeMode(runtime.dataMode) },
+      { label: "Review outcome", value: scorecard.outcomeLabel },
+      {
+        label: "Sections",
+        value: `${scorecard.summary.readySections} ready / ${scorecard.summary.warningSections} warning / ${scorecard.summary.blockedSections} blocked`,
+      },
+      {
+        label: "Active concerns",
+        value: formatAvailabilityCount({
+          runtime,
+          value: activeConcerns,
+        }),
+      },
+      {
+        label: "Freshness lag",
+        value: `${scorecard.summary.staleSignals} stale signal${scorecard.summary.staleSignals === 1 ? "" : "s"}`,
+      },
+      {
+        label: "Export artifact",
+        value: scorecard.artifact.fileName,
+      },
     ],
   };
 }
