@@ -193,11 +193,14 @@
 - `deterministic audit packs for workflow evidence, trace, and applied decision context`
 - `explicit pilot controls with tenant/workspace rollout posture and guarded high-risk live workflows`
 - `persisted pilot feedback ledger with create/resolve flow linked from command center and audit packs`
+- `tenant readiness checklist with explicit cutover blockers, warnings, and drillback links`
+- `pilot review scorecards with deterministic weekly governance markdown export`
+- `recurring governance review delivery with persisted weekly schedules and governance-scoped ledger entries`
 
 Следующий рекомендованный ход:
-- keep Sessions 01 through 36 as the locked baseline;
-- start Session 37 to expose tenant readiness and cutover blockers without building a broad tenant admin plane;
-- use Session 38 to produce recurring pilot review scorecards before choosing the next expansion wave.
+- keep Sessions 01 through 39 as the locked baseline;
+- start Session 40 to make cutover approvals and accepted warnings durable on top of readiness and review;
+- widen worker help only inside isolated Wave 11 follow-up zones now that Session 39 has fixed the review-scheduling boundary.
 
 ## Definition of Done по релизу Alpha
 

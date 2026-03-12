@@ -42,14 +42,18 @@ As of 2026-03-12:
 - Session 34 audit pack and operational exports is complete in the lead branch.
 - Session 35 pilot controls and tenant readiness is complete in the lead branch.
 - Session 36 pilot feedback ledger and resolution loop is complete in the lead branch.
+- Session 37 tenant readiness and cutover checklist is complete in the lead branch.
+- Session 38 pilot review scorecards and governance export is complete in the lead branch.
 - Wave 1 foundation services are complete. Wave 2 fact capture and connector shell is complete. Wave 3 platform access model is complete through Session 08. Wave 4 vertical pilot now has Session 09, Session 10, Session 11, Session 12, Session 13, and Session 14 complete.
 - Wave 5 evidence and runtime modernization is complete on the lead branch.
 - Wave 6 integration truth expansion is complete on the lead branch through Session 26.
 - Wave 7 durable runtime hardening is complete on the lead branch through Session 29.
 - Wave 8 source-of-truth depth is complete on the lead branch through Session 32.
 - Wave 9 pilot-grade operatorization is complete on the lead branch through Session 35.
-- Wave 10 pilot feedback and go-live readiness is now active on the lead branch through Session 36.
-- The next canonical session is Session 37 inside Wave 10 pilot feedback and go-live readiness.
+- Wave 10 pilot feedback and go-live readiness is complete on the lead branch through Session 38.
+- Wave 11 governance automation and controlled widening is now active on the lead branch.
+- Session 39 governance review scheduling and delivery is complete on the lead branch.
+- The next canonical session is Session 40 inside Wave 11 governance automation and controlled widening.
 
 ## 1. Product Direction
 
@@ -452,9 +456,9 @@ The detailed roadmap for post-alpha modernization is tracked in:
 1. Session 36: Pilot Feedback Ledger and Resolution Loop
    Status: complete on 2026-03-12 in the lead branch.
 2. Session 37: Tenant Readiness and Cutover Checklist
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 3. Session 38: Pilot Review Scorecards and Governance Export
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 
 ### Goals
 
@@ -471,6 +475,35 @@ The detailed roadmap for post-alpha modernization is tracked in:
 1. Pilot controls and audit packs are useful only if real pilot feedback is captured against them.
 2. A narrow readiness surface is safer than a broad multi-tenant control plane rewrite.
 3. Review scorecards should be built only after runtime, command, audit, and rollout posture are already explicit.
+
+## Wave 11: Governance Automation and Controlled Widening
+
+**Mode:** Lead-first sequencing with selective worker help now allowed only inside isolated follow-up zones because Session 39 fixed the review-scheduling boundary.
+
+### Sessions
+
+1. Session 39: Governance Review Scheduling and Delivery
+   Status: complete.
+2. Session 40: Cutover Decision Register and Warning Waivers
+   Status: planned.
+3. Session 41: Tenant Onboarding Runbook and Rollout Templates
+   Status: planned.
+
+### Goals
+
+1. Turn pilot review from an on-demand export into a recurring governed delivery loop.
+2. Make cutover approvals, accepted warnings, and reversals durable instead of implicit.
+3. Make the next tenant rollout repeatable without reopening a broad tenant-admin rewrite.
+
+### Target outcome
+
+`scheduled governance review + explicit cutover decisions + repeatable tenant widening`
+
+### Why this wave follows Wave 10
+
+1. The scorecard/export from Wave 10 should become a recurring operating artifact before new pilot widening starts.
+2. Tenant readiness and pilot review now exist, so the next gap is durable decision capture rather than more read-only surfaces.
+3. Repeatable onboarding should come only after governance cadence and cutover acceptance are explicit.
 
 ## 6. Technical Tracks
 
@@ -564,6 +597,10 @@ Includes:
 
 `durable pilot feedback + explicit tenant readiness + recurring pilot review scorecards`
 
+### Milestone K
+
+`scheduled governance reviews + durable cutover decisions + repeatable tenant widening`
+
 ## 8. Rules for Parallel Sessions
 
 1. Never run parallel sessions before Wave 0 is closed.
@@ -606,9 +643,9 @@ A worker session should:
 
 ### Best option right now
 
-1. Keep Sessions 01 through 36 as the locked lead-branch baseline.
-2. Move directly into Session 37 now that pilot feedback is persisted and linked to real workflow artifacts.
-3. Use worker help only for isolated scorecard slices after Session 37 sets the readiness boundary.
+1. Keep Sessions 01 through 39 as the locked lead-branch baseline.
+2. Start Session 40 to make cutover approvals and accepted warnings durable on top of readiness and review.
+3. Keep worker help constrained to isolated Wave 11 follow-up zones while the new governance state settles.
 
 ### Why this is best
 
@@ -625,11 +662,11 @@ That is more valuable now than broadening the UI or adding another shallow conne
 ## 11. Immediate Next Actions
 
 1. Keep Wave 0 closed and stable; it is no longer the active bottleneck.
-2. Keep Sessions 01 through 36 as the locked baseline.
-3. Start Session 37:
-   - expose tenant readiness and cutover blockers from existing runtime, connector, and rollout facts;
-   - keep the surface read-only and operator-facing.
-4. Use Session 38 to turn pilot operations into recurring scorecards and governance exports.
+2. Keep Sessions 01 through 39 as the locked baseline.
+3. Start Session 40:
+   - make cutover approvals, accepted warnings, and reversals durable on top of readiness and review;
+   - keep the slice narrow by avoiding a broad approval workflow engine.
+4. Use Session 40 to decide how much tenant-onboarding/runbook work Session 41 should own.
 
 ## 12. Definition of Alpha
 
