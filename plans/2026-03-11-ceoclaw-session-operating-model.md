@@ -42,12 +42,12 @@ Reason:
 
 Prefer lead-first sequencing for the active sessions defined in the master execution plan.
 
-As of 2026-03-12 after Session 35 landed, Wave 9 is complete and no further wave should start until the master execution plan defines the next canonical post-pilot sequence.
+As of 2026-03-12 after Session 35 landed, Wave 10 is now the active lead-first sequence and it starts with Session 36.
 
 Recommended concurrency:
-- 1 lead session for post-pilot planning and any cross-surface follow-up that falls out of pilot feedback;
-- 1 worker session maximum only for isolated follow-up once the next wave is explicitly defined;
-- 2 worker sessions maximum only after the next wave has clearly separated file zones;
+- 1 lead session for Session 36 because it sets the pilot-feedback boundary across command, audit, and operator surfaces;
+- 1 worker session maximum only for isolated readiness UI or read-model work after Session 36 lands;
+- 2 worker sessions maximum only after Wave 10 has clearly separated file zones;
 - 3 sessions maximum per wave for now.
 
 ## 3. Session Roles
@@ -126,6 +126,9 @@ Use exactly one of the files from:
 - [session-33-executive-command-center-exception-inbox.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-33-executive-command-center-exception-inbox.md)
 - [session-34-audit-pack-and-operational-exports.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-34-audit-pack-and-operational-exports.md)
 - [session-35-pilot-controls-and-tenant-readiness.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-35-pilot-controls-and-tenant-readiness.md)
+- [session-36-pilot-feedback-ledger-resolution-loop.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-36-pilot-feedback-ledger-resolution-loop.md)
+- [session-37-tenant-readiness-cutover-checklist.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-37-tenant-readiness-cutover-checklist.md)
+- [session-38-pilot-review-scorecards-governance-export.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-38-pilot-review-scorecards-governance-export.md)
 
 Do not combine prompt files in one worker session.
 
@@ -181,7 +184,7 @@ Status: Sessions 09 through 26 are complete on 2026-03-11. Meeting-to-action, wo
 ### Stage 8
 
 Start the next sequence only after the previous one is canonically fixed in the master plan.
-Status: Sessions 27 through 35 are complete, Wave 9 is complete, and any next sequence should be defined in the master execution plan before new implementation starts.
+Status: Sessions 27 through 35 are complete, Wave 9 is complete, and Wave 10 is now active with Session 36 first.
 
 ## 8. When Not to Parallelize
 
@@ -212,8 +215,8 @@ Right now:
 1. Wave 0 no longer blocks parallel execution.
 2. Sessions 01 through 35 are complete on the lead branch.
 3. Keep exact active session selection in the master execution plan, not here.
-4. Wave 7, Wave 8, and Wave 9 are complete on the lead branch.
-5. No next wave should be inferred from this file; define it first in the master execution plan.
+4. Wave 7, Wave 8, and Wave 9 are complete on the lead branch, and Wave 10 is now the active continuation.
+5. The active sequence is Wave 10 pilot feedback and go-live readiness, with Session 36 first.
 
 ## 11. Success Condition for This Operating Model
 

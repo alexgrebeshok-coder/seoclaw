@@ -195,8 +195,9 @@
 
 Следующий рекомендованный ход:
 - keep Sessions 01 through 35 as the locked baseline;
-- use the completed pilot-control and audit surfaces to collect real pilot feedback;
-- define the next canonical post-Wave-9 execution plan before starting another expansion wave.
+- start Wave 10 with Session 36 so pilot feedback becomes durable product truth;
+- use Session 37 to expose tenant readiness and cutover blockers without building a broad tenant admin plane;
+- use Session 38 to produce recurring pilot review scorecards before choosing the next expansion wave.
 
 ## Definition of Done по релизу Alpha
 
@@ -273,3 +274,6 @@
 - `doc/session-prompts/session-33-executive-command-center-exception-inbox.md`
 - `doc/session-prompts/session-34-audit-pack-and-operational-exports.md`
 - `doc/session-prompts/session-35-pilot-controls-and-tenant-readiness.md`
+- `doc/session-prompts/session-36-pilot-feedback-ledger-resolution-loop.md`
+- `doc/session-prompts/session-37-tenant-readiness-cutover-checklist.md`
+- `doc/session-prompts/session-38-pilot-review-scorecards-governance-export.md`

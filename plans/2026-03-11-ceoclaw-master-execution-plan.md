@@ -47,7 +47,8 @@ As of 2026-03-12:
 - Wave 7 durable runtime hardening is complete on the lead branch through Session 29.
 - Wave 8 source-of-truth depth is complete on the lead branch through Session 32.
 - Wave 9 pilot-grade operatorization is complete on the lead branch through Session 35.
-- No post-Wave-9 execution wave is canonically defined yet; the next move is to define it from pilot feedback before new expansion starts.
+- Wave 10 pilot feedback and go-live readiness is now active on the lead branch.
+- The next canonical session is Session 36 inside Wave 10 pilot feedback and go-live readiness.
 
 ## 1. Product Direction
 
@@ -441,6 +442,35 @@ The detailed roadmap for post-alpha modernization is tracked in:
 2. It turns the system from a strong alpha into a pilot-grade operating layer.
 3. It avoids polishing operator UX before the underlying truth and runtime are strong enough.
 
+## Wave 10: Pilot Feedback and Go-Live Readiness
+
+**Mode:** Lead-first sequencing with selective worker help for isolated read-only readiness and review surfaces after Session 36 lands.
+
+### Sessions
+
+1. Session 36: Pilot Feedback Ledger and Resolution Loop
+   Status: planned.
+2. Session 37: Tenant Readiness and Cutover Checklist
+   Status: planned.
+3. Session 38: Pilot Review Scorecards and Governance Export
+   Status: planned.
+
+### Goals
+
+1. Turn pilot feedback into durable product truth instead of off-platform chat fragments.
+2. Make tenant cutover readiness and live blockers explicit before wider rollout.
+3. Produce recurring review artifacts that quantify pilot health across feedback, delivery, freshness, and exceptions.
+
+### Target outcome
+
+`pilot feedback ledger + go-live readiness checklist + weekly review scorecards`
+
+### Why this wave follows Wave 9
+
+1. Pilot controls and audit packs are useful only if real pilot feedback is captured against them.
+2. A narrow readiness surface is safer than a broad multi-tenant control plane rewrite.
+3. Review scorecards should be built only after runtime, command, audit, and rollout posture are already explicit.
+
 ## 6. Technical Tracks
 
 ### Track A: Stability and Platform
@@ -529,6 +559,10 @@ Includes:
 
 `pilot-grade operator control + auditability + tenant-safe rollout posture`
 
+### Milestone J
+
+`durable pilot feedback + explicit tenant readiness + recurring pilot review scorecards`
+
 ## 8. Rules for Parallel Sessions
 
 1. Never run parallel sessions before Wave 0 is closed.
@@ -572,8 +606,8 @@ A worker session should:
 ### Best option right now
 
 1. Keep Sessions 01 through 35 as the locked lead-branch baseline.
-2. Use the completed audit-pack and pilot-control surfaces to collect real pilot feedback instead of adding another shallow surface immediately.
-3. Define the next canonical execution wave in this plan before starting any post-Wave-9 expansion.
+2. Start Wave 10 with Session 36 so pilot feedback becomes durable product truth instead of an external coordination artifact.
+3. Use worker help only for isolated readiness and scorecard slices after Session 36 sets the data-model boundary.
 
 ### Why this is best
 
@@ -591,8 +625,14 @@ That is more valuable now than broadening the UI or adding another shallow conne
 
 1. Keep Wave 0 closed and stable; it is no longer the active bottleneck.
 2. Keep Sessions 01 through 35 as the locked baseline.
-3. Use the completed pilot-control posture to validate one real pilot path across delivery, executive delivery, and scheduled outbound boundaries.
-4. Define the next canonical post-Wave-9 execution wave before starting Session 36 or any new expansion track.
+3. Start Session 36:
+   - add one durable pilot feedback ledger tied to real workflows, audit packs, or exception items;
+   - keep feedback status, ownership, and resolution explicit;
+   - preserve the narrow pilot-control posture introduced in Session 35.
+4. Start Session 37 only after Session 36 lands:
+   - expose tenant readiness and cutover blockers from existing runtime, connector, and rollout facts;
+   - keep the surface read-only and operator-facing.
+5. Use Session 38 to turn pilot operations into recurring scorecards and governance exports.
 
 ## 12. Definition of Alpha
 
