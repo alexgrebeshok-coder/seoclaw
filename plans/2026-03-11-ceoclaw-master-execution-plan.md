@@ -6,7 +6,7 @@
 
 ## Execution Status Snapshot
 
-As of 2026-03-11:
+As of 2026-03-12:
 - Wave 0 core stabilization is complete.
 - Session 01 import and validation pipeline is complete in the lead branch.
 - Session 02 AI action engine generalization is complete in the lead branch.
@@ -34,11 +34,18 @@ As of 2026-03-11:
 - Session 24 action safety and compensation layer is complete in the lead branch.
 - Session 28 evidence and escalation sync jobs is complete in the lead branch.
 - Session 27 AI run persistence and workflow ledger is complete in the lead branch.
+- Session 29 delivery ledger and idempotent execution is complete in the lead branch.
+- Session 30 GPS telemetry domain expansion is complete in the lead branch.
+- Session 31 1C financial truth deepening is complete in the lead branch.
+- Session 32 reconciliation casefile and fact linking is complete in the lead branch.
+- Session 33 executive command center and exception inbox is complete in the lead branch.
 - Wave 1 foundation services are complete. Wave 2 fact capture and connector shell is complete. Wave 3 platform access model is complete through Session 08. Wave 4 vertical pilot now has Session 09, Session 10, Session 11, Session 12, Session 13, and Session 14 complete.
 - Wave 5 evidence and runtime modernization is complete on the lead branch.
 - Wave 6 integration truth expansion is complete on the lead branch through Session 26.
-- Wave 7 durable runtime hardening is now active, with Sessions 27 and 28 complete on the lead branch.
-- The next canonical sequence remains: Wave 7 durable runtime hardening, Wave 8 source-of-truth depth, and Wave 9 pilot-grade operatorization.
+- Wave 7 durable runtime hardening is complete on the lead branch through Session 29.
+- Wave 8 source-of-truth depth is complete on the lead branch through Session 32.
+- Wave 9 pilot-grade operatorization is in progress on the lead branch through Session 33.
+- The next canonical session is Session 34 inside Wave 9 pilot-grade operatorization.
 
 ## 1. Product Direction
 
@@ -346,7 +353,7 @@ The detailed roadmap for post-alpha modernization is tracked in:
 2. Session 28: Evidence and Escalation Sync Jobs
    Status: complete on lead branch.
 3. Session 29: Delivery Ledger and Idempotent Execution
-   Status: planned.
+   Status: complete on lead branch.
 
 ### Goals
 
@@ -370,6 +377,7 @@ The detailed roadmap for post-alpha modernization is tracked in:
 2. Mock-mode run progression no longer depends on in-memory adapter state to build traceable operator runs.
 3. Existing `POST /api/ai/runs`, `GET /api/ai/runs/:id`, `POST /api/ai/runs/:id/proposals/:proposalId/apply`, and `GET /api/ai/runs/:id/trace` now read from the durable ledger when `DATABASE_URL` is configured.
 4. File-backed run storage remains only as a fallback when no database is configured.
+5. Outbound Telegram, email, and scheduled digest flows now persist delivery attempts in `DeliveryLedger`, reuse idempotency keys, and expose retry posture plus per-target execution state in the operator UI.
 5. `GET /api/evidence` and `GET /api/escalations` are now read-only views over persisted derivation, with explicit `POST /api/evidence/sync` and `POST /api/escalations/sync` job boundaries and operator-visible freshness metadata.
 6. Work-report writes now trigger narrow evidence sync jobs, and signal-packet / proposal-apply flows trigger narrow escalation sync jobs without recreating truth during reads.
 
@@ -380,11 +388,11 @@ The detailed roadmap for post-alpha modernization is tracked in:
 ### Sessions
 
 1. Session 30: GPS Telemetry Domain Expansion
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 2. Session 31: 1C Financial Truth Deepening
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 3. Session 32: Reconciliation Casefile and Fact Linking
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 
 ### Goals
 
@@ -409,7 +417,7 @@ The detailed roadmap for post-alpha modernization is tracked in:
 ### Sessions
 
 1. Session 33: Executive Command Center and Exception Inbox
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 2. Session 34: Audit Pack and Operational Exports
    Status: planned.
 3. Session 35: Pilot Controls and Tenant Readiness
@@ -561,9 +569,9 @@ A worker session should:
 
 ### Best option right now
 
-1. Keep the lead track on Wave 7 first.
-2. Move directly to Session 29 after Session 28.
-3. Use worker help only after workflow state ownership is fixed.
+1. Keep the lead track on Wave 9 first.
+2. Move directly into Session 34 now that Session 33 fixed the command-model boundary.
+3. Use worker help only for isolated export and pilot-control work while Wave 9 stays lead-first.
 
 ### Why this is best
 
@@ -580,12 +588,12 @@ That is more valuable now than broadening the UI or adding another shallow conne
 ## 11. Immediate Next Actions
 
 1. Keep Wave 0 closed and stable; it is no longer the active bottleneck.
-2. Keep Sessions 01 through 28 as the locked baseline.
-3. Start Session 29:
-   - add a durable delivery ledger for Telegram, email, and scheduled sends;
-   - introduce idempotency keys and retry posture for outbound actions;
-   - surface per-target execution history to operators.
-4. Land Wave 8 only after Session 29 stabilizes.
+2. Keep Sessions 01 through 33 as the locked baseline.
+3. Start Session 34:
+   - export evidence, decisions, traces, and applied changes as deterministic audit packs;
+   - keep the Session 33 command-center workload drillable back to source truth and source actions;
+   - preserve the durable runtime, persisted truth, and idempotent execution guarantees established in Waves 7 through 9.
+4. Keep Session 35 behind the Session 34 audit/export boundary.
 
 ## 12. Definition of Alpha
 

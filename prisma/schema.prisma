@@ -426,6 +426,40 @@ model TelegramBriefDeliveryPolicy {
   @@index([deliveryHour, active])
 }
 
+model DeliveryLedger {
+  id                String   @id @default(cuid())
+  channel           String
+  provider          String
+  mode              String
+  scope             String
+  projectId         String?
+  projectName       String?
+  locale            String
+  target            String?
+  headline          String
+  idempotencyKey    String   @unique
+  scheduledPolicyId String?
+  status            String
+  retryPosture      String
+  attemptCount      Int      @default(0)
+  dryRun            Boolean  @default(false)
+  providerMessageId String?
+  contentHash       String
+  requestJson       String
+  responseJson      String?
+  lastError         String?
+  firstAttemptAt    DateTime?
+  lastAttemptAt     DateTime?
+  deliveredAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([channel, updatedAt])
+  @@index([status, updatedAt])
+  @@index([projectId, updatedAt])
+  @@index([scheduledPolicyId, updatedAt])
+}
+
 // ============================================
 // WORK REPORT MODEL
 // ============================================
@@ -564,6 +598,35 @@ model DerivedSyncState {
 
   @@index([status, updatedAt])
   @@index([lastSuccessAt])
+}
+
+model ReconciliationCasefile {
+  id                 String   @id @default(cuid())
+  key                String   @unique
+  caseType           String
+  truthStatus        String
+  resolutionStatus   String   @default("open")
+  projectId          String?
+  projectName        String?
+  financeProjectId   String?
+  title              String
+  explanation        String
+  reasonCodesJson    String
+  evidenceRecordIdsJson String
+  fusionFactIdsJson  String
+  telemetryRefsJson  String
+  financeJson        String?
+  fieldJson          String?
+  telemetryJson      String?
+  lastObservedAt     DateTime
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([resolutionStatus, updatedAt])
+  @@index([truthStatus, updatedAt])
+  @@index([projectId])
+  @@index([caseType, updatedAt])
+  @@index([lastObservedAt])
 }
 
 // ============================================

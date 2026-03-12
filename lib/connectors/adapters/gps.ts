@@ -22,6 +22,7 @@ const descriptor: ConnectorDescriptor = {
   operations: [
     "Probe live telemetry readiness via GPS session stats",
     "Read sample telemetry sessions via a live GPS API path",
+    "Read normalized telemetry truth grouped by sessions, equipment, and geofences",
   ],
   credentials: [
     {
@@ -43,6 +44,12 @@ const descriptor: ConnectorDescriptor = {
       method: "GET",
       path: "/api/connectors/gps/sample",
       description: "Read one normalized GPS telemetry sample from the live sessions endpoint.",
+    },
+    {
+      method: "GET",
+      path: "/api/connectors/gps/telemetry",
+      description:
+        "Read normalized GPS telemetry truth with deterministic session, equipment, and geofence rollups.",
     },
   ],
   stub: false,

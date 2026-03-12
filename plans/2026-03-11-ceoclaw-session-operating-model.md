@@ -42,13 +42,12 @@ Reason:
 
 Prefer lead-first sequencing for the active sessions defined in the master execution plan.
 
-As of 2026-03-11 after Session 28 landed, that means the remaining Wave 7 queue:
-- Session 29.
+As of 2026-03-12 after Session 33 landed, Wave 9 is active and the next lead-first sequence moves into Session 34.
 
 Recommended concurrency:
-- 1 lead session for schema or durable workflow state;
-- 1 worker session maximum for isolated route/UI work during Session 28;
-- 2 worker sessions maximum only after the Wave 7 storage boundary is stable;
+- 1 lead session for cross-surface workflow and audit/export boundary changes;
+- 1 worker session maximum for isolated UI/export work while Session 34 fixes the audit-pack boundary;
+- 2 worker sessions maximum only after the Wave 9 audit boundary is stable;
 - 3 sessions maximum per wave for now.
 
 ## 3. Session Roles
@@ -182,7 +181,7 @@ Status: Sessions 09 through 26 are complete on 2026-03-11. Meeting-to-action, wo
 ### Stage 8
 
 Start the next sequence only after the previous one is canonically fixed in the master plan.
-Status: the next active sequence is now chosen. Sessions 27 and 28 are complete, and Wave 7 should continue lead-first through Session 29.
+Status: Sessions 27 through 33 are complete, Wave 9 is active through Session 33, and Session 34 is the next lead-first step.
 
 ## 8. When Not to Parallelize
 
@@ -211,10 +210,10 @@ That means:
 Right now:
 
 1. Wave 0 no longer blocks parallel execution.
-2. Sessions 01 through 28 are complete on the lead branch.
+2. Sessions 01 through 33 are complete on the lead branch.
 3. Keep exact active session selection in the master execution plan, not here.
-4. Wave 6 is now complete on the lead branch.
-5. The active sequence is Wave 7 durable runtime hardening, with Session 29 next.
+4. Wave 7 and Wave 8 are complete on the lead branch, and Wave 9 is now active through Session 33.
+5. The active sequence is Wave 9 pilot-grade operatorization, with Session 34 next.
 
 ## 11. Success Condition for This Operating Model
 

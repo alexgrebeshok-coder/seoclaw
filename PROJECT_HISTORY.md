@@ -9,15 +9,15 @@
 
 ---
 
-## Актуальная рамка на 2026-03-11
+## Актуальная рамка на 2026-03-12
 
 История ниже полезна как эволюция продукта, но текущая форма CEOClaw уже шире исходного dashboard MVP.
 
 Актуально:
 
 1. продукт движется из `AI-powered PM dashboard` в `AI operating layer`;
-2. уже есть proposal/apply, work reports, executive briefs, plan-vs-fact, policy/workspace model, Telegram delivery, SMTP email delivery, GPS telemetry sample, 1C finance sample, evidence ledger, visual facts, AI trace/evals, operator escalation queue, live/demo truth layer, knowledge loop, enterprise truth expansion, durable AI run ledger и explicit sync jobs для evidence/escalation;
-3. следующий этап уже выбран как явный post-Wave-6 track: durable runtime hardening -> source-of-truth depth -> pilot-grade operatorization.
+2. уже есть proposal/apply, work reports, executive briefs, plan-vs-fact, policy/workspace model, Telegram delivery, SMTP email delivery, GPS telemetry truth with normalized session/equipment/geofence rollups, 1C financial truth with normalized project deltas and portfolio rollups, evidence ledger, visual facts, AI trace/evals, operator escalation queue, live/demo truth layer, knowledge loop, enterprise truth expansion, durable AI run ledger, explicit sync jobs для evidence/escalation, durable delivery ledger с idempotent execution, persisted reconciliation casefiles с explainable mismatch reasons и executive command center с shared exception inbox across escalations and reconciliation gaps;
+3. Wave 7 durable runtime hardening закрыт через Session 29, Wave 8 source-of-truth depth закрыт через Session 32, Wave 9 pilot-grade operatorization уже идёт через Session 33, а следующий канонический шаг — Session 34 audit pack and operational exports.
 
 Единственный канонический источник текущего execution-state:
 

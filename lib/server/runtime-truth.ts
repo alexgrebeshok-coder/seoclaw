@@ -1,7 +1,9 @@
 import type { ConnectorStatus, ConnectorStatusSummary } from "@/lib/connectors";
+import type { ExceptionInboxResult } from "@/lib/command-center";
 import type { GpsTelemetrySampleSnapshot } from "@/lib/connectors/gps-client";
 import type { OneCFinanceSampleSnapshot } from "@/lib/connectors/one-c-client";
 import type { EscalationListResult } from "@/lib/escalations";
+import type { DerivedSyncStatus } from "@/lib/sync-state";
 
 import type { ServerRuntimeState } from "./runtime-mode";
 
@@ -42,6 +44,20 @@ function getSampleLabel(
       return `${label} degraded`;
     default:
       return `${label} pending`;
+  }
+}
+
+function getSyncLabel(status: DerivedSyncStatus | "idle") {
+  switch (status) {
+    case "success":
+      return "Fresh";
+    case "running":
+      return "Running";
+    case "error":
+      return "Failed";
+    case "idle":
+    default:
+      return "Idle";
   }
 }
 
@@ -99,12 +115,12 @@ export function buildIntegrationsRuntimeTruth(input: {
     status,
     description:
       status === "live"
-        ? "Portfolio context and evidence ledger are backed by the live database, while connector probes and sample reads report their own real external state."
+        ? "Portfolio context and evidence ledger are backed by the live database, while connector probes and truth reads report their own real external state."
         : status === "mixed"
-          ? "This page mixes demo portfolio context with live connector probes and read-only samples. Treat connector evidence as real and portfolio context as illustrative."
+          ? "This page mixes demo portfolio context with live connector probes and read-only truth slices. Treat connector evidence as real and portfolio context as illustrative."
           : status === "degraded"
             ? "APP_DATA_MODE=live is active, but database-backed portfolio context is unavailable. Connector probes may still report their own external health."
-            : "This page is currently using demo portfolio context. Any configured external connector reads are either unavailable or not confirmed as live yet.",
+            : "This page is currently using demo portfolio context. Any configured external connector truth reads are either unavailable or not confirmed as live yet.",
     facts: [
       { label: "Runtime mode", value: describeMode(runtime.dataMode) },
       {
@@ -115,8 +131,8 @@ export function buildIntegrationsRuntimeTruth(input: {
         label: "Connector probes",
         value: `${connectorSummary.configured}/${connectorSummary.total} configured`,
       },
-      { label: "GPS sample", value: getSampleLabel("GPS", gpsSample.status) },
-      { label: "1C sample", value: getSampleLabel("1C", oneCSample.status) },
+      { label: "GPS truth", value: getSampleLabel("GPS", gpsSample.status) },
+      { label: "1C truth", value: getSampleLabel("1C", oneCSample.status) },
       {
         label: "Evidence ledger",
         value: runtime.databaseConfigured ? `${evidenceCount} persisted record${evidenceCount === 1 ? "" : "s"}` : "Unavailable without DB",
@@ -240,6 +256,52 @@ export function buildBriefsRuntimeTruth(input: {
       },
       { label: "Top alerts", value: String(portfolioAlertCount) },
       { label: "Project briefs", value: String(projectBriefCount) },
+    ],
+  };
+}
+
+export function buildCommandCenterRuntimeTruth(input: {
+  inbox: ExceptionInboxResult;
+  runtime: ServerRuntimeState;
+}): OperatorRuntimeTruth {
+  const { inbox, runtime } = input;
+  const status: OperatorTruthStatus =
+    runtime.healthStatus === "degraded"
+      ? "degraded"
+      : runtime.usingMockData
+        ? "demo"
+        : "live";
+
+  return {
+    status,
+    description:
+      status === "live"
+        ? "The command center is reading live escalation follow-through and reconciliation gaps from one operator inbox."
+        : status === "degraded"
+          ? "Live operator workflows were requested, but DATABASE_URL is unavailable. The command center cannot manage real exceptions."
+          : "Demo mode keeps the command center in preview only. Live exception follow-through and closure are intentionally blocked.",
+    facts: [
+      { label: "Runtime mode", value: describeMode(runtime.dataMode) },
+      {
+        label: "Inbox items",
+        value: `${inbox.summary.total} loaded exception${inbox.summary.total === 1 ? "" : "s"}`,
+      },
+      {
+        label: "Critical/high",
+        value: String(inbox.summary.critical + inbox.summary.high),
+      },
+      {
+        label: "Owned now",
+        value: `${inbox.summary.assigned} assigned`,
+      },
+      {
+        label: "Escalation sync",
+        value: getSyncLabel(inbox.sync.escalations?.status ?? "idle"),
+      },
+      {
+        label: "Reconciliation sync",
+        value: getSyncLabel(inbox.sync.reconciliation?.status ?? "idle"),
+      },
     ],
   };
 }

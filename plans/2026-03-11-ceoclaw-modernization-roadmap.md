@@ -10,7 +10,7 @@ This roadmap explains the modernization direction and 30/60/90-day shape. It is 
 
 ## 1. Why This Roadmap Exists
 
-CEOClaw has already crossed the alpha threshold for an AI operating layer. Sessions 01 through 28 are complete on the lead branch, and the product already spans:
+CEOClaw has already crossed the alpha threshold for an AI operating layer. Sessions 01 through 33 are complete on the lead branch, and the product already spans:
 - enterprise fact intake;
 - evidence and verification;
 - proposal and apply;
@@ -30,10 +30,10 @@ CEOClaw should evolve from a strong alpha into a pilot-grade, evidence-backed op
 
 The highest-leverage gaps are now:
 
-1. workflow state is not yet durable enough;
-2. truth derivation still happens too much on read paths;
-3. source-of-truth domains are still too narrow;
-4. operator control is spread across pages instead of one pilot-grade command model.
+1. audit and export packaging is not yet strong enough for pilot review;
+2. command-center workload still needs deterministic audit artifacts and handoff surfaces;
+3. pilot controls are not yet strong enough for tenant-safe rollout;
+4. workspace/environment guardrails still need a clearer live-pilot posture.
 
 ## 3. Current Baseline
 
@@ -51,18 +51,16 @@ As of 2026-03-11 the lead branch already has:
 10. evidence ledger with `reported / observed / verified` states;
 11. Video Fact MVP and cross-source confidence fusion;
 12. AI trace, provenance, eval coverage, and action safety/compensation;
-13. escalation queue, knowledge loop, and enterprise truth rollup.
+13. escalation queue, knowledge loop, enterprise truth rollup, normalized GPS telemetry truth, normalized 1C financial truth with deterministic project deltas, persisted reconciliation casefiles for inspectable mismatch reasons, and an executive command center with a shared exception inbox across escalations and reconciliation gaps.
 
 ## 4. Gaps Still Open
 
 The following high-value gaps remain open:
 
-1. AI runs and workflow traces still rely on file-backed state in `.ceoclaw-cache`.
-2. Evidence and escalation state now have explicit sync boundaries, but outbound delivery execution still lacks a durable ledger.
-3. GPS and 1C are still narrow read domains, not deeper operational truth models.
-4. There is no durable reconciliation casefile linking finance, telemetry, work reports, and video evidence.
-5. Operator control is distributed across multiple pages instead of one exception-driven command view.
-6. Audit/export and pilot controls are not yet strong enough for enterprise rollout.
+1. GPS and 1C are still narrow read domains, not deeper operational truth models.
+2. The shared command model exists, but audit/export and pilot controls are not yet strong enough for enterprise rollout.
+3. Reconciliation, evidence, and outbound execution still need deterministic audit packaging for pilot review.
+4. Tenant-safe rollout guardrails still need to catch up with the richer command and truth layers.
 
 ## 5. 30-Day Plan
 
@@ -119,6 +117,9 @@ Exit criteria:
 - delivery retries stop depending on blind re-execution;
 - outbound actions become auditable per run and per target.
 
+Status:
+- complete on 2026-03-11 in the lead branch.
+
 ## 6. 60-Day Plan
 
 ### Wave 8: Source-of-Truth Depth
@@ -133,6 +134,9 @@ Deliver:
 - narrow but honest telemetry views beyond the current sample card;
 - deterministic mappings that other truth layers can reference.
 
+Status:
+- complete on 2026-03-12 in the lead branch.
+
 #### Session 31: 1C Financial Truth Deepening
 
 Goal:
@@ -142,6 +146,9 @@ Deliver:
 - broader project finance slices suitable for reconciliation;
 - operator-visible financial truth deltas that can be linked to field evidence;
 - no write-back semantics yet.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
 
 #### Session 32: Reconciliation Casefile and Fact Linking
 
@@ -153,11 +160,17 @@ Deliver:
 - explainable matching and mismatch reasons;
 - one operator surface for unresolved reconciliation gaps.
 
+Status:
+- complete on 2026-03-12 in the lead branch.
+
 Exit criteria across Wave 8:
 
 1. GPS and 1C truth become materially deeper than narrow sample reads.
 2. Cross-source mismatches are inspectable as cases, not only summary counters.
 3. Operators can answer why a project is corroborated, partial, or contradictory.
+
+Wave 8 status:
+- complete on 2026-03-12 in the lead branch.
 
 ## 7. 90-Day Plan
 
@@ -172,6 +185,9 @@ Deliver:
 - shared command center for escalations, truth gaps, and pending follow-through;
 - owner-first exception inbox;
 - clearer management path from signal to action to closure.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
 
 #### Session 34: Audit Pack and Operational Exports
 
@@ -198,6 +214,10 @@ Deliver across the 90-day horizon:
 - deeper source truth;
 - unified operator control;
 - auditability and safer pilot rollout.
+
+Wave 9 status:
+- in progress on 2026-03-12 in the lead branch through Session 33.
+- the next canonical session is Session 34.
 
 ## 8. Research Principles Behind This Roadmap
 

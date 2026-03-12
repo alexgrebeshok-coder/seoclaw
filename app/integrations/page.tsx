@@ -4,9 +4,13 @@ import {
   getConnectorRegistry,
   summarizeConnectorStatuses,
 } from "@/lib/connectors";
-import { getEnterpriseTruthOverview } from "@/lib/enterprise-truth";
-import { getGpsTelemetrySampleSnapshot } from "@/lib/connectors/gps-client";
-import { getOneCFinanceSampleSnapshot } from "@/lib/connectors/one-c-client";
+import {
+  getEnterpriseTruthOverview,
+  getReconciliationCasefiles,
+  type ReconciliationCasefileListResult,
+} from "@/lib/enterprise-truth";
+import { getGpsTelemetryTruthSnapshot } from "@/lib/connectors/gps-client";
+import { getOneCFinanceTruthSnapshot } from "@/lib/connectors/one-c-client";
 import { getEvidenceFusionOverview, getEvidenceLedgerOverview } from "@/lib/evidence";
 import { getServerRuntimeState } from "@/lib/server/runtime-mode";
 import { buildIntegrationsRuntimeTruth } from "@/lib/server/runtime-truth";
@@ -16,17 +20,35 @@ export const dynamic = "force-dynamic";
 
 export default async function IntegrationsRoute() {
   const runtimeState = getServerRuntimeState();
-  const [connectors, gpsSample, oneCSample] = await Promise.all([
+  const emptyCasefiles: ReconciliationCasefileListResult = {
+    syncedAt: null,
+    summary: {
+      total: 0,
+      open: 0,
+      resolved: 0,
+      corroborated: 0,
+      contradictory: 0,
+      partial: 0,
+      projectCases: 0,
+      telemetryGaps: 0,
+    },
+    cases: [],
+    sync: null,
+  };
+  const [connectors, gpsTelemetry, oneCFinance, reconciliation] = await Promise.all([
     getConnectorRegistry().getStatuses(),
-    getGpsTelemetrySampleSnapshot(),
-    getOneCFinanceSampleSnapshot(),
+    getGpsTelemetryTruthSnapshot(),
+    getOneCFinanceTruthSnapshot(),
+    runtimeState.databaseConfigured
+      ? getReconciliationCasefiles({ limit: 24 })
+      : Promise.resolve(emptyCasefiles),
   ]);
   const summary = summarizeConnectorStatuses(connectors);
   const evidence = runtimeState.databaseConfigured
     ? await getEvidenceLedgerOverview(
         { limit: 24 },
         {
-          gpsSnapshot: gpsSample,
+          gpsSnapshot: gpsTelemetry,
           listReports: runtimeState.usingMockData ? async () => [] : undefined,
         }
       )
@@ -67,15 +89,15 @@ export default async function IntegrationsRoute() {
     {
       evidence,
       fusion,
-      gpsSample,
-      oneCSample,
+      gpsSample: gpsTelemetry,
+      oneCSample: oneCFinance,
     }
   );
   const runtimeTruth = buildIntegrationsRuntimeTruth({
     connectorSummary: summary,
     evidenceCount: evidence.summary.total,
-    gpsSample,
-    oneCSample,
+    gpsSample: gpsTelemetry,
+    oneCSample: oneCFinance,
     runtime: runtimeState,
   });
 
@@ -86,8 +108,9 @@ export default async function IntegrationsRoute() {
         evidence={evidence}
         enterpriseTruth={enterpriseTruth}
         fusion={fusion}
-        gpsSample={gpsSample}
-        oneCSample={oneCSample}
+        gpsTelemetry={gpsTelemetry}
+        oneCFinance={oneCFinance}
+        reconciliation={reconciliation}
         runtimeTruth={runtimeTruth}
         summary={summary}
       />

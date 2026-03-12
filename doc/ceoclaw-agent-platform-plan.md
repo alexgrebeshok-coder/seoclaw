@@ -185,12 +185,16 @@
 - `enterprise truth expansion`
 - `durable AI run workflow ledger`
 - `explicit evidence and escalation sync jobs`
+- `durable delivery ledger and idempotent outbound execution`
+- `normalized GPS telemetry truth with session/equipment/geofence rollups`
+- `normalized 1C financial truth with project deltas and portfolio rollups`
+- `persisted reconciliation casefiles with deterministic mismatch reasons across finance, field evidence, and telemetry`
+- `executive command center with a shared exception inbox across escalations and reconciliation casefiles`
 
 Следующий рекомендованный ход:
 - execute the chosen post-Wave-6 sequence explicitly:
-  - Wave 7: durable runtime hardening;
-  - Wave 8: source-of-truth depth;
-  - Wave 9: pilot-grade operatorization.
+  - Wave 9 is now in progress through Session 33: executive command center and exception inbox;
+  - start Session 34: audit pack and operational exports.
 
 ## Definition of Done по релизу Alpha
 

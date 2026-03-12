@@ -45,6 +45,7 @@ export const operationsNavigation: NavigationItem[] = [
   { href: "/imports", label: "Imports", icon: Database },
   { href: "/briefs", label: "Executive Briefs", icon: FileText },
   { href: "/meetings", label: "Meeting to Action", icon: MessageSquareText },
+  { href: "/command-center", label: "Command Center", icon: AlertTriangle },
   { href: "/work-reports", label: "Work Reports", icon: RefreshCcw },
   { href: "/integrations", label: "Connector Health", icon: Wrench },
 ];
@@ -77,6 +78,7 @@ const localizedPageTitles: Record<string, ResolvedTitle> = {
   "/imports": { eyebrow: "Data intake", title: "Imports" },
   "/briefs": { eyebrow: "Executive comms", title: "Executive Briefs" },
   "/meetings": { eyebrow: "Agentic intake", title: "Meeting to Action" },
+  "/command-center": { eyebrow: "Exception control", title: "Executive Command Center" },
   "/work-reports": { eyebrow: "Delivery cadence", title: "Work Reports" },
   "/integrations": { eyebrow: "Platform trust", title: "Connector Health" },
 };
@@ -101,6 +103,10 @@ export function resolveTitle(pathname: string | null): ResolvedTitle {
 
   if (safePathname.startsWith("/meetings/")) {
     return localizedPageTitles["/meetings"];
+  }
+
+  if (safePathname.startsWith("/command-center/")) {
+    return localizedPageTitles["/command-center"];
   }
 
   if (safePathname.startsWith("/work-reports/")) {

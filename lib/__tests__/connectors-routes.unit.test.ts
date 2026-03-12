@@ -4,6 +4,8 @@ import { NextRequest } from "next/server";
 import { GET as getConnectorById } from "../../app/api/connectors/[id]/route";
 import { POST as postEmailBrief } from "../../app/api/connectors/email/briefs/route";
 import { GET as getGpsSample } from "../../app/api/connectors/gps/sample/route";
+import { GET as getGpsTelemetry } from "../../app/api/connectors/gps/telemetry/route";
+import { GET as getOneCFinance } from "../../app/api/connectors/one-c/finance/route";
 import { GET as getOneCSample } from "../../app/api/connectors/one-c/sample/route";
 import { GET as getConnectors } from "../../app/api/connectors/route";
 import { GET as getHealth } from "../../app/api/health/route";
@@ -87,7 +89,7 @@ function installConnectorFetchMock() {
     }
 
     if (url.includes("1c.example.com") && url.includes("/project-financials")) {
-      if (url.includes("page_size=1")) {
+      if (new URL(url).searchParams.get("page_size") === "1") {
         return createJsonResponse({
           provider: "1C:ERP",
           projects: [
@@ -271,6 +273,21 @@ async function run() {
         assert.equal(gpsSampleBody.samples[0].equipmentId, "EXC-KOM-01");
         assert.equal(gpsSampleBody.samples[0].status, "work");
 
+        const gpsTelemetryResponse = await getGpsTelemetry(accessRequest);
+        const gpsTelemetryBody = await gpsTelemetryResponse.json();
+        assert.equal(gpsTelemetryResponse.status, 200);
+        assert.equal(gpsTelemetryBody.id, "gps");
+        assert.equal(gpsTelemetryBody.status, "ok");
+        assert.equal(gpsTelemetryBody.summary.sessionCount, 1);
+        assert.equal(gpsTelemetryBody.summary.equipmentCount, 1);
+        assert.equal(gpsTelemetryBody.summary.geofenceCount, 1);
+        assert.equal(gpsTelemetryBody.equipment[0].equipmentId, "EXC-KOM-01");
+        assert.equal(
+          gpsTelemetryBody.geofences[0].geofenceName,
+          "Salekhard-Labytnangi Earthwork Zone"
+        );
+        assert.equal(gpsTelemetryBody.sessions[0].sessionId, "sess-20260207-EXC-KOM-01-003");
+
         const oneCSampleResponse = await getOneCSample(accessRequest);
         const oneCSampleBody = await oneCSampleResponse.json();
         assert.equal(oneCSampleResponse.status, 200);
@@ -279,6 +296,20 @@ async function run() {
         assert.equal(oneCSampleBody.samples.length, 2);
         assert.equal(oneCSampleBody.samples[0].projectId, "proj-yanao-001");
         assert.equal(oneCSampleBody.samples[1].status, "over_budget");
+
+        const oneCFinanceResponse = await getOneCFinance(accessRequest);
+        const oneCFinanceBody = await oneCFinanceResponse.json();
+        assert.equal(oneCFinanceResponse.status, 200);
+        assert.equal(oneCFinanceBody.id, "one-c");
+        assert.equal(oneCFinanceBody.status, "ok");
+        assert.equal(oneCFinanceBody.summary.projectCount, 2);
+        assert.equal(oneCFinanceBody.summary.overPlanCount, 1);
+        assert.equal(oneCFinanceBody.summary.underPlanCount, 1);
+        assert.equal(oneCFinanceBody.summary.totalBudgetVariance, 3500000);
+        assert.equal(oneCFinanceBody.projects[0].projectId, "proj-yanao-002");
+        assert.equal(oneCFinanceBody.projects[0].budgetDeltaStatus, "over_plan");
+        assert.equal(oneCFinanceBody.projects[1].projectId, "proj-yanao-001");
+        assert.equal(oneCFinanceBody.projects[1].budgetDeltaStatus, "under_plan");
 
         const missingResponse = await getConnectorById(accessRequest, {
           params: Promise.resolve({ id: "missing" }),
@@ -299,6 +330,7 @@ async function run() {
             body: JSON.stringify({
               scope: "portfolio",
               locale: "ru",
+              idempotencyKey: `connectors-route-email-${Date.now()}`,
             }),
           }
         );
