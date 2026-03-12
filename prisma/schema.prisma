@@ -472,6 +472,45 @@ model CutoverDecision {
   @@index([decisionType, createdAt])
 }
 
+model TenantOnboardingRunbook {
+  id                    String   @id @default(cuid())
+  workspaceId           String   @default("executive")
+  baselineTenantSlug    String
+  baselineTenantLabel   String
+  targetTenantSlug      String?
+  targetTenantLabel     String?
+  status                String   @default("draft")
+  summary               String
+  rolloutScope          String
+  operatorNotes         String?
+  handoffNotes          String?
+  rollbackPlan          String?
+  targetCutoverAt       DateTime?
+  templateVersion       String   @default("tenant-rollout-v1")
+  readinessOutcome      String
+  readinessOutcomeLabel String
+  readinessGeneratedAt  DateTime
+  reviewOutcome         String
+  reviewOutcomeLabel    String
+  reviewGeneratedAt     DateTime
+  latestDecisionType    String?
+  latestDecisionLabel   String?
+  latestDecisionSummary String?
+  latestDecisionAt      DateTime?
+  blockerCount          Int      @default(0)
+  warningCount          Int      @default(0)
+  createdByUserId       String?
+  createdByName         String?
+  createdByRole         String?
+  updatedByUserId       String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([workspaceId, updatedAt])
+  @@index([baselineTenantSlug, updatedAt])
+  @@index([status, updatedAt])
+}
+
 model DeliveryLedger {
   id                String   @id @default(cuid())
   channel           String

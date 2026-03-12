@@ -7,11 +7,13 @@ import type { ServerRuntimeState } from "@/lib/server/runtime-mode";
 import {
   buildBriefsRuntimeTruth,
   buildIntegrationsRuntimeTruth,
+  buildTenantOnboardingRuntimeTruth,
   buildPilotReviewRuntimeTruth,
   buildTenantReadinessRuntimeTruth,
   buildWorkReportsRuntimeTruth,
   getOperatorTruthBadge,
 } from "@/lib/server/runtime-truth";
+import type { TenantOnboardingOverview } from "@/lib/tenant-onboarding";
 import type { TenantReadinessReport } from "@/lib/tenant-readiness";
 
 const connectorSummary: ConnectorStatusSummary = {
@@ -294,6 +296,144 @@ const demoReviewTruth = buildPilotReviewRuntimeTruth({
 });
 assert.equal(
   demoReviewTruth.facts.find((fact) => fact.label === "Active concerns")?.value,
+  "Unavailable"
+);
+
+const tenantOnboardingOverview: TenantOnboardingOverview = {
+  accessProfile: readiness.accessProfile,
+  currentReadiness: {
+    generatedAt: readiness.generatedAt,
+    outcome: readiness.outcome,
+    outcomeLabel: readiness.outcomeLabel,
+    posture: {
+      liveMutationAllowed: readiness.posture.liveMutationAllowed,
+      stage: readiness.posture.stage,
+      stageLabel: readiness.posture.stageLabel,
+      tenantSlug: readiness.posture.tenantSlug,
+      writeWorkspaces: readiness.posture.writeWorkspaces,
+    },
+    summary: {
+      blockers: readiness.summary.blockers,
+      warnings: readiness.summary.warnings,
+    },
+    tenant: readiness.tenant,
+  },
+  currentReview: {
+    artifact: {
+      fileName: pilotReview.artifact.fileName,
+      format: pilotReview.artifact.format,
+    },
+    generatedAt: pilotReview.generatedAt,
+    outcome: "ready",
+    outcomeLabel: "Ready",
+    summary: {
+      blockedSections: 0,
+      openExceptions: 0,
+      openFeedback: 0,
+      warningSections: 0,
+    },
+  },
+  generatedAt: "2026-03-12T08:10:00.000Z",
+  latestDecision: {
+    createdAt: "2026-03-12T08:07:00.000Z",
+    createdByName: "Alex",
+    createdByRole: "EXEC",
+    createdByUserId: "alex-1",
+    decisionLabel: "Cutover approved",
+    decisionType: "cutover_approved",
+    details: null,
+    id: "decision-1",
+    readinessGeneratedAt: readiness.generatedAt,
+    readinessOutcome: readiness.outcome,
+    readinessOutcomeLabel: readiness.outcomeLabel,
+    reviewGeneratedAt: pilotReview.generatedAt,
+    reviewOutcome: "ready",
+    reviewOutcomeLabel: "Ready",
+    summary: "Approved the next rollout window.",
+    tenantSlug: readiness.tenant.slug,
+    warningId: null,
+    warningLabel: null,
+    workspaceId: "executive",
+  },
+  latestRunbook: {
+    baselineTenantLabel: readiness.tenant.label,
+    baselineTenantSlug: readiness.tenant.slug,
+    blockerCount: 0,
+    createdAt: "2026-03-12T08:06:00.000Z",
+    createdByName: "Alex",
+    createdByRole: "EXEC",
+    createdByUserId: "alex-1",
+    handoffNotes: "Share with executive reviewer.",
+    id: "runbook-1",
+    latestDecisionAt: "2026-03-12T08:07:00.000Z",
+    latestDecisionLabel: "Cutover approved",
+    latestDecisionSummary: "Approved the next rollout window.",
+    latestDecisionType: "cutover_approved",
+    operatorNotes: "Start in delivery workspace.",
+    readinessGeneratedAt: readiness.generatedAt,
+    readinessOutcome: readiness.outcome,
+    readinessOutcomeLabel: readiness.outcomeLabel,
+    reviewGeneratedAt: pilotReview.generatedAt,
+    reviewOutcome: "ready",
+    reviewOutcomeLabel: "Ready",
+    rollbackPlan: "Return to current tenant only.",
+    rolloutScope: "Prepare the northern tenant rollout.",
+    status: "prepared",
+    statusLabel: "Prepared",
+    summary: "Prepare the northern tenant rollout.",
+    targetCutoverAt: "2026-03-15T09:00:00.000Z",
+    targetTenantLabel: "Northern tenant",
+    targetTenantSlug: "tenant-north",
+    templateVersion: "tenant-rollout-v1",
+    updatedAt: "2026-03-12T08:09:00.000Z",
+    updatedByUserId: "alex-1",
+    warningCount: 0,
+    workspaceId: "executive",
+  },
+  persistenceAvailable: true,
+  runbooks: [],
+  summary: {
+    completed: 0,
+    draft: 0,
+    prepared: 1,
+    scheduled: 0,
+    total: 1,
+  },
+  template: {
+    intro: "Onboarding template",
+    items: [],
+    version: "tenant-rollout-v1",
+  },
+};
+
+const tenantOnboardingTruth = buildTenantOnboardingRuntimeTruth({
+  overview: tenantOnboardingOverview,
+  runtime: liveRuntime,
+});
+assert.equal(tenantOnboardingTruth.status, "live");
+assert.equal(
+  tenantOnboardingTruth.facts.find((fact) => fact.label === "Latest runbook")?.value,
+  "Prepared"
+);
+
+const tenantOnboardingDemoTruth = buildTenantOnboardingRuntimeTruth({
+  overview: {
+    ...tenantOnboardingOverview,
+    latestRunbook: null,
+    persistenceAvailable: false,
+    summary: {
+      completed: 0,
+      draft: 0,
+      prepared: 0,
+      scheduled: 0,
+      total: 0,
+    },
+  },
+  runtime: demoRuntime,
+});
+assert.equal(tenantOnboardingDemoTruth.status, "demo");
+assert.equal(
+  tenantOnboardingDemoTruth.facts.find((fact) => fact.label === "Saved runbooks")?.value,
   "Unavailable"
 );
 

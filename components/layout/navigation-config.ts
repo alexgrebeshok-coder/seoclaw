@@ -52,6 +52,7 @@ export const operationsNavigation: NavigationItem[] = [
   { href: "/pilot-controls", label: "Pilot Controls", icon: ShieldCheck },
   { href: "/pilot-feedback", label: "Pilot Feedback", icon: MessageSquareText },
   { href: "/tenant-readiness", label: "Tenant Readiness", icon: ListChecks },
+  { href: "/tenant-onboarding", label: "Tenant Onboarding", icon: FileText },
   { href: "/pilot-review", label: "Pilot Review", icon: FileText },
   { href: "/work-reports", label: "Work Reports", icon: RefreshCcw },
   { href: "/integrations", label: "Connector Health", icon: Wrench },
@@ -90,6 +91,7 @@ const localizedPageTitles: Record<string, ResolvedTitle> = {
   "/pilot-controls": { eyebrow: "Rollout posture", title: "Pilot Controls" },
   "/pilot-feedback": { eyebrow: "Pilot loop", title: "Pilot Feedback" },
   "/tenant-readiness": { eyebrow: "Go-live posture", title: "Tenant Readiness" },
+  "/tenant-onboarding": { eyebrow: "Rollout runbook", title: "Tenant Onboarding" },
   "/pilot-review": { eyebrow: "Governance review", title: "Pilot Review" },
   "/work-reports": { eyebrow: "Delivery cadence", title: "Work Reports" },
   "/integrations": { eyebrow: "Platform trust", title: "Connector Health" },
@@ -135,6 +137,10 @@ export function resolveTitle(pathname: string | null): ResolvedTitle {
 
   if (safePathname.startsWith("/tenant-readiness/")) {
     return localizedPageTitles["/tenant-readiness"];
+  }
+
+  if (safePathname.startsWith("/tenant-onboarding/")) {
+    return localizedPageTitles["/tenant-onboarding"];
   }
 
   if (safePathname.startsWith("/pilot-review/")) {

@@ -148,6 +148,9 @@ export function PilotReviewPage({
             <Link className={buttonVariants({ variant: "outline" })} href="/pilot-feedback">
               Open pilot feedback
             </Link>
+            <Link className={buttonVariants({ variant: "outline" })} href="/tenant-onboarding">
+              Open tenant onboarding
+            </Link>
             <Link className={buttonVariants({ variant: "outline" })} href="/briefs">
               Open executive briefs
             </Link>

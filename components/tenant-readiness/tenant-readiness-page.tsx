@@ -268,6 +268,9 @@ export function TenantReadinessPage({
             <Link className={buttonVariants({ variant: "outline" })} href="/pilot-review">
               Open pilot review
             </Link>
+            <Link className={buttonVariants({ variant: "outline" })} href="/tenant-onboarding">
+              Open tenant onboarding
+            </Link>
           </>
         }
         chips={[

@@ -7,6 +7,7 @@ import type { EscalationListResult } from "@/lib/escalations";
 import type { PilotReviewScorecard } from "@/lib/pilot-review";
 import type { PilotFeedbackListResult } from "@/lib/pilot-feedback";
 import { getPilotControlState, getPilotStageLabel, type PilotControlState } from "@/lib/server/pilot-controls";
+import type { TenantOnboardingOverview } from "@/lib/tenant-onboarding";
 import type { TenantReadinessReport } from "@/lib/tenant-readiness";
 import type { DerivedSyncStatus } from "@/lib/sync-state";
 
@@ -570,6 +571,78 @@ export function buildPilotReviewRuntimeTruth(input: {
         value: scorecard.artifact.fileName,
       },
     ],
+  };
+}
+
+export function buildTenantOnboardingRuntimeTruth(input: {
+  overview: TenantOnboardingOverview;
+  runtime: ServerRuntimeState;
+}): OperatorRuntimeTruth {
+  const { overview, runtime } = input;
+  const activeWarnings =
+    overview.currentReadiness.summary.warnings + overview.currentReview.summary.warningSections;
+  const latestRunbook = overview.latestRunbook;
+  const status: OperatorTruthStatus =
+    runtime.healthStatus === "degraded"
+      ? "degraded"
+      : runtime.usingMockData
+        ? "demo"
+        : overview.currentReadiness.outcome === "blocked" ||
+            overview.currentReview.outcome === "blocked"
+          ? "mixed"
+          : latestRunbook && latestRunbook.status !== "draft"
+            ? "live"
+            : "mixed";
+
+  return {
+    status,
+    description:
+      status === "degraded"
+        ? "Tenant onboarding is degraded because the server runtime cannot guarantee trustworthy readiness, review, or persistence facts."
+        : status === "demo"
+          ? "The rollout template is visible, but demo or unavailable operator data means saved onboarding runbooks cannot be treated as live widening state."
+          : overview.currentReadiness.outcome === "blocked" ||
+              overview.currentReview.outcome === "blocked"
+            ? "The rollout runbook is persisted, but the current baseline still has blocked readiness or governance signals."
+            : latestRunbook && latestRunbook.status !== "draft"
+              ? "The rollout baseline is live and a persisted runbook already carries target-tenant, handoff, and rollback context."
+              : "The rollout baseline is live, but the latest handoff is still draft-level or not yet persisted.",
+    facts: [
+      { label: "Runtime mode", value: describeMode(runtime.dataMode) },
+      { label: "Baseline tenant", value: overview.currentReadiness.tenant.slug },
+      {
+        label: "Current baseline",
+        value: `${overview.currentReadiness.outcomeLabel} readiness · ${overview.currentReview.outcomeLabel} review`,
+      },
+      {
+        label: "Latest decision",
+        value: overview.latestDecision?.decisionLabel ?? "No decision recorded",
+      },
+      {
+        label: "Latest runbook",
+        value: latestRunbook ? latestRunbook.statusLabel : "Not started",
+      },
+      {
+        label: "Saved runbooks",
+        value: formatAvailabilityCount({
+          runtime,
+          value: overview.summary.total,
+        }),
+      },
+      {
+        label: "Active warnings",
+        value: formatAvailabilityCount({
+          runtime,
+          value: activeWarnings,
+        }),
+      },
+    ],
+    note:
+      !overview.persistenceAvailable && runtime.databaseConfigured
+        ? "Persistence is disabled for this response even though DATABASE_URL exists."
+        : !overview.persistenceAvailable
+          ? "Enable DATABASE_URL to turn the rollout template into a durable onboarding handoff."
+          : undefined,
   };
 }
 
