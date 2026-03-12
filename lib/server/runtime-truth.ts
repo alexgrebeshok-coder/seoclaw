@@ -1,3 +1,4 @@
+import type { WorkflowAuditPack } from "@/lib/audit-packs";
 import type { ConnectorStatus, ConnectorStatusSummary } from "@/lib/connectors";
 import type { ExceptionInboxResult } from "@/lib/command-center";
 import type { GpsTelemetrySampleSnapshot } from "@/lib/connectors/gps-client";
@@ -256,6 +257,55 @@ export function buildBriefsRuntimeTruth(input: {
       },
       { label: "Top alerts", value: String(portfolioAlertCount) },
       { label: "Project briefs", value: String(projectBriefCount) },
+    ],
+  };
+}
+
+export function buildAuditPacksRuntimeTruth(input: {
+  candidateCount: number;
+  pack: WorkflowAuditPack | null;
+  runtime: ServerRuntimeState;
+}): OperatorRuntimeTruth {
+  const { candidateCount, pack, runtime } = input;
+  const status: OperatorTruthStatus =
+    runtime.healthStatus === "degraded"
+      ? "degraded"
+      : runtime.usingMockData
+        ? "demo"
+        : "live";
+
+  return {
+    status,
+    description:
+      status === "live"
+        ? "Audit packs are assembled from persisted workflow runs, evidence, and trace artifacts in the live database."
+        : status === "degraded"
+          ? "Live audit-pack export was requested, but database-backed workflow state is unavailable."
+          : "Demo mode keeps audit-pack export in a safe preview state and avoids claiming live operator history.",
+    facts: [
+      { label: "Runtime mode", value: describeMode(runtime.dataMode) },
+      {
+        label: "Workflow ledger",
+        value:
+          status === "live"
+            ? "Live persisted runs"
+            : status === "degraded"
+              ? "Unavailable"
+              : "Demo-safe preview",
+      },
+      { label: "Exportable workflows", value: String(candidateCount) },
+      {
+        label: "Current artifact",
+        value: pack ? pack.scope.packetLabel ?? pack.scope.runId : "No artifact selected",
+      },
+      {
+        label: "Evidence scope",
+        value: pack ? `${pack.evidence.records.length} record${pack.evidence.records.length === 1 ? "" : "s"}` : "No evidence loaded",
+      },
+      {
+        label: "Decision context",
+        value: pack ? pack.decision.status : "No decision loaded",
+      },
     ],
   };
 }

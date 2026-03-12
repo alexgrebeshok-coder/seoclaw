@@ -131,6 +131,9 @@ function mapEscalationInboxItem(item: EscalationRecordView): ExceptionInboxItem 
     observedAt: item.lastObservedAt,
     links: compactLinks([
       { href: "/work-reports", label: "Open work reports" },
+      item.metadata.runId
+        ? { href: `/audit-packs?runId=${item.metadata.runId}`, label: "Open audit pack" }
+        : null,
       item.projectId
         ? { href: `/projects/${item.projectId}`, label: "Open project" }
         : null,

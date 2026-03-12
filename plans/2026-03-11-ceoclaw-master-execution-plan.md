@@ -39,13 +39,14 @@ As of 2026-03-12:
 - Session 31 1C financial truth deepening is complete in the lead branch.
 - Session 32 reconciliation casefile and fact linking is complete in the lead branch.
 - Session 33 executive command center and exception inbox is complete in the lead branch.
+- Session 34 audit pack and operational exports is complete in the lead branch.
 - Wave 1 foundation services are complete. Wave 2 fact capture and connector shell is complete. Wave 3 platform access model is complete through Session 08. Wave 4 vertical pilot now has Session 09, Session 10, Session 11, Session 12, Session 13, and Session 14 complete.
 - Wave 5 evidence and runtime modernization is complete on the lead branch.
 - Wave 6 integration truth expansion is complete on the lead branch through Session 26.
 - Wave 7 durable runtime hardening is complete on the lead branch through Session 29.
 - Wave 8 source-of-truth depth is complete on the lead branch through Session 32.
-- Wave 9 pilot-grade operatorization is in progress on the lead branch through Session 33.
-- The next canonical session is Session 34 inside Wave 9 pilot-grade operatorization.
+- Wave 9 pilot-grade operatorization is in progress on the lead branch through Session 34.
+- The next canonical session is Session 35 inside Wave 9 pilot-grade operatorization.
 
 ## 1. Product Direction
 
@@ -419,7 +420,7 @@ The detailed roadmap for post-alpha modernization is tracked in:
 1. Session 33: Executive Command Center and Exception Inbox
    Status: complete on 2026-03-12 in the lead branch.
 2. Session 34: Audit Pack and Operational Exports
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 3. Session 35: Pilot Controls and Tenant Readiness
    Status: planned.
 
@@ -570,8 +571,8 @@ A worker session should:
 ### Best option right now
 
 1. Keep the lead track on Wave 9 first.
-2. Move directly into Session 34 now that Session 33 fixed the command-model boundary.
-3. Use worker help only for isolated export and pilot-control work while Wave 9 stays lead-first.
+2. Move directly into Session 35 now that Session 34 fixed the audit/export boundary.
+3. Use worker help only for isolated pilot-control work while Wave 9 stays lead-first.
 
 ### Why this is best
 
@@ -588,12 +589,12 @@ That is more valuable now than broadening the UI or adding another shallow conne
 ## 11. Immediate Next Actions
 
 1. Keep Wave 0 closed and stable; it is no longer the active bottleneck.
-2. Keep Sessions 01 through 33 as the locked baseline.
-3. Start Session 34:
-   - export evidence, decisions, traces, and applied changes as deterministic audit packs;
-   - keep the Session 33 command-center workload drillable back to source truth and source actions;
-   - preserve the durable runtime, persisted truth, and idempotent execution guarantees established in Waves 7 through 9.
-4. Keep Session 35 behind the Session 34 audit/export boundary.
+2. Keep Sessions 01 through 34 as the locked baseline.
+3. Start Session 35:
+   - add tenant-safe pilot controls and workspace/environment guardrails on top of the new command and audit surfaces;
+   - preserve the deterministic audit-pack flow and source drillback introduced in Session 34;
+   - keep the durable runtime, persisted truth, and idempotent execution guarantees established in Waves 7 through 9 intact.
+4. Close Wave 9 only after Session 35 fixes pilot safety boundaries canonically.
 
 ## 12. Definition of Alpha
 

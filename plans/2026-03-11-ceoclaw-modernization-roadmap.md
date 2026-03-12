@@ -10,7 +10,7 @@ This roadmap explains the modernization direction and 30/60/90-day shape. It is 
 
 ## 1. Why This Roadmap Exists
 
-CEOClaw has already crossed the alpha threshold for an AI operating layer. Sessions 01 through 33 are complete on the lead branch, and the product already spans:
+CEOClaw has already crossed the alpha threshold for an AI operating layer. Sessions 01 through 34 are complete on the lead branch, and the product already spans:
 - enterprise fact intake;
 - evidence and verification;
 - proposal and apply;
@@ -30,10 +30,10 @@ CEOClaw should evolve from a strong alpha into a pilot-grade, evidence-backed op
 
 The highest-leverage gaps are now:
 
-1. audit and export packaging is not yet strong enough for pilot review;
-2. command-center workload still needs deterministic audit artifacts and handoff surfaces;
-3. pilot controls are not yet strong enough for tenant-safe rollout;
-4. workspace/environment guardrails still need a clearer live-pilot posture.
+1. pilot controls are not yet strong enough for tenant-safe rollout;
+2. workspace/environment guardrails still need a clearer live-pilot posture;
+3. the new command and audit surfaces still need safer tenant/workspace boundaries;
+4. live-pilot onboarding and cutover posture are still not explicit enough.
 
 ## 3. Current Baseline
 
@@ -51,16 +51,16 @@ As of 2026-03-11 the lead branch already has:
 10. evidence ledger with `reported / observed / verified` states;
 11. Video Fact MVP and cross-source confidence fusion;
 12. AI trace, provenance, eval coverage, and action safety/compensation;
-13. escalation queue, knowledge loop, enterprise truth rollup, normalized GPS telemetry truth, normalized 1C financial truth with deterministic project deltas, persisted reconciliation casefiles for inspectable mismatch reasons, and an executive command center with a shared exception inbox across escalations and reconciliation gaps.
+13. escalation queue, knowledge loop, enterprise truth rollup, normalized GPS telemetry truth, normalized 1C financial truth with deterministic project deltas, persisted reconciliation casefiles for inspectable mismatch reasons, an executive command center with a shared exception inbox across escalations and reconciliation gaps, and deterministic audit packs for workflow evidence, trace, and decision handoff.
 
 ## 4. Gaps Still Open
 
 The following high-value gaps remain open:
 
 1. GPS and 1C are still narrow read domains, not deeper operational truth models.
-2. The shared command model exists, but audit/export and pilot controls are not yet strong enough for enterprise rollout.
-3. Reconciliation, evidence, and outbound execution still need deterministic audit packaging for pilot review.
-4. Tenant-safe rollout guardrails still need to catch up with the richer command and truth layers.
+2. The shared command model and audit-pack export now exist, but pilot controls are not yet strong enough for enterprise rollout.
+3. Tenant-safe rollout guardrails still need to catch up with the richer command and truth layers.
+4. Live-pilot onboarding and environment cutover still need safer defaults and clearer controls.
 
 ## 5. 30-Day Plan
 
@@ -199,6 +199,9 @@ Deliver:
 - operator-friendly reporting surfaces for pilot review;
 - deterministic export boundaries.
 
+Status:
+- complete on 2026-03-12 in the lead branch.
+
 #### Session 35: Pilot Controls and Tenant Readiness
 
 Goal:
@@ -216,8 +219,8 @@ Deliver across the 90-day horizon:
 - auditability and safer pilot rollout.
 
 Wave 9 status:
-- in progress on 2026-03-12 in the lead branch through Session 33.
-- the next canonical session is Session 34.
+- in progress on 2026-03-12 in the lead branch through Session 34.
+- the next canonical session is Session 35.
 
 ## 8. Research Principles Behind This Roadmap
 

@@ -205,6 +205,9 @@ export function CommandCenterPage({
             <Link className={buttonVariants({ variant: "outline" })} href="/work-reports">
               Open work reports
             </Link>
+            <Link className={buttonVariants({ variant: "outline" })} href="/audit-packs">
+              Open audit packs
+            </Link>
             <Link className={buttonVariants({ variant: "outline" })} href="/integrations">
               Open connector health
             </Link>

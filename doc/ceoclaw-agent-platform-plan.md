@@ -190,11 +190,12 @@
 - `normalized 1C financial truth with project deltas and portfolio rollups`
 - `persisted reconciliation casefiles with deterministic mismatch reasons across finance, field evidence, and telemetry`
 - `executive command center with a shared exception inbox across escalations and reconciliation casefiles`
+- `deterministic audit packs for workflow evidence, trace, and applied decision context`
 
 Следующий рекомендованный ход:
 - execute the chosen post-Wave-6 sequence explicitly:
-  - Wave 9 is now in progress through Session 33: executive command center and exception inbox;
-  - start Session 34: audit pack and operational exports.
+  - Wave 9 is now in progress through Session 34: audit pack and operational exports;
+  - start Session 35: pilot controls and tenant readiness.
 
 ## Definition of Done по релизу Alpha
 

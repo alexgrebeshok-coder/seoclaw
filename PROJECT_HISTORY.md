@@ -16,8 +16,8 @@
 Актуально:
 
 1. продукт движется из `AI-powered PM dashboard` в `AI operating layer`;
-2. уже есть proposal/apply, work reports, executive briefs, plan-vs-fact, policy/workspace model, Telegram delivery, SMTP email delivery, GPS telemetry truth with normalized session/equipment/geofence rollups, 1C financial truth with normalized project deltas and portfolio rollups, evidence ledger, visual facts, AI trace/evals, operator escalation queue, live/demo truth layer, knowledge loop, enterprise truth expansion, durable AI run ledger, explicit sync jobs для evidence/escalation, durable delivery ledger с idempotent execution, persisted reconciliation casefiles с explainable mismatch reasons и executive command center с shared exception inbox across escalations and reconciliation gaps;
-3. Wave 7 durable runtime hardening закрыт через Session 29, Wave 8 source-of-truth depth закрыт через Session 32, Wave 9 pilot-grade operatorization уже идёт через Session 33, а следующий канонический шаг — Session 34 audit pack and operational exports.
+2. уже есть proposal/apply, work reports, executive briefs, plan-vs-fact, policy/workspace model, Telegram delivery, SMTP email delivery, GPS telemetry truth with normalized session/equipment/geofence rollups, 1C financial truth with normalized project deltas and portfolio rollups, evidence ledger, visual facts, AI trace/evals, operator escalation queue, live/demo truth layer, knowledge loop, enterprise truth expansion, durable AI run ledger, explicit sync jobs для evidence/escalation, durable delivery ledger с idempotent execution, persisted reconciliation casefiles с explainable mismatch reasons, executive command center с shared exception inbox across escalations and reconciliation gaps и deterministic audit packs for workflow evidence, trace, and applied decision context;
+3. Wave 7 durable runtime hardening закрыт через Session 29, Wave 8 source-of-truth depth закрыт через Session 32, Wave 9 pilot-grade operatorization уже идёт через Session 34, а следующий канонический шаг — Session 35 pilot controls and tenant readiness.
 
 Единственный канонический источник текущего execution-state:
 
