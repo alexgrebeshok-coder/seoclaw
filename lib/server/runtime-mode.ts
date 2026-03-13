@@ -24,14 +24,22 @@ export function getServerDataMode(env: RuntimeEnv = process.env): ServerDataMode
   return normalizeMode(env.APP_DATA_MODE);
 }
 
+function getNormalizedDatabaseUrl(env: RuntimeEnv = process.env): string | null {
+  const value = env.DATABASE_URL?.trim();
+  return value ? value : null;
+}
+
 export function isDatabaseConfigured(env: RuntimeEnv = process.env): boolean {
-  return Boolean(env.DATABASE_URL?.trim());
+  const databaseUrl = getNormalizedDatabaseUrl(env);
+  if (!databaseUrl) return false;
+
+  // The current Prisma datasource is SQLite, so the URL must resolve to a file path.
+  return databaseUrl.startsWith("file:");
 }
 
 export function shouldServeMockData(env: RuntimeEnv = process.env): boolean {
   const mode = getServerDataMode(env);
   if (mode === "demo") return true;
-  if (mode === "live") return false;
   return !isDatabaseConfigured(env);
 }
 

@@ -17,11 +17,12 @@ const descriptor: ConnectorDescriptor = {
   name: "1C",
   description:
     "Enterprise finance connector for 1C ERP and PM data. It now exposes a live read-only financial probe and sample path without pretending write-back readiness.",
-  direction: "bidirectional",
+  direction: "inbound",
   sourceSystem: "1C:ERP / 1C:PM HTTP or OData APIs",
   operations: [
     "Probe live 1C financial-read readiness via project finance sample",
     "Read sample project financial status through a live 1C API path",
+    "Read normalized project finance truth with deterministic deltas and portfolio rollups",
   ],
   credentials: [
     {
@@ -43,6 +44,12 @@ const descriptor: ConnectorDescriptor = {
       method: "GET",
       path: "/api/connectors/one-c/sample",
       description: "Read one normalized 1C project finance sample from the live API.",
+    },
+    {
+      method: "GET",
+      path: "/api/connectors/one-c/finance",
+      description:
+        "Read normalized 1C financial truth with project deltas and aggregate budget rollups.",
     },
   ],
   stub: false,

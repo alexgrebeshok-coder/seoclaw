@@ -6,6 +6,7 @@ export const emailBriefDeliverySchema = z
     projectId: z.string().trim().min(1).optional(),
     locale: z.enum(["ru", "en"]).optional(),
     recipient: z.string().trim().email().optional(),
+    idempotencyKey: z.string().trim().min(1).optional(),
     dryRun: z.boolean().optional(),
   })
   .superRefine((value, context) => {

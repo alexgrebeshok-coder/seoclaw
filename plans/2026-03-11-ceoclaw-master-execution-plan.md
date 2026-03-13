@@ -6,7 +6,7 @@
 
 ## Execution Status Snapshot
 
-As of 2026-03-11:
+As of 2026-03-12:
 - Wave 0 core stabilization is complete.
 - Session 01 import and validation pipeline is complete in the lead branch.
 - Session 02 AI action engine generalization is complete in the lead branch.
@@ -34,11 +34,29 @@ As of 2026-03-11:
 - Session 24 action safety and compensation layer is complete in the lead branch.
 - Session 28 evidence and escalation sync jobs is complete in the lead branch.
 - Session 27 AI run persistence and workflow ledger is complete in the lead branch.
+- Session 29 delivery ledger and idempotent execution is complete in the lead branch.
+- Session 30 GPS telemetry domain expansion is complete in the lead branch.
+- Session 31 1C financial truth deepening is complete in the lead branch.
+- Session 32 reconciliation casefile and fact linking is complete in the lead branch.
+- Session 33 executive command center and exception inbox is complete in the lead branch.
+- Session 34 audit pack and operational exports is complete in the lead branch.
+- Session 35 pilot controls and tenant readiness is complete in the lead branch.
+- Session 36 pilot feedback ledger and resolution loop is complete in the lead branch.
+- Session 37 tenant readiness and cutover checklist is complete in the lead branch.
+- Session 38 pilot review scorecards and governance export is complete in the lead branch.
 - Wave 1 foundation services are complete. Wave 2 fact capture and connector shell is complete. Wave 3 platform access model is complete through Session 08. Wave 4 vertical pilot now has Session 09, Session 10, Session 11, Session 12, Session 13, and Session 14 complete.
 - Wave 5 evidence and runtime modernization is complete on the lead branch.
 - Wave 6 integration truth expansion is complete on the lead branch through Session 26.
-- Wave 7 durable runtime hardening is now active, with Sessions 27 and 28 complete on the lead branch.
-- The next canonical sequence remains: Wave 7 durable runtime hardening, Wave 8 source-of-truth depth, and Wave 9 pilot-grade operatorization.
+- Wave 7 durable runtime hardening is complete on the lead branch through Session 29.
+- Wave 8 source-of-truth depth is complete on the lead branch through Session 32.
+- Wave 9 pilot-grade operatorization is complete on the lead branch through Session 35.
+- Wave 10 pilot feedback and go-live readiness is complete on the lead branch through Session 38.
+- Wave 11 governance automation and controlled widening is complete on the lead branch.
+- Session 39 governance review scheduling and delivery is complete on the lead branch.
+- Session 40 cutover decision register and warning waivers is complete on the lead branch.
+- Session 41 tenant onboarding runbook and rollout templates is complete on the lead branch.
+- Session 42 tenant rollout packet and handoff export is complete on the lead branch.
+- The next canonical step is to define Wave 12 based on what the bounded rollout handoff/export layer exposes as the next real bottleneck.
 
 ## 1. Product Direction
 
@@ -346,7 +364,7 @@ The detailed roadmap for post-alpha modernization is tracked in:
 2. Session 28: Evidence and Escalation Sync Jobs
    Status: complete on lead branch.
 3. Session 29: Delivery Ledger and Idempotent Execution
-   Status: planned.
+   Status: complete on lead branch.
 
 ### Goals
 
@@ -370,6 +388,7 @@ The detailed roadmap for post-alpha modernization is tracked in:
 2. Mock-mode run progression no longer depends on in-memory adapter state to build traceable operator runs.
 3. Existing `POST /api/ai/runs`, `GET /api/ai/runs/:id`, `POST /api/ai/runs/:id/proposals/:proposalId/apply`, and `GET /api/ai/runs/:id/trace` now read from the durable ledger when `DATABASE_URL` is configured.
 4. File-backed run storage remains only as a fallback when no database is configured.
+5. Outbound Telegram, email, and scheduled digest flows now persist delivery attempts in `DeliveryLedger`, reuse idempotency keys, and expose retry posture plus per-target execution state in the operator UI.
 5. `GET /api/evidence` and `GET /api/escalations` are now read-only views over persisted derivation, with explicit `POST /api/evidence/sync` and `POST /api/escalations/sync` job boundaries and operator-visible freshness metadata.
 6. Work-report writes now trigger narrow evidence sync jobs, and signal-packet / proposal-apply flows trigger narrow escalation sync jobs without recreating truth during reads.
 
@@ -380,11 +399,11 @@ The detailed roadmap for post-alpha modernization is tracked in:
 ### Sessions
 
 1. Session 30: GPS Telemetry Domain Expansion
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 2. Session 31: 1C Financial Truth Deepening
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 3. Session 32: Reconciliation Casefile and Fact Linking
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 
 ### Goals
 
@@ -409,11 +428,11 @@ The detailed roadmap for post-alpha modernization is tracked in:
 ### Sessions
 
 1. Session 33: Executive Command Center and Exception Inbox
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 2. Session 34: Audit Pack and Operational Exports
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 3. Session 35: Pilot Controls and Tenant Readiness
-   Status: planned.
+   Status: complete on 2026-03-12 in the lead branch.
 
 ### Goals
 
@@ -430,6 +449,66 @@ The detailed roadmap for post-alpha modernization is tracked in:
 1. It productizes the trust layers built in Waves 7 and 8.
 2. It turns the system from a strong alpha into a pilot-grade operating layer.
 3. It avoids polishing operator UX before the underlying truth and runtime are strong enough.
+
+## Wave 10: Pilot Feedback and Go-Live Readiness
+
+**Mode:** Lead-first sequencing with selective worker help for isolated read-only readiness and review surfaces after Session 36 lands.
+
+### Sessions
+
+1. Session 36: Pilot Feedback Ledger and Resolution Loop
+   Status: complete on 2026-03-12 in the lead branch.
+2. Session 37: Tenant Readiness and Cutover Checklist
+   Status: complete on 2026-03-12 in the lead branch.
+3. Session 38: Pilot Review Scorecards and Governance Export
+   Status: complete on 2026-03-12 in the lead branch.
+
+### Goals
+
+1. Turn pilot feedback into durable product truth instead of off-platform chat fragments.
+2. Make tenant cutover readiness and live blockers explicit before wider rollout.
+3. Produce recurring review artifacts that quantify pilot health across feedback, delivery, freshness, and exceptions.
+
+### Target outcome
+
+`pilot feedback ledger + go-live readiness checklist + weekly review scorecards`
+
+### Why this wave follows Wave 9
+
+1. Pilot controls and audit packs are useful only if real pilot feedback is captured against them.
+2. A narrow readiness surface is safer than a broad multi-tenant control plane rewrite.
+3. Review scorecards should be built only after runtime, command, audit, and rollout posture are already explicit.
+
+## Wave 11: Governance Automation and Controlled Widening
+
+**Mode:** Lead-first sequencing with selective worker help now allowed only inside isolated follow-up zones because Session 39 and Session 40 fixed the governance cadence and decision boundaries.
+
+### Sessions
+
+1. Session 39: Governance Review Scheduling and Delivery
+   Status: complete.
+2. Session 40: Cutover Decision Register and Warning Waivers
+   Status: complete.
+3. Session 41: Tenant Onboarding Runbook and Rollout Templates
+   Status: complete.
+4. Session 42: Tenant Rollout Packet and Handoff Export
+   Status: complete.
+
+### Goals
+
+1. Turn pilot review from an on-demand export into a recurring governed delivery loop.
+2. Make cutover approvals, accepted warnings, and reversals durable instead of implicit.
+3. Make the next tenant rollout repeatable without reopening a broad tenant-admin rewrite.
+
+### Target outcome
+
+`scheduled governance review + explicit cutover decisions + repeatable tenant widening handoff`
+
+### Why this wave follows Wave 10
+
+1. The scorecard/export from Wave 10 should become a recurring operating artifact before new pilot widening starts.
+2. Tenant readiness and pilot review now exist, so the next gap is durable decision capture rather than more read-only surfaces.
+3. Repeatable onboarding should come only after governance cadence and cutover acceptance are explicit.
 
 ## 6. Technical Tracks
 
@@ -519,6 +598,14 @@ Includes:
 
 `pilot-grade operator control + auditability + tenant-safe rollout posture`
 
+### Milestone J
+
+`durable pilot feedback + explicit tenant readiness + recurring pilot review scorecards`
+
+### Milestone K
+
+`scheduled governance reviews + durable cutover decisions + repeatable tenant widening`
+
 ## 8. Rules for Parallel Sessions
 
 1. Never run parallel sessions before Wave 0 is closed.
@@ -561,9 +648,9 @@ A worker session should:
 
 ### Best option right now
 
-1. Keep the lead track on Wave 7 first.
-2. Move directly to Session 29 after Session 28.
-3. Use worker help only after workflow state ownership is fixed.
+1. Keep Sessions 01 through 42 as the locked lead-branch baseline.
+2. Close Wave 11 canonically now that governance review delivery, cutover decisions, onboarding runbooks, and rollout handoff export all exist on the lead branch.
+3. Define Wave 12 only after reviewing where the new rollout packet still leaves real operator friction or truth gaps.
 
 ### Why this is best
 
@@ -580,12 +667,13 @@ That is more valuable now than broadening the UI or adding another shallow conne
 ## 11. Immediate Next Actions
 
 1. Keep Wave 0 closed and stable; it is no longer the active bottleneck.
-2. Keep Sessions 01 through 28 as the locked baseline.
-3. Start Session 29:
-   - add a durable delivery ledger for Telegram, email, and scheduled sends;
-   - introduce idempotency keys and retry posture for outbound actions;
-   - surface per-target execution history to operators.
-4. Land Wave 8 only after Session 29 stabilizes.
+2. Keep Sessions 01 through 42 as the locked baseline.
+3. Mark Wave 11 complete in all planning artifacts because the bounded governance loop is now in place end to end:
+   - recurring pilot-review delivery;
+   - explicit cutover approvals, waivers, and rollbacks;
+   - persisted onboarding runbooks;
+   - deterministic rollout packet and handoff export.
+4. Define Wave 12 only after deciding which post-Wave 11 bottleneck deserves the next canonical slice.
 
 ## 12. Definition of Alpha
 

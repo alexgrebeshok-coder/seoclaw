@@ -10,7 +10,7 @@ This roadmap explains the modernization direction and 30/60/90-day shape. It is 
 
 ## 1. Why This Roadmap Exists
 
-CEOClaw has already crossed the alpha threshold for an AI operating layer. Sessions 01 through 28 are complete on the lead branch, and the product already spans:
+CEOClaw has already crossed the alpha threshold for an AI operating layer. Sessions 01 through 42 are complete on the lead branch, and Wave 11 is now complete on top of that baseline. The product already spans:
 - enterprise fact intake;
 - evidence and verification;
 - proposal and apply;
@@ -18,9 +18,9 @@ CEOClaw has already crossed the alpha threshold for an AI operating layer. Sessi
 - operator control;
 - knowledge and enterprise truth rollups.
 
-The next 90 days should not add more shallow surfaces. They should turn the current alpha into a pilot-grade operating layer.
+The current 90-day modernization run has delivered its core target on the lead branch.
 
-The new 90-day target is:
+That delivered target is:
 
 `durable execution -> deeper source truth -> pilot-grade operator control`
 
@@ -30,10 +30,10 @@ CEOClaw should evolve from a strong alpha into a pilot-grade, evidence-backed op
 
 The highest-leverage gaps are now:
 
-1. workflow state is not yet durable enough;
-2. truth derivation still happens too much on read paths;
-3. source-of-truth domains are still too narrow;
-4. operator control is spread across pages instead of one pilot-grade command model.
+1. the governance loop now exists end to end, so the next wave should be chosen from observed operator friction rather than assumed upfront;
+2. tenant widening now has a bounded rollout packet and handoff export, so the next gap should be validated from real usage rather than solved with a speculative workflow engine;
+3. GPS, 1C, reconciliation, and operator depth should be prioritized only after Wave 11 artifacts show where the next trustworthy bottleneck actually sits;
+4. the next wave should stay narrow and evidence-backed rather than reopening broad platform expansion.
 
 ## 3. Current Baseline
 
@@ -51,18 +51,16 @@ As of 2026-03-11 the lead branch already has:
 10. evidence ledger with `reported / observed / verified` states;
 11. Video Fact MVP and cross-source confidence fusion;
 12. AI trace, provenance, eval coverage, and action safety/compensation;
-13. escalation queue, knowledge loop, and enterprise truth rollup.
+13. escalation queue, knowledge loop, enterprise truth rollup, normalized GPS telemetry truth, normalized 1C financial truth with deterministic project deltas, persisted reconciliation casefiles for inspectable mismatch reasons, an executive command center with a shared exception inbox across escalations and reconciliation gaps, deterministic audit packs for workflow evidence, trace, and decision handoff, explicit pilot controls with tenant/workspace rollout posture, a persisted pilot feedback ledger linked to real workflow artifacts, a tenant readiness checklist with explicit cutover blockers, and pilot review scorecards with deterministic governance export.
 
 ## 4. Gaps Still Open
 
 The following high-value gaps remain open:
 
-1. AI runs and workflow traces still rely on file-backed state in `.ceoclaw-cache`.
-2. Evidence and escalation state now have explicit sync boundaries, but outbound delivery execution still lacks a durable ledger.
-3. GPS and 1C are still narrow read domains, not deeper operational truth models.
-4. There is no durable reconciliation casefile linking finance, telemetry, work reports, and video evidence.
-5. Operator control is distributed across multiple pages instead of one exception-driven command view.
-6. Audit/export and pilot controls are not yet strong enough for enterprise rollout.
+1. Pilot review still needs one recurring delivery/scheduling path instead of manual artifact pickup.
+2. Tenant readiness and pilot review still need a durable approval/waiver trail for real cutover decisions.
+3. The next tenant rollout still needs a repeatable onboarding/runbook boundary.
+4. GPS, 1C, and reconciliation depth should be prioritized only after this governance loop produces evidence about the next bottleneck.
 
 ## 5. 30-Day Plan
 
@@ -119,6 +117,9 @@ Exit criteria:
 - delivery retries stop depending on blind re-execution;
 - outbound actions become auditable per run and per target.
 
+Status:
+- complete on 2026-03-11 in the lead branch.
+
 ## 6. 60-Day Plan
 
 ### Wave 8: Source-of-Truth Depth
@@ -133,6 +134,9 @@ Deliver:
 - narrow but honest telemetry views beyond the current sample card;
 - deterministic mappings that other truth layers can reference.
 
+Status:
+- complete on 2026-03-12 in the lead branch.
+
 #### Session 31: 1C Financial Truth Deepening
 
 Goal:
@@ -142,6 +146,9 @@ Deliver:
 - broader project finance slices suitable for reconciliation;
 - operator-visible financial truth deltas that can be linked to field evidence;
 - no write-back semantics yet.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
 
 #### Session 32: Reconciliation Casefile and Fact Linking
 
@@ -153,11 +160,17 @@ Deliver:
 - explainable matching and mismatch reasons;
 - one operator surface for unresolved reconciliation gaps.
 
+Status:
+- complete on 2026-03-12 in the lead branch.
+
 Exit criteria across Wave 8:
 
 1. GPS and 1C truth become materially deeper than narrow sample reads.
 2. Cross-source mismatches are inspectable as cases, not only summary counters.
 3. Operators can answer why a project is corroborated, partial, or contradictory.
+
+Wave 8 status:
+- complete on 2026-03-12 in the lead branch.
 
 ## 7. 90-Day Plan
 
@@ -173,6 +186,9 @@ Deliver:
 - owner-first exception inbox;
 - clearer management path from signal to action to closure.
 
+Status:
+- complete on 2026-03-12 in the lead branch.
+
 #### Session 34: Audit Pack and Operational Exports
 
 Goal:
@@ -182,6 +198,9 @@ Deliver:
 - exportable audit packs for evidence, decisions, traces, and applied changes;
 - operator-friendly reporting surfaces for pilot review;
 - deterministic export boundaries.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
 
 #### Session 35: Pilot Controls and Tenant Readiness
 
@@ -193,13 +212,131 @@ Deliver:
 - workspace/environment rollout guardrails;
 - clearer onboarding and cutover posture for live pilots.
 
+Status:
+- complete on 2026-03-12 in the lead branch.
+
 Deliver across the 90-day horizon:
 - durable runtime;
 - deeper source truth;
 - unified operator control;
 - auditability and safer pilot rollout.
 
-## 8. Research Principles Behind This Roadmap
+Wave 9 status:
+- complete on 2026-03-12 in the lead branch through Session 35.
+- Wave 10 followed and completed on 2026-03-12 through Session 38.
+- Wave 11 is now complete on the lead branch through Session 42.
+
+## 8. Next Canonical Execution Wave
+
+### Wave 10: Pilot Feedback and Go-Live Readiness
+
+#### Session 36: Pilot Feedback Ledger and Resolution Loop
+
+Goal:
+- make pilot feedback durable, inspectable, and tied to real workflow artifacts.
+
+Deliver:
+- one persisted feedback ledger or equivalent durable model;
+- linkage to at least one existing command/audit workflow;
+- explicit open/resolved state with owner and next action.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
+
+#### Session 37: Tenant Readiness and Cutover Checklist
+
+Goal:
+- make tenant-level rollout blockers explicit before live cutover widens.
+
+Deliver:
+- one operator-facing readiness view tied to runtime truth, connector health, and pilot posture;
+- explicit blockers, warnings, and safe-to-promote signals;
+- drillback to the underlying surfaces that still need action.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
+
+#### Session 38: Pilot Review Scorecards and Governance Export
+
+Goal:
+- turn pilot operations into a repeatable management review artifact.
+
+Deliver:
+- one scorecard over feedback, backlog, freshness, blocked workflows, and delivery posture;
+- deterministic export for weekly or steering review;
+- no generic BI subsystem.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
+
+Wave 10 status:
+- complete on 2026-03-12 in the lead branch through Session 38.
+
+## 9. Next Canonical Execution Wave
+
+### Wave 11: Governance Automation and Controlled Widening
+
+#### Session 39: Governance Review Scheduling and Delivery
+
+Goal:
+- turn pilot review from a manual export into a recurring governance delivery loop.
+
+Deliver:
+- one explicit policy, schedule, or trigger path for pilot-review delivery;
+- reuse of the deterministic scorecard/export artifact as the payload;
+- auditable execution history through the existing delivery boundary.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
+
+#### Session 40: Cutover Decision Register and Warning Waivers
+
+Goal:
+- make approvals, accepted warnings, and reversals durable instead of implicit.
+
+Deliver:
+- one narrow decision register tied to readiness/review outcomes;
+- explicit accepted-warning or rollback posture;
+- no broad approval workflow engine.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
+
+#### Session 41: Tenant Onboarding Runbook and Rollout Templates
+
+Goal:
+- make the next tenant rollout repeatable without broad provisioning infrastructure.
+
+Deliver:
+- one runbook/template surface for tenant rollout preparation;
+- reuse of readiness, review, and decision boundaries from prior waves;
+- no tenant-control-plane rewrite.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
+
+#### Session 42: Tenant Rollout Packet and Handoff Export
+
+Goal:
+- turn onboarding, readiness, review, and decisions into one deterministic rollout handoff artifact.
+
+Deliver:
+- one rollout packet or handoff export surface for the latest tenant-preparation state;
+- reuse of onboarding runbook, readiness, review, and decision boundaries from prior sessions;
+- no broad rollout workflow engine.
+
+Status:
+- complete on 2026-03-12 in the lead branch.
+
+Wave 11 status:
+- complete on 2026-03-12 in the lead branch through Session 42.
+- Session 39 is complete on 2026-03-12 in the lead branch.
+- Session 40 is complete on 2026-03-12 in the lead branch.
+- Session 41 is complete on 2026-03-12 in the lead branch.
+- Session 42 is complete on 2026-03-12 in the lead branch.
+- the next canonical step is to define Wave 12 based on observed post-Wave 11 bottlenecks rather than assuming a Session 43 upfront.
+
+## 10. Research Principles Behind This Roadmap
 
 This roadmap follows the most consistent guidance from current agent-system practice:
 

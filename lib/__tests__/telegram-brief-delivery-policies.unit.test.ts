@@ -61,9 +61,28 @@ function testDueWindowMatchesLocalHour() {
     new Date("2026-03-11T09:05:00.000Z")
   );
 
+  const retriedFailedWindow = shouldAttemptTelegramPolicy(
+    {
+      id: "policy-6",
+      scope: "portfolio",
+      projectId: null,
+      locale: "ru",
+      chatId: null,
+      cadence: "daily",
+      timezone: "UTC",
+      deliveryHour: 9,
+      active: true,
+      lastAttemptAt: "2026-03-11T09:00:00.000Z",
+      lastDeliveredAt: null,
+      lastError: "Telegram delivery failed.",
+    },
+    new Date("2026-03-11T09:20:00.000Z")
+  );
+
   assert.equal(due, true);
   assert.equal(skippedSameWindow, false);
   assert.equal(skippedWrongHour, false);
+  assert.equal(retriedFailedWindow, true);
 }
 
 function testWeekdayCadenceSkipsWeekend() {

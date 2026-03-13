@@ -6,6 +6,7 @@ export const telegramBriefDeliverySchema = z
     projectId: z.string().trim().min(1).optional(),
     locale: z.enum(["ru", "en"]).optional(),
     chatId: z.string().trim().min(1).optional(),
+    idempotencyKey: z.string().trim().min(1).optional(),
     dryRun: z.boolean().optional(),
   })
   .superRefine((value, context) => {

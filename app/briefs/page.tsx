@@ -1,5 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { BriefsPage } from "@/components/briefs/briefs-page";
+import { listRecentBriefDeliveryLedger } from "@/lib/briefs/delivery-ledger";
 import { getConnectorRegistry } from "@/lib/connectors";
 import {
   generatePortfolioBriefFromSnapshot,
@@ -52,6 +53,9 @@ export default async function BriefsRoute() {
       ? getKnowledgeLoopOverview({ limit: 4 })
       : Promise.resolve(buildEmptyKnowledgeLoopOverview()),
   ]);
+  const deliveryLedgerEntries = knowledgeLoopAvailable
+    ? await listRecentBriefDeliveryLedger(6)
+    : [];
   const portfolioBrief = generatePortfolioBriefFromSnapshot(snapshot, { locale: "ru" });
 
   const projectIds = Array.from(
@@ -102,6 +106,14 @@ export default async function BriefsRoute() {
             : runtimeState.dataMode === "demo"
               ? "Knowledge loop is paused in demo mode because it depends on live escalation history, not on illustrative portfolio facts."
               : "Knowledge loop is unavailable until DATABASE_URL is configured for live operator data."
+        }
+        deliveryLedgerEntries={deliveryLedgerEntries}
+        deliveryLedgerAvailabilityNote={
+          knowledgeLoopAvailable
+            ? undefined
+            : runtimeState.dataMode === "demo"
+              ? "Delivery ledger is paused in demo mode because outbound execution history is only canonical in live operator mode."
+              : "Delivery ledger is unavailable until DATABASE_URL is configured for durable operator history."
         }
         runtimeTruth={runtimeTruth}
       />

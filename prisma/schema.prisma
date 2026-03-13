@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model Organization {
@@ -426,6 +427,156 @@ model TelegramBriefDeliveryPolicy {
   @@index([deliveryHour, active])
 }
 
+model PilotReviewDeliveryPolicy {
+  id              String   @id @default(cuid())
+  workspaceId     String   @default("executive")
+  channel         String   @default("email")
+  recipient       String?
+  timezone        String   @default("UTC")
+  deliveryHour    Int
+  deliveryWeekday Int      @default(1)
+  active          Boolean  @default(true)
+  createdByUserId String?
+  updatedByUserId String?
+  lastAttemptAt   DateTime?
+  lastDeliveredAt DateTime?
+  lastError       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([workspaceId, active])
+  @@index([deliveryWeekday, deliveryHour, active])
+}
+
+model CutoverDecision {
+  id                    String   @id @default(cuid())
+  workspaceId           String   @default("executive")
+  tenantSlug            String
+  decisionType          String
+  summary               String
+  details               String?
+  warningId             String?
+  warningLabel          String?
+  readinessOutcome      String
+  readinessOutcomeLabel String
+  readinessGeneratedAt  DateTime
+  reviewOutcome         String
+  reviewOutcomeLabel    String
+  reviewGeneratedAt     DateTime
+  createdByUserId       String?
+  createdByName         String?
+  createdByRole         String?
+  createdAt             DateTime @default(now())
+
+  @@index([workspaceId, createdAt])
+  @@index([tenantSlug, createdAt])
+  @@index([decisionType, createdAt])
+}
+
+model TenantOnboardingRunbook {
+  id                    String   @id @default(cuid())
+  workspaceId           String   @default("executive")
+  baselineTenantSlug    String
+  baselineTenantLabel   String
+  targetTenantSlug      String?
+  targetTenantLabel     String?
+  status                String   @default("draft")
+  summary               String
+  rolloutScope          String
+  operatorNotes         String?
+  handoffNotes          String?
+  rollbackPlan          String?
+  targetCutoverAt       DateTime?
+  templateVersion       String   @default("tenant-rollout-v1")
+  readinessOutcome      String
+  readinessOutcomeLabel String
+  readinessGeneratedAt  DateTime
+  reviewOutcome         String
+  reviewOutcomeLabel    String
+  reviewGeneratedAt     DateTime
+  latestDecisionType    String?
+  latestDecisionLabel   String?
+  latestDecisionSummary String?
+  latestDecisionAt      DateTime?
+  blockerCount          Int      @default(0)
+  warningCount          Int      @default(0)
+  createdByUserId       String?
+  createdByName         String?
+  createdByRole         String?
+  updatedByUserId       String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([workspaceId, updatedAt])
+  @@index([baselineTenantSlug, updatedAt])
+  @@index([status, updatedAt])
+}
+
+model DeliveryLedger {
+  id                String   @id @default(cuid())
+  channel           String
+  provider          String
+  mode              String
+  scope             String
+  projectId         String?
+  projectName       String?
+  locale            String
+  target            String?
+  headline          String
+  idempotencyKey    String   @unique
+  scheduledPolicyId String?
+  status            String
+  retryPosture      String
+  attemptCount      Int      @default(0)
+  dryRun            Boolean  @default(false)
+  providerMessageId String?
+  contentHash       String
+  requestJson       String
+  responseJson      String?
+  lastError         String?
+  firstAttemptAt    DateTime?
+  lastAttemptAt     DateTime?
+  deliveredAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([channel, updatedAt])
+  @@index([status, updatedAt])
+  @@index([projectId, updatedAt])
+  @@index([scheduledPolicyId, updatedAt])
+}
+
+model PilotFeedback {
+  id             String   @id @default(cuid())
+  targetType     String
+  targetId       String
+  targetLabel    String
+  sourceLabel    String
+  sourceHref     String?
+  projectId      String?
+  projectName    String?
+  severity       String
+  status         String   @default("open")
+  summary        String
+  details        String?
+  ownerId        String?
+  ownerName      String?
+  ownerRole      String?
+  reporterName   String?
+  resolutionNote String?
+  metadataJson   String?
+  openedAt       DateTime @default(now())
+  resolvedAt     DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status, updatedAt])
+  @@index([severity, status, updatedAt])
+  @@index([targetType, targetId, updatedAt])
+  @@index([projectId, updatedAt])
+  @@index([ownerId, updatedAt])
+}
+
 // ============================================
 // WORK REPORT MODEL
 // ============================================
@@ -564,6 +715,35 @@ model DerivedSyncState {
 
   @@index([status, updatedAt])
   @@index([lastSuccessAt])
+}
+
+model ReconciliationCasefile {
+  id                 String   @id @default(cuid())
+  key                String   @unique
+  caseType           String
+  truthStatus        String
+  resolutionStatus   String   @default("open")
+  projectId          String?
+  projectName        String?
+  financeProjectId   String?
+  title              String
+  explanation        String
+  reasonCodesJson    String
+  evidenceRecordIdsJson String
+  fusionFactIdsJson  String
+  telemetryRefsJson  String
+  financeJson        String?
+  fieldJson          String?
+  telemetryJson      String?
+  lastObservedAt     DateTime
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([resolutionStatus, updatedAt])
+  @@index([truthStatus, updatedAt])
+  @@index([projectId])
+  @@index([caseType, updatedAt])
+  @@index([lastObservedAt])
 }
 
 // ============================================

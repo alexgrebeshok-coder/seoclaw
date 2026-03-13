@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { DataErrorState } from "@/components/ui/data-error-state";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { api } from "@/lib/client/api-error";
 import { cn } from "@/lib/utils";
 
 interface CalendarEvent {
@@ -29,16 +30,21 @@ export const CalendarView = React.memo(function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationRef = useRef<number>(0);
 
   const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
     try {
-      const response = await fetch("/api/calendar/events");
-      const data = await response.json();
-      setEvents(data);
+      const data = await api.get<unknown>("/api/calendar/events");
+      setEvents(Array.isArray(data) ? (data as CalendarEvent[]) : []);
     } catch (error) {
       console.error("[CalendarView] Error:", error);
+      setEvents([]);
+      setError("Календарь не смог синхронизироваться с API. Можно повторить запрос.");
     } finally {
       setLoading(false);
     }
@@ -124,6 +130,19 @@ export const CalendarView = React.memo(function CalendarView() {
       <Card className="p-6">
         <div className="h-96 animate-pulse rounded bg-[var(--surface-secondary)]" />
       </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <DataErrorState
+        actionLabel="Попробовать снова"
+        description={error}
+        onRetry={() => {
+          void fetchEvents();
+        }}
+        title="Что-то пошло не так"
+      />
     );
   }
 

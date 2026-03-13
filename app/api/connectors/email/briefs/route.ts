@@ -8,6 +8,8 @@ import {
   serverError,
   validationError,
 } from "@/lib/server/api-utils";
+import { evaluatePilotWorkflowAccess } from "@/lib/server/pilot-controls";
+import { getServerRuntimeState } from "@/lib/server/runtime-mode";
 import { emailBriefDeliverySchema } from "@/lib/validators/email-brief-delivery";
 
 export const runtime = "nodejs";
@@ -28,6 +30,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (!parsed.success) {
       return validationError(parsed.error);
+    }
+
+    const pilotAccess = evaluatePilotWorkflowAccess({
+      accessProfile: authResult.accessProfile,
+      dryRun: parsed.data.dryRun,
+      runtime: getServerRuntimeState(),
+      workflow: "executive_delivery",
+    });
+    if (!pilotAccess.allowed) {
+      return jsonError(
+        403,
+        pilotAccess.code ?? "PILOT_STAGE_BLOCKED",
+        pilotAccess.message ?? "Executive delivery is blocked by pilot controls."
+      );
     }
 
     const result = await deliverBriefByEmail(parsed.data);
