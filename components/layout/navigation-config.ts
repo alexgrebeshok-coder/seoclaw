@@ -8,9 +8,11 @@ import {
   FileText,
   LayoutDashboard,
   LineChart,
+  ListChecks,
   MessageSquareText,
   RefreshCcw,
   Settings2,
+  ShieldCheck,
   Sparkles,
   Users,
   Workflow,
@@ -45,6 +47,14 @@ export const operationsNavigation: NavigationItem[] = [
   { href: "/imports", label: "Imports", icon: Database },
   { href: "/briefs", label: "Executive Briefs", icon: FileText },
   { href: "/meetings", label: "Meeting to Action", icon: MessageSquareText },
+  { href: "/command-center", label: "Command Center", icon: AlertTriangle },
+  { href: "/audit-packs", label: "Audit Packs", icon: FileText },
+  { href: "/pilot-controls", label: "Pilot Controls", icon: ShieldCheck },
+  { href: "/pilot-feedback", label: "Pilot Feedback", icon: MessageSquareText },
+  { href: "/tenant-readiness", label: "Tenant Readiness", icon: ListChecks },
+  { href: "/tenant-onboarding", label: "Tenant Onboarding", icon: FileText },
+  { href: "/tenant-rollout-packet", label: "Rollout Packet", icon: FileText },
+  { href: "/pilot-review", label: "Pilot Review", icon: FileText },
   { href: "/work-reports", label: "Work Reports", icon: RefreshCcw },
   { href: "/integrations", label: "Connector Health", icon: Wrench },
 ];
@@ -77,6 +87,14 @@ const localizedPageTitles: Record<string, ResolvedTitle> = {
   "/imports": { eyebrow: "Data intake", title: "Imports" },
   "/briefs": { eyebrow: "Executive comms", title: "Executive Briefs" },
   "/meetings": { eyebrow: "Agentic intake", title: "Meeting to Action" },
+  "/command-center": { eyebrow: "Exception control", title: "Executive Command Center" },
+  "/audit-packs": { eyebrow: "Audit readiness", title: "Audit Packs" },
+  "/pilot-controls": { eyebrow: "Rollout posture", title: "Pilot Controls" },
+  "/pilot-feedback": { eyebrow: "Pilot loop", title: "Pilot Feedback" },
+  "/tenant-readiness": { eyebrow: "Go-live posture", title: "Tenant Readiness" },
+  "/tenant-onboarding": { eyebrow: "Rollout runbook", title: "Tenant Onboarding" },
+  "/tenant-rollout-packet": { eyebrow: "Rollout handoff", title: "Tenant Rollout Packet" },
+  "/pilot-review": { eyebrow: "Governance review", title: "Pilot Review" },
   "/work-reports": { eyebrow: "Delivery cadence", title: "Work Reports" },
   "/integrations": { eyebrow: "Platform trust", title: "Connector Health" },
 };
@@ -101,6 +119,38 @@ export function resolveTitle(pathname: string | null): ResolvedTitle {
 
   if (safePathname.startsWith("/meetings/")) {
     return localizedPageTitles["/meetings"];
+  }
+
+  if (safePathname.startsWith("/command-center/")) {
+    return localizedPageTitles["/command-center"];
+  }
+
+  if (safePathname.startsWith("/audit-packs/")) {
+    return localizedPageTitles["/audit-packs"];
+  }
+
+  if (safePathname.startsWith("/pilot-controls/")) {
+    return localizedPageTitles["/pilot-controls"];
+  }
+
+  if (safePathname.startsWith("/pilot-feedback/")) {
+    return localizedPageTitles["/pilot-feedback"];
+  }
+
+  if (safePathname.startsWith("/tenant-readiness/")) {
+    return localizedPageTitles["/tenant-readiness"];
+  }
+
+  if (safePathname.startsWith("/tenant-onboarding/")) {
+    return localizedPageTitles["/tenant-onboarding"];
+  }
+
+  if (safePathname.startsWith("/tenant-rollout-packet/")) {
+    return localizedPageTitles["/tenant-rollout-packet"];
+  }
+
+  if (safePathname.startsWith("/pilot-review/")) {
+    return localizedPageTitles["/pilot-review"];
   }
 
   if (safePathname.startsWith("/work-reports/")) {

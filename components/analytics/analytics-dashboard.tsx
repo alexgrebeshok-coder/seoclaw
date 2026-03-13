@@ -11,9 +11,9 @@ import {
   Users,
   CheckCircle2,
   AlertCircle,
-  Clock,
   Target,
 } from "lucide-react";
+import { api } from "@/lib/client/api-error";
 import { cn } from "@/lib/utils";
 
 interface AnalyticsSummary {
@@ -45,6 +45,33 @@ interface TeamMember {
   performance: number;
 }
 
+type AnalyticsOverviewResponse = {
+  summary: AnalyticsSummary;
+  projects?: ProjectHealth[];
+};
+
+type AnalyticsTeamResponse = {
+  members?: TeamMember[];
+};
+
+function isAnalyticsOverviewResponse(input: unknown): input is AnalyticsOverviewResponse {
+  return Boolean(
+    input &&
+      typeof input === "object" &&
+      "summary" in input &&
+      typeof (input as AnalyticsOverviewResponse).summary === "object"
+  );
+}
+
+function isAnalyticsTeamResponse(input: unknown): input is AnalyticsTeamResponse {
+  return Boolean(
+    input &&
+      typeof input === "object" &&
+      "members" in input &&
+      Array.isArray((input as AnalyticsTeamResponse).members)
+  );
+}
+
 const statusColors = {
   healthy: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
   at_risk: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
@@ -66,19 +93,23 @@ export const AnalyticsDashboard = React.memo(function AnalyticsDashboard() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [overviewRes, teamRes] = await Promise.all([
-        fetch("/api/analytics/overview"),
-        fetch("/api/analytics/team-performance"),
+      const [overviewData, teamData] = await Promise.all([
+        api.get<unknown>("/api/analytics/overview"),
+        api.get<unknown>("/api/analytics/team-performance"),
       ]);
 
-      const overviewData = await overviewRes.json();
-      const teamData = await teamRes.json();
-
-      setSummary(overviewData.summary);
-      setProjects(overviewData.projects || []);
-      setTeam(teamData.members || []);
+      setSummary(isAnalyticsOverviewResponse(overviewData) ? overviewData.summary : null);
+      setProjects(
+        isAnalyticsOverviewResponse(overviewData) && Array.isArray(overviewData.projects)
+          ? overviewData.projects
+          : []
+      );
+      setTeam(isAnalyticsTeamResponse(teamData) ? teamData.members ?? [] : []);
     } catch (error) {
       console.error("[AnalyticsDashboard] Error:", error);
+      setSummary(null);
+      setProjects([]);
+      setTeam([]);
     } finally {
       setLoading(false);
     }

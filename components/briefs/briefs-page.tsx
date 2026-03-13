@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BriefDeliveryLedgerCard } from "@/components/briefs/brief-delivery-ledger-card";
 import { BriefQueueTable } from "@/components/briefs/brief-queue-table";
 import { KnowledgeLoopCard } from "@/components/briefs/knowledge-loop-card";
 import { BriefRequestForm } from "@/components/briefs/brief-request-form";
@@ -8,6 +9,7 @@ import { DomainApiCard } from "@/components/layout/domain-api-card";
 import { DomainPageHeader } from "@/components/layout/domain-page-header";
 import { OperatorRuntimeCard } from "@/components/layout/operator-runtime-card";
 import { buttonVariants } from "@/components/ui/button";
+import type { BriefDeliveryLedgerRecord } from "@/lib/briefs/delivery-ledger";
 import type { PortfolioBrief, ProjectBrief } from "@/lib/briefs/types";
 import type { KnowledgeLoopOverview } from "@/lib/knowledge";
 import {
@@ -64,6 +66,8 @@ export function BriefsPage({
   projectOptions,
   knowledgeLoop,
   knowledgeLoopAvailabilityNote,
+  deliveryLedgerEntries,
+  deliveryLedgerAvailabilityNote,
   runtimeTruth,
 }: {
   portfolioBrief: PortfolioBrief;
@@ -71,6 +75,8 @@ export function BriefsPage({
   projectOptions: Array<{ id: string; name: string }>;
   knowledgeLoop: KnowledgeLoopOverview;
   knowledgeLoopAvailabilityNote?: string;
+  deliveryLedgerEntries: BriefDeliveryLedgerRecord[];
+  deliveryLedgerAvailabilityNote?: string;
   runtimeTruth: OperatorRuntimeTruth;
 }) {
   const leadProjectBrief = projectBriefs[0] ?? null;
@@ -105,6 +111,11 @@ export function BriefsPage({
       <KnowledgeLoopCard
         availabilityNote={knowledgeLoopAvailabilityNote}
         overview={knowledgeLoop}
+      />
+
+      <BriefDeliveryLedgerCard
+        availabilityNote={deliveryLedgerAvailabilityNote}
+        entries={deliveryLedgerEntries}
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">

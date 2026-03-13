@@ -30,6 +30,37 @@ export interface OneCFinanceSampleSnapshot {
   metadata?: OneCSampleMetadata;
 }
 
+export interface OneCProjectFinanceTruth extends OneCProjectFinanceSample {
+  projectKey: string;
+  observedAt: string | null;
+  actualToPlanRatio: number | null;
+  paymentsToActualRatio: number | null;
+  actsToActualRatio: number | null;
+  paymentGap: number | null;
+  actGap: number | null;
+  paymentsVsActsGap: number | null;
+  budgetDeltaStatus: "on_plan" | "over_plan" | "under_plan" | "unknown";
+}
+
+export interface OneCFinanceTruthSummary {
+  projectCount: number;
+  overPlanCount: number;
+  underPlanCount: number;
+  onPlanCount: number;
+  totalPlannedBudget: number;
+  totalActualBudget: number;
+  totalPaymentsActual: number;
+  totalActsActual: number;
+  totalBudgetVariance: number;
+  totalPaymentGap: number;
+  totalActGap: number;
+}
+
+export interface OneCFinanceTruthSnapshot extends OneCFinanceSampleSnapshot {
+  summary: OneCFinanceTruthSummary;
+  projects: OneCProjectFinanceTruth[];
+}
+
 export function getOneCApiUrl(env: NodeJS.ProcessEnv = process.env) {
   return env.ONE_C_BASE_URL?.trim() || null;
 }
@@ -167,6 +198,7 @@ export async function fetchOneCFinanceSample(
   input: {
     baseUrl: string;
     apiKey: string;
+    pageSize?: number;
   },
   fetchImpl: OneCFetch = fetch
 ): Promise<
@@ -185,7 +217,7 @@ export async function fetchOneCFinanceSample(
       metadata?: OneCSampleMetadata;
     }
 > {
-  const sampleUrl = buildOneCSampleUrl(input.baseUrl);
+  const sampleUrl = buildOneCSampleUrl(input.baseUrl, sanitizePageSize(input.pageSize, 3, 24));
   const response = await fetchImpl(sampleUrl, {
     method: "GET",
     headers: buildOneCHeaders(input.apiKey),
@@ -249,6 +281,7 @@ export async function fetchOneCFinanceSample(
       sampleUrl,
       responseShape: describePayloadShape(parsedPayload),
       sampleCount: samples.length,
+      requestedPageSize: sanitizePageSize(input.pageSize, 3, 24),
       totalPlannedBudget: totals.totalPlannedBudget,
       totalActualBudget: totals.totalActualBudget,
       totalPaymentsActual: totals.totalPaymentsActual,
@@ -261,7 +294,79 @@ export async function getOneCFinanceSampleSnapshot(
   env: NodeJS.ProcessEnv = process.env,
   fetchImpl: OneCFetch = fetch
 ): Promise<OneCFinanceSampleSnapshot> {
+  return getOneCFinanceBaseSnapshot({
+    env,
+    fetchImpl,
+    pageSize: 3,
+  });
+}
+
+export async function getOneCFinanceTruthSnapshot(
+  options: {
+    pageSize?: number;
+    env?: NodeJS.ProcessEnv;
+    fetchImpl?: OneCFetch;
+  } = {}
+): Promise<OneCFinanceTruthSnapshot> {
+  const snapshot = await getOneCFinanceBaseSnapshot({
+    env: options.env,
+    fetchImpl: options.fetchImpl,
+    pageSize: options.pageSize ?? 12,
+  });
+
+  return buildOneCFinanceTruthSnapshot(snapshot);
+}
+
+export function buildOneCFinanceTruthSnapshot(
+  snapshot: OneCFinanceSampleSnapshot
+): OneCFinanceTruthSnapshot {
+  const projects = buildNormalizedFinanceProjects(snapshot.samples);
+
+  return {
+    ...snapshot,
+    summary: {
+      projectCount: projects.length,
+      overPlanCount: projects.filter((project) => project.budgetDeltaStatus === "over_plan").length,
+      underPlanCount: projects.filter((project) => project.budgetDeltaStatus === "under_plan").length,
+      onPlanCount: projects.filter((project) => project.budgetDeltaStatus === "on_plan").length,
+      totalPlannedBudget: projects.reduce(
+        (total, project) => total + (project.plannedBudget ?? 0),
+        0
+      ),
+      totalActualBudget: projects.reduce(
+        (total, project) => total + (project.actualBudget ?? 0),
+        0
+      ),
+      totalPaymentsActual: projects.reduce(
+        (total, project) => total + (project.paymentsActual ?? 0),
+        0
+      ),
+      totalActsActual: projects.reduce(
+        (total, project) => total + (project.actsActual ?? 0),
+        0
+      ),
+      totalBudgetVariance: projects.reduce(
+        (total, project) => total + (project.variance ?? 0),
+        0
+      ),
+      totalPaymentGap: projects.reduce(
+        (total, project) => total + (project.paymentGap ?? 0),
+        0
+      ),
+      totalActGap: projects.reduce((total, project) => total + (project.actGap ?? 0), 0),
+    },
+    projects,
+  };
+}
+
+async function getOneCFinanceBaseSnapshot(input: {
+  pageSize: number;
+  env?: NodeJS.ProcessEnv;
+  fetchImpl?: OneCFetch;
+}): Promise<OneCFinanceSampleSnapshot> {
   const checkedAt = new Date().toISOString();
+  const env = input.env ?? process.env;
+  const fetchImpl = input.fetchImpl ?? fetch;
   const apiUrl = getOneCApiUrl(env);
   const apiKey = getOneCApiKey(env);
   const missingSecrets = [
@@ -275,7 +380,7 @@ export async function getOneCFinanceSampleSnapshot(
       checkedAt,
       configured: false,
       status: "pending",
-      message: "1C finance sample is waiting for ONE_C_BASE_URL and ONE_C_API_KEY.",
+      message: "1C finance read is waiting for ONE_C_BASE_URL and ONE_C_API_KEY.",
       missingSecrets,
       samples: [],
     };
@@ -286,6 +391,7 @@ export async function getOneCFinanceSampleSnapshot(
       {
         baseUrl: apiUrl!,
         apiKey: apiKey!,
+        pageSize: input.pageSize,
       },
       fetchImpl
     );
@@ -296,7 +402,7 @@ export async function getOneCFinanceSampleSnapshot(
         checkedAt,
         configured: true,
         status: "degraded",
-        message: `1C finance sample failed: ${result.message}`,
+        message: `1C finance read failed: ${result.message}`,
         missingSecrets: [],
         sampleUrl: result.sampleUrl,
         samples: [],
@@ -323,8 +429,8 @@ export async function getOneCFinanceSampleSnapshot(
       status: "degraded",
       message:
         error instanceof Error
-          ? `1C finance sample failed: ${error.message}`
-          : "1C finance sample failed with an unknown error.",
+          ? `1C finance read failed: ${error.message}`
+          : "1C finance read failed with an unknown error.",
       missingSecrets: [],
       samples: [],
     };
@@ -490,6 +596,52 @@ function normalizeStatus(value: string) {
   return normalized.replace(/\s+/g, "_");
 }
 
+function buildNormalizedFinanceProjects(samples: OneCProjectFinanceSample[]) {
+  return samples
+    .map((sample, index) => {
+      const actualToPlanRatio = divideOrNull(sample.actualBudget, sample.plannedBudget);
+      const paymentsToActualRatio = divideOrNull(sample.paymentsActual, sample.actualBudget);
+      const actsToActualRatio = divideOrNull(sample.actsActual, sample.actualBudget);
+      const variancePercent =
+        sample.variancePercent ??
+        divideOrNull(sample.variance, sample.plannedBudget);
+
+      return {
+        ...sample,
+        projectKey:
+          buildOneCEntityKey(
+            "project",
+            sample.projectId ??
+              sample.projectName ??
+              [sample.reportDate, sample.currency, String(index)].filter(Boolean).join(":")
+          ) ?? `one-c-project:${index}`,
+        observedAt: sample.reportDate,
+        actualToPlanRatio,
+        paymentsToActualRatio,
+        actsToActualRatio,
+        paymentGap: subtractOrNull(sample.actualBudget, sample.paymentsActual),
+        actGap: subtractOrNull(sample.actualBudget, sample.actsActual),
+        paymentsVsActsGap: subtractOrNull(sample.paymentsActual, sample.actsActual),
+        budgetDeltaStatus: deriveBudgetDeltaStatus(sample.variance, variancePercent),
+      } satisfies OneCProjectFinanceTruth;
+    })
+    .sort((left, right) => {
+      const statusDiff =
+        getBudgetStatusRank(left.budgetDeltaStatus) - getBudgetStatusRank(right.budgetDeltaStatus);
+      if (statusDiff !== 0) {
+        return statusDiff;
+      }
+
+      const varianceDiff =
+        Math.abs(right.variancePercent ?? 0) - Math.abs(left.variancePercent ?? 0);
+      if (varianceDiff !== 0) {
+        return varianceDiff;
+      }
+
+      return compareDates(right.observedAt, left.observedAt);
+    });
+}
+
 function summarizeFinanceSamples(samples: OneCProjectFinanceSample[]) {
   return samples.reduce(
     (accumulator, sample) => {
@@ -504,6 +656,102 @@ function summarizeFinanceSamples(samples: OneCProjectFinanceSample[]) {
       totalPaymentsActual: 0,
     }
   );
+}
+
+function deriveBudgetDeltaStatus(
+  variance: number | null,
+  variancePercent: number | null
+): OneCProjectFinanceTruth["budgetDeltaStatus"] {
+  if (variance === null && variancePercent === null) {
+    return "unknown";
+  }
+
+  if ((variancePercent !== null && Math.abs(variancePercent) <= 0.02) || variance === 0) {
+    return "on_plan";
+  }
+
+  if ((variance ?? 0) < 0) {
+    return "over_plan";
+  }
+
+  return "under_plan";
+}
+
+function getBudgetStatusRank(status: OneCProjectFinanceTruth["budgetDeltaStatus"]) {
+  switch (status) {
+    case "over_plan":
+      return 0;
+    case "under_plan":
+      return 1;
+    case "on_plan":
+      return 2;
+    case "unknown":
+    default:
+      return 3;
+  }
+}
+
+function subtractOrNull(left: number | null, right: number | null) {
+  if (left === null || right === null) {
+    return null;
+  }
+
+  return left - right;
+}
+
+function divideOrNull(left: number | null, right: number | null) {
+  if (left === null || right === null || right === 0) {
+    return null;
+  }
+
+  return left / right;
+}
+
+function sanitizePageSize(value: number | undefined, fallback: number, max: number) {
+  if (!Number.isFinite(value) || value === undefined) {
+    return fallback;
+  }
+
+  const rounded = Math.round(value);
+  if (rounded < 1) {
+    return 1;
+  }
+
+  return Math.min(rounded, max);
+}
+
+function buildOneCEntityKey(prefix: string, value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalized ? `one-c-${prefix}:${normalized}` : null;
+}
+
+function compareDates(left: string | null, right: string | null) {
+  const leftMs = left ? Date.parse(left) : Number.NEGATIVE_INFINITY;
+  const rightMs = right ? Date.parse(right) : Number.NEGATIVE_INFINITY;
+
+  if (!Number.isFinite(leftMs) && !Number.isFinite(rightMs)) {
+    return 0;
+  }
+
+  if (!Number.isFinite(leftMs)) {
+    return -1;
+  }
+
+  if (!Number.isFinite(rightMs)) {
+    return 1;
+  }
+
+  return leftMs - rightMs;
 }
 
 function readStringField(record: unknown, keys: string[]) {

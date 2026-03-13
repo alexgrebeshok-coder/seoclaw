@@ -42,13 +42,12 @@ Reason:
 
 Prefer lead-first sequencing for the active sessions defined in the master execution plan.
 
-As of 2026-03-11 after Session 28 landed, that means the remaining Wave 7 queue:
-- Session 29.
+As of 2026-03-12 after Session 42 landed, Wave 11 is complete and the next lead-first step is to define Wave 12 before opening new implementation prompts.
 
 Recommended concurrency:
-- 1 lead session for schema or durable workflow state;
-- 1 worker session maximum for isolated route/UI work during Session 28;
-- 2 worker sessions maximum only after the Wave 7 storage boundary is stable;
+- 1 lead session to define Wave 12 because the next canonical bottleneck should now be chosen from evidence rather than guessed;
+- keep worker sessions paused until a Wave 12 prompt exists or a clearly isolated follow-up slice is identified;
+- 2 worker sessions maximum only after the next wave has clearly isolated domains;
 - 3 sessions maximum per wave for now.
 
 ## 3. Session Roles
@@ -127,6 +126,9 @@ Use exactly one of the files from:
 - [session-33-executive-command-center-exception-inbox.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-33-executive-command-center-exception-inbox.md)
 - [session-34-audit-pack-and-operational-exports.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-34-audit-pack-and-operational-exports.md)
 - [session-35-pilot-controls-and-tenant-readiness.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-35-pilot-controls-and-tenant-readiness.md)
+- [session-36-pilot-feedback-ledger-resolution-loop.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-36-pilot-feedback-ledger-resolution-loop.md)
+- [session-37-tenant-readiness-cutover-checklist.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-37-tenant-readiness-cutover-checklist.md)
+- [session-38-pilot-review-scorecards-governance-export.md](/Users/aleksandrgrebeshok/CODEBASE/pm-dashboard-visual-test/doc/session-prompts/session-38-pilot-review-scorecards-governance-export.md)
 
 Do not combine prompt files in one worker session.
 
@@ -182,7 +184,7 @@ Status: Sessions 09 through 26 are complete on 2026-03-11. Meeting-to-action, wo
 ### Stage 8
 
 Start the next sequence only after the previous one is canonically fixed in the master plan.
-Status: the next active sequence is now chosen. Sessions 27 and 28 are complete, and Wave 7 should continue lead-first through Session 29.
+Status: Sessions 27 through 42 are complete, Wave 9 and Wave 10 are complete, and Wave 11 is now complete on the lead branch.
 
 ## 8. When Not to Parallelize
 
@@ -211,10 +213,10 @@ That means:
 Right now:
 
 1. Wave 0 no longer blocks parallel execution.
-2. Sessions 01 through 28 are complete on the lead branch.
+2. Sessions 01 through 42 are complete on the lead branch.
 3. Keep exact active session selection in the master execution plan, not here.
-4. Wave 6 is now complete on the lead branch.
-5. The active sequence is Wave 7 durable runtime hardening, with Session 29 next.
+4. Wave 7, Wave 8, Wave 9, and Wave 10 are complete on the lead branch.
+5. Wave 11 governance automation and controlled widening is complete on the lead branch, and the next canonical step is to define Wave 12.
 
 ## 11. Success Condition for This Operating Model
 

@@ -185,12 +185,24 @@
 - `enterprise truth expansion`
 - `durable AI run workflow ledger`
 - `explicit evidence and escalation sync jobs`
+- `durable delivery ledger and idempotent outbound execution`
+- `normalized GPS telemetry truth with session/equipment/geofence rollups`
+- `normalized 1C financial truth with project deltas and portfolio rollups`
+- `persisted reconciliation casefiles with deterministic mismatch reasons across finance, field evidence, and telemetry`
+- `executive command center with a shared exception inbox across escalations and reconciliation casefiles`
+- `deterministic audit packs for workflow evidence, trace, and applied decision context`
+- `explicit pilot controls with tenant/workspace rollout posture and guarded high-risk live workflows`
+- `persisted pilot feedback ledger with create/resolve flow linked from command center and audit packs`
+- `tenant readiness checklist with explicit cutover blockers, warnings, and drillback links`
+- `pilot review scorecards with deterministic weekly governance markdown export`
+- `recurring governance review delivery with persisted weekly schedules and governance-scoped ledger entries`
+- `durable cutover decision register for approvals, warning waivers, and rollback state`
+- `persisted tenant onboarding runbook surface with target-tenant scope, handoff notes, and rollback posture`
 
 Следующий рекомендованный ход:
-- execute the chosen post-Wave-6 sequence explicitly:
-  - Wave 7: durable runtime hardening;
-  - Wave 8: source-of-truth depth;
-  - Wave 9: pilot-grade operatorization.
+- keep Sessions 01 through 42 as the locked baseline;
+- treat Wave 11 as complete now that the bounded rollout handoff/export layer is in place;
+- define Wave 12 from observed post-Wave 11 operator friction instead of assuming a Session 43 upfront.
 
 ## Definition of Done по релизу Alpha
 
@@ -267,3 +279,6 @@
 - `doc/session-prompts/session-33-executive-command-center-exception-inbox.md`
 - `doc/session-prompts/session-34-audit-pack-and-operational-exports.md`
 - `doc/session-prompts/session-35-pilot-controls-and-tenant-readiness.md`
+- `doc/session-prompts/session-36-pilot-feedback-ledger-resolution-loop.md`
+- `doc/session-prompts/session-37-tenant-readiness-cutover-checklist.md`
+- `doc/session-prompts/session-38-pilot-review-scorecards-governance-export.md`

@@ -9,15 +9,15 @@
 
 ---
 
-## Актуальная рамка на 2026-03-11
+## Актуальная рамка на 2026-03-12
 
 История ниже полезна как эволюция продукта, но текущая форма CEOClaw уже шире исходного dashboard MVP.
 
 Актуально:
 
 1. продукт движется из `AI-powered PM dashboard` в `AI operating layer`;
-2. уже есть proposal/apply, work reports, executive briefs, plan-vs-fact, policy/workspace model, Telegram delivery, SMTP email delivery, GPS telemetry sample, 1C finance sample, evidence ledger, visual facts, AI trace/evals, operator escalation queue, live/demo truth layer, knowledge loop, enterprise truth expansion, durable AI run ledger и explicit sync jobs для evidence/escalation;
-3. следующий этап уже выбран как явный post-Wave-6 track: durable runtime hardening -> source-of-truth depth -> pilot-grade operatorization.
+2. уже есть proposal/apply, work reports, executive briefs, plan-vs-fact, policy/workspace model, Telegram delivery, SMTP email delivery, GPS telemetry truth with normalized session/equipment/geofence rollups, 1C financial truth with normalized project deltas and portfolio rollups, evidence ledger, visual facts, AI trace/evals, operator escalation queue, live/demo truth layer, knowledge loop, enterprise truth expansion, durable AI run ledger, explicit sync jobs для evidence/escalation, durable delivery ledger с idempotent execution, persisted reconciliation casefiles с explainable mismatch reasons, executive command center с shared exception inbox across escalations and reconciliation gaps, deterministic audit packs for workflow evidence, trace, and applied decision context, explicit pilot controls with tenant/workspace rollout posture, persisted pilot feedback ledger with create/resolve flow, tenant readiness checklist with explicit cutover blockers and drillback links, pilot review scorecards with deterministic governance markdown export, recurring governance review delivery with persisted weekly email schedules plus governance-scoped delivery history, durable cutover decision register for approvals, warning waivers, and rollback entries, и persisted tenant onboarding runbook surface with target-tenant handoff and rollback notes;
+3. Wave 7 durable runtime hardening закрыт через Session 29, Wave 8 source-of-truth depth закрыт через Session 32, Wave 9 pilot-grade operatorization закрыт через Session 35, Wave 10 pilot feedback and go-live readiness закрыт через Session 38, Wave 11 governance automation and controlled widening закрыт через Session 42, а следующий канонический шаг — определить Wave 12 по результатам нового bounded rollout handoff/export layer.
 
 Единственный канонический источник текущего execution-state:
 

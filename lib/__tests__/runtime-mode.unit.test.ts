@@ -24,6 +24,10 @@ assert.equal(
   isDatabaseConfigured({ DATABASE_URL: "file:./dev.db" } as NodeJS.ProcessEnv),
   true
 );
+assert.equal(
+  isDatabaseConfigured({ DATABASE_URL: "postgres://broken" } as NodeJS.ProcessEnv),
+  false
+);
 
 assert.equal(shouldServeMockData({} as NodeJS.ProcessEnv), true);
 assert.equal(
@@ -40,13 +44,30 @@ assert.equal(
   } as NodeJS.ProcessEnv),
   false
 );
+assert.equal(
+  shouldServeMockData({
+    APP_DATA_MODE: "live",
+    DATABASE_URL: "postgres://broken",
+  } as NodeJS.ProcessEnv),
+  true
+);
 
 const degradedRuntime = getServerRuntimeState({
   APP_DATA_MODE: "live",
 } as NodeJS.ProcessEnv);
 assert.equal(degradedRuntime.healthStatus, "degraded");
 assert.equal(degradedRuntime.databaseConfigured, false);
-assert.equal(degradedRuntime.usingMockData, false);
+assert.equal(degradedRuntime.usingMockData, true);
+
+const invalidDatabaseRuntime = getServerRuntimeState({
+  APP_DATA_MODE: "live",
+  DATABASE_URL: "postgres://broken",
+} as NodeJS.ProcessEnv);
+assert.equal(invalidDatabaseRuntime.healthStatus, "degraded");
+assert.equal(invalidDatabaseRuntime.databaseConfigured, false);
+assert.equal(invalidDatabaseRuntime.usingMockData, true);
+assert.equal(canReadLiveOperatorData(invalidDatabaseRuntime), false);
+assert.equal(getLiveOperatorDataBlockReason(invalidDatabaseRuntime), "database_unavailable");
 
 const demoRuntime = getServerRuntimeState({
   APP_DATA_MODE: "demo",

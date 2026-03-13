@@ -3,6 +3,7 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { api } from "@/lib/client/api-error";
 import { leadingLabel } from "@/lib/utils";
 import {
   BarChart,
@@ -18,23 +19,68 @@ interface TeamPerformanceProps {
   projectId?: string;
 }
 
+type TeamPerformanceResponse = {
+  summary: {
+    totalMembers: number;
+    totalTasks: number;
+    totalCompleted: number;
+    avgPerformanceScore: number;
+  };
+  members: Array<{
+    memberId: string;
+    memberName: string;
+    memberInitials?: string | null;
+    role?: string | null;
+    performanceScore: number;
+    metrics: {
+      totalTasks: number;
+      completedTasks: number;
+    };
+    time: {
+      totalHoursLogged: number;
+    };
+  }>;
+};
+
+const emptyTeamPerformance: TeamPerformanceResponse = {
+  summary: {
+    totalMembers: 0,
+    totalTasks: 0,
+    totalCompleted: 0,
+    avgPerformanceScore: 0,
+  },
+  members: [],
+};
+
+function isTeamPerformanceResponse(input: unknown): input is TeamPerformanceResponse {
+  return Boolean(
+    input &&
+      typeof input === "object" &&
+      "summary" in input &&
+      "members" in input &&
+      Array.isArray((input as TeamPerformanceResponse).members)
+  );
+}
+
 export const TeamPerformance = React.memo(function TeamPerformance({
   projectId,
 }: TeamPerformanceProps) {
-  const [data, setData] = React.useState<any>(null);
+  const [data, setData] = React.useState<TeamPerformanceResponse>(emptyTeamPerformance);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     async function fetchPerformance() {
+      setLoading(true);
+
       try {
         const url = projectId
           ? `/api/analytics/team-performance?projectId=${projectId}`
           : "/api/analytics/team-performance";
-        const response = await fetch(url);
-        const result = await response.json();
-        setData(result);
+        const result = await api.get<unknown>(url);
+        setData(isTeamPerformanceResponse(result) ? result : emptyTeamPerformance);
       } catch (error) {
         console.error("[TeamPerformance] Error:", error);
+        setData(emptyTeamPerformance);
       } finally {
         setLoading(false);
       }
@@ -51,7 +97,7 @@ export const TeamPerformance = React.memo(function TeamPerformance({
     );
   }
 
-  if (!data || data.members.length === 0) {
+  if (data.members.length === 0) {
     return (
       <Card className="p-6 text-center text-[var(--ink-muted)]">
         No team data available

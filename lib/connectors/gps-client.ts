@@ -28,6 +28,54 @@ export interface GpsTelemetrySampleSnapshot {
   metadata?: GpsSampleMetadata;
 }
 
+export interface GpsTelemetryNormalizedSession extends GpsTelemetrySample {
+  sessionKey: string;
+  equipmentKey: string | null;
+  geofenceKey: string | null;
+  observedAt: string | null;
+  hasOpenEndedRange: boolean;
+}
+
+export interface GpsTelemetryEquipmentTruth {
+  equipmentKey: string;
+  equipmentId: string | null;
+  equipmentType: string | null;
+  sessionCount: number;
+  totalDurationSeconds: number;
+  latestObservedAt: string | null;
+  latestStatus: string | null;
+  latestGeofenceKey: string | null;
+  latestGeofenceName: string | null;
+}
+
+export interface GpsTelemetryGeofenceTruth {
+  geofenceKey: string;
+  geofenceId: string | null;
+  geofenceName: string | null;
+  sessionCount: number;
+  equipmentCount: number;
+  totalDurationSeconds: number;
+  latestObservedAt: string | null;
+  equipmentIds: string[];
+}
+
+export interface GpsTelemetryTruthSummary {
+  sessionCount: number;
+  equipmentCount: number;
+  geofenceCount: number;
+  totalDurationSeconds: number;
+  openEndedSessionCount: number;
+  equipmentLinkedSessions: number;
+  geofenceLinkedSessions: number;
+}
+
+export interface GpsTelemetryTruthSnapshot extends GpsTelemetrySampleSnapshot {
+  summary: GpsTelemetryTruthSummary;
+  sessions: GpsTelemetryNormalizedSession[];
+  equipment: GpsTelemetryEquipmentTruth[];
+  geofences: GpsTelemetryGeofenceTruth[];
+}
+
 export function getGpsApiUrl(env: NodeJS.ProcessEnv = process.env) {
   return env.GPS_API_URL?.trim() || null;
 }
@@ -47,7 +95,7 @@ export function buildGpsProbeUrl(baseUrl: string) {
   return url.toString();
 }
 
-export function buildGpsSampleUrl(baseUrl: string) {
+export function buildGpsSessionsUrl(baseUrl: string, pageSize = 3) {
   const url = new URL(baseUrl);
   const normalizedPath = url.pathname.replace(/\/$/, "");
 
@@ -64,10 +112,14 @@ export function buildGpsSampleUrl(baseUrl: string) {
   }
 
   if (!url.searchParams.has("page_size")) {
-    url.searchParams.set("page_size", "3");
+    url.searchParams.set("page_size", String(sanitizePageSize(pageSize, 3, 24)));
   }
 
   return url.toString();
+}
+
+export function buildGpsSampleUrl(baseUrl: string) {
+  return buildGpsSessionsUrl(baseUrl, 3);
 }
 
 export async function probeGpsApi(
@@ -149,6 +201,7 @@ export async function fetchGpsTelemetrySample(
   input: {
     baseUrl: string;
     apiKey: string;
+    pageSize?: number;
   },
   fetchImpl: GpsFetch = fetch
 ): Promise<
@@ -167,7 +220,7 @@ export async function fetchGpsTelemetrySample(
       metadata?: GpsSampleMetadata;
     }
 > {
-  const sampleUrl = buildGpsSampleUrl(input.baseUrl);
+  const sampleUrl = buildGpsSessionsUrl(input.baseUrl, input.pageSize ?? 3);
   const response = await fetchImpl(sampleUrl, {
     method: "GET",
     headers: buildGpsHeaders(input.apiKey),
@@ -230,6 +283,7 @@ export async function fetchGpsTelemetrySample(
       sampleUrl,
       responseShape: describePayloadShape(parsedPayload),
       sampleCount: samples.length,
+      requestedPageSize: sanitizePageSize(input.pageSize, 3, 24),
       ...(provider ? { provider } : {}),
     },
   };
@@ -239,7 +293,64 @@ export async function getGpsTelemetrySampleSnapshot(
   env: NodeJS.ProcessEnv = process.env,
   fetchImpl: GpsFetch = fetch
 ): Promise<GpsTelemetrySampleSnapshot> {
+  return getGpsTelemetryBaseSnapshot({
+    env,
+    fetchImpl,
+    pageSize: 3,
+  });
+}
+
+export async function getGpsTelemetryTruthSnapshot(
+  options: {
+    pageSize?: number;
+    env?: NodeJS.ProcessEnv;
+    fetchImpl?: GpsFetch;
+  } = {}
+): Promise<GpsTelemetryTruthSnapshot> {
+  const snapshot = await getGpsTelemetryBaseSnapshot({
+    env: options.env,
+    fetchImpl: options.fetchImpl,
+    pageSize: options.pageSize ?? 12,
+  });
+
+  return buildGpsTelemetryTruthSnapshot(snapshot);
+}
+
+export function buildGpsTelemetryTruthSnapshot(
+  snapshot: GpsTelemetrySampleSnapshot
+): GpsTelemetryTruthSnapshot {
+  const sessions = buildNormalizedGpsSessions(snapshot.samples);
+  const equipment = buildGpsEquipmentTruth(sessions);
+  const geofences = buildGpsGeofenceTruth(sessions);
+
+  return {
+    ...snapshot,
+    summary: {
+      sessionCount: sessions.length,
+      equipmentCount: equipment.length,
+      geofenceCount: geofences.length,
+      totalDurationSeconds: sessions.reduce(
+        (total, session) => total + (session.durationSeconds ?? 0),
+        0
+      ),
+      openEndedSessionCount: sessions.filter((session) => session.hasOpenEndedRange).length,
+      equipmentLinkedSessions: sessions.filter((session) => session.equipmentKey !== null).length,
+      geofenceLinkedSessions: sessions.filter((session) => session.geofenceKey !== null).length,
+    },
+    sessions,
+    equipment,
+    geofences,
+  };
+}
+
+async function getGpsTelemetryBaseSnapshot(input: {
+  pageSize: number;
+  env?: NodeJS.ProcessEnv;
+  fetchImpl?: GpsFetch;
+}): Promise<GpsTelemetrySampleSnapshot> {
   const checkedAt = new Date().toISOString();
+  const env = input.env ?? process.env;
+  const fetchImpl = input.fetchImpl ?? fetch;
   const apiUrl = getGpsApiUrl(env);
   const apiKey = getGpsApiKey(env);
   const missingSecrets = [
@@ -264,6 +375,7 @@ export async function getGpsTelemetrySampleSnapshot(
       {
         baseUrl: apiUrl!,
         apiKey: apiKey!,
+        pageSize: input.pageSize,
       },
       fetchImpl
     );
@@ -307,6 +419,148 @@ export async function getGpsTelemetrySampleSnapshot(
       samples: [],
     };
   }
+}
+
+function buildNormalizedGpsSessions(samples: GpsTelemetrySample[]) {
+  return samples
+    .map((sample, index) => {
+      const equipmentKey = buildGpsEntityKey("equipment", sample.equipmentId);
+      const geofenceKey = buildGpsEntityKey(
+        "geofence",
+        sample.geofenceId ?? sample.geofenceName
+      );
+      const observedAt = sample.endedAt ?? sample.startedAt ?? null;
+
+      return {
+        ...sample,
+        sessionKey:
+          buildGpsEntityKey(
+            "session",
+            sample.sessionId ??
+              [sample.equipmentId, sample.startedAt, sample.endedAt, String(index)]
+                .filter(Boolean)
+                .join(":")
+          ) ?? `gps-session:${index}`,
+        equipmentKey,
+        geofenceKey,
+        observedAt,
+        hasOpenEndedRange: sample.startedAt !== null && sample.endedAt === null,
+      } satisfies GpsTelemetryNormalizedSession;
+    })
+    .sort((left, right) => compareTimestamps(right.observedAt, left.observedAt));
+}
+
+function buildGpsEquipmentTruth(
+  sessions: GpsTelemetryNormalizedSession[]
+): GpsTelemetryEquipmentTruth[] {
+  const equipmentMap = new Map<string, GpsTelemetryEquipmentTruth>();
+
+  for (const session of sessions) {
+    if (!session.equipmentKey) {
+      continue;
+    }
+
+    const existing = equipmentMap.get(session.equipmentKey) ?? {
+      equipmentKey: session.equipmentKey,
+      equipmentId: session.equipmentId,
+      equipmentType: session.equipmentType,
+      sessionCount: 0,
+      totalDurationSeconds: 0,
+      latestObservedAt: null,
+      latestStatus: null,
+      latestGeofenceKey: null,
+      latestGeofenceName: null,
+    };
+
+    existing.sessionCount += 1;
+    existing.totalDurationSeconds += session.durationSeconds ?? 0;
+    existing.equipmentId = existing.equipmentId ?? session.equipmentId;
+    existing.equipmentType = existing.equipmentType ?? session.equipmentType;
+
+    if (compareTimestamps(session.observedAt, existing.latestObservedAt) > 0) {
+      existing.latestObservedAt = session.observedAt;
+      existing.latestStatus = session.status;
+      existing.latestGeofenceKey = session.geofenceKey;
+      existing.latestGeofenceName = session.geofenceName;
+    }
+
+    equipmentMap.set(session.equipmentKey, existing);
+  }
+
+  return Array.from(equipmentMap.values()).sort((left, right) => {
+    const observedDiff = compareTimestamps(right.latestObservedAt, left.latestObservedAt);
+    if (observedDiff !== 0) {
+      return observedDiff;
+    }
+
+    return right.sessionCount - left.sessionCount;
+  });
+}
+
+function buildGpsGeofenceTruth(
+  sessions: GpsTelemetryNormalizedSession[]
+): GpsTelemetryGeofenceTruth[] {
+  const geofenceMap = new Map<
+    string,
+    GpsTelemetryGeofenceTruth & { equipmentKeySet: Set<string> }
+  >();
+
+  for (const session of sessions) {
+    if (!session.geofenceKey) {
+      continue;
+    }
+
+    const existing = geofenceMap.get(session.geofenceKey) ?? {
+      geofenceKey: session.geofenceKey,
+      geofenceId: session.geofenceId,
+      geofenceName: session.geofenceName,
+      sessionCount: 0,
+      equipmentCount: 0,
+      totalDurationSeconds: 0,
+      latestObservedAt: null,
+      equipmentIds: [],
+      equipmentKeySet: new Set<string>(),
+    };
+
+    existing.sessionCount += 1;
+    existing.totalDurationSeconds += session.durationSeconds ?? 0;
+    existing.geofenceId = existing.geofenceId ?? session.geofenceId;
+    existing.geofenceName = existing.geofenceName ?? session.geofenceName;
+
+    if (session.equipmentKey && !existing.equipmentKeySet.has(session.equipmentKey)) {
+      existing.equipmentKeySet.add(session.equipmentKey);
+      existing.equipmentCount += 1;
+    }
+
+    if (session.equipmentId && !existing.equipmentIds.includes(session.equipmentId)) {
+      existing.equipmentIds.push(session.equipmentId);
+    }
+
+    if (compareTimestamps(session.observedAt, existing.latestObservedAt) > 0) {
+      existing.latestObservedAt = session.observedAt;
+    }
+
+    geofenceMap.set(session.geofenceKey, existing);
+  }
+
+  return Array.from(geofenceMap.values(), (entry) => ({
+    geofenceKey: entry.geofenceKey,
+    geofenceId: entry.geofenceId,
+    geofenceName: entry.geofenceName,
+    sessionCount: entry.sessionCount,
+    equipmentCount: entry.equipmentCount,
+    totalDurationSeconds: entry.totalDurationSeconds,
+    latestObservedAt: entry.latestObservedAt,
+    equipmentIds: entry.equipmentIds,
+  }))
+    .sort((left, right) => {
+      const observedDiff = compareTimestamps(right.latestObservedAt, left.latestObservedAt);
+      if (observedDiff !== 0) {
+        return observedDiff;
+      }
+
+      return right.sessionCount - left.sessionCount;
+    });
 }
 
 function interpretGpsPayload(payload: unknown, probeUrl: string) {
@@ -495,6 +749,53 @@ function deriveDurationSeconds(startedAt: string | null, endedAt: string | null)
   }
 
   return Math.round((endedMs - startedMs) / 1000);
+}
+
+function sanitizePageSize(value: number | undefined, fallback: number, max: number) {
+  if (!Number.isFinite(value) || value === undefined) {
+    return fallback;
+  }
+
+  const rounded = Math.round(value);
+  if (rounded < 1) {
+    return 1;
+  }
+
+  return Math.min(rounded, max);
+}
+
+function buildGpsEntityKey(prefix: string, value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalized ? `gps-${prefix}:${normalized}` : null;
+}
+
+function compareTimestamps(left: string | null, right: string | null) {
+  const leftMs = left ? Date.parse(left) : Number.NEGATIVE_INFINITY;
+  const rightMs = right ? Date.parse(right) : Number.NEGATIVE_INFINITY;
+
+  if (!Number.isFinite(leftMs) && !Number.isFinite(rightMs)) {
+    return 0;
+  }
+
+  if (!Number.isFinite(leftMs)) {
+    return -1;
+  }
+
+  if (!Number.isFinite(rightMs)) {
+    return 1;
+  }
+
+  return leftMs - rightMs;
 }
 
 function hasExplicitProbePath(pathname: string) {

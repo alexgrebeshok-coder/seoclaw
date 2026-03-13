@@ -1,4 +1,8 @@
 import { generatePortfolioBrief, generateProjectBrief } from "@/lib/briefs/generate";
+import {
+  executeBriefDelivery,
+  type BriefDeliveryLedgerRecord,
+} from "@/lib/briefs/delivery-ledger";
 import { resolveBriefLocale, type BriefLocale } from "@/lib/briefs/locale";
 import {
   getTelegramDefaultChatId,
@@ -14,6 +18,8 @@ export interface TelegramBriefDeliveryRequest {
   locale?: BriefLocale;
   chatId?: string | null;
   dryRun?: boolean;
+  idempotencyKey?: string;
+  scheduledPolicyId?: string | null;
 }
 
 export interface TelegramBriefDeliveryResult {
@@ -25,6 +31,8 @@ export interface TelegramBriefDeliveryResult {
   dryRun: boolean;
   messageText: string;
   messageId?: number;
+  replayed?: boolean;
+  ledger?: BriefDeliveryLedgerRecord | null;
 }
 
 interface TelegramBriefDeliveryDeps {
@@ -55,46 +63,69 @@ export async function deliverBriefToTelegram(
 
   const messageText = brief.formats.telegramDigest;
   const chatId = request.chatId?.trim() || getTelegramDefaultChatId(env);
+  const projectName = "project" in brief ? brief.project.name : null;
 
   if (!request.dryRun && !chatId) {
     throw new Error("Telegram chat id is required when no TELEGRAM_DEFAULT_CHAT_ID is configured.");
   }
 
-  if (request.dryRun) {
-    return {
-      scope: request.scope,
-      locale,
-      chatId: chatId ?? null,
-      headline: brief.headline,
-      delivered: false,
-      dryRun: true,
-      messageText,
-    };
-  }
-
-  const token = getTelegramToken(env);
-  if (!token) {
+  const token = request.dryRun ? null : getTelegramToken(env);
+  if (!request.dryRun && !token) {
     throw new Error("TELEGRAM_BOT_TOKEN is not configured.");
   }
 
-  const sendResult = await sendMessage({
-    token,
-    chatId: chatId!,
-    text: messageText,
-  });
+  const execution = await executeBriefDelivery({
+    channel: "telegram",
+    provider: "telegram_bot_api",
+    mode: request.scheduledPolicyId ? "scheduled" : "manual",
+    scope: request.scope,
+    projectId: request.projectId,
+    projectName,
+    locale,
+    target: chatId ?? null,
+    headline: brief.headline,
+    content: {
+      messageText,
+    },
+    requestPayload: {
+      scope: request.scope,
+      projectId: request.projectId ?? null,
+      locale,
+      chatId: chatId ?? null,
+      dryRun: request.dryRun ?? false,
+    },
+    dryRun: request.dryRun,
+    idempotencyKey: request.idempotencyKey,
+    scheduledPolicyId: request.scheduledPolicyId,
+    env,
+    execute: async () => {
+      const sendResult = await sendMessage({
+        token: token!,
+        chatId: chatId!,
+        text: messageText,
+      });
 
-  if (!sendResult.ok) {
-    throw new Error(sendResult.message);
-  }
+      if (!sendResult.ok) {
+        throw new Error(sendResult.message);
+      }
+
+      return {
+        providerMessageId: sendResult.result.message_id,
+        providerPayload: sendResult.result,
+      };
+    },
+  });
 
   return {
     scope: request.scope,
     locale,
-    chatId: String(chatId),
+    chatId: chatId ? String(chatId) : null,
     headline: brief.headline,
-    delivered: true,
-    dryRun: false,
+    delivered: !request.dryRun,
+    dryRun: request.dryRun ?? false,
     messageText,
-    messageId: sendResult.result.message_id,
+    ...(execution.providerMessageId ? { messageId: Number(execution.providerMessageId) } : {}),
+    replayed: execution.replayed,
+    ledger: execution.ledger,
   };
 }

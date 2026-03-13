@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
+import { buildScheduledBriefDeliveryIdempotencyKey } from "./delivery-ledger";
 import { deliverBriefToTelegram, type TelegramBriefDeliveryRequest } from "./telegram-delivery";
 import { resolveBriefLocale, type BriefLocale } from "./locale";
 
@@ -64,6 +65,8 @@ export interface TelegramPolicyExecutionCandidate {
   deliveryHour: number;
   active: boolean;
   lastAttemptAt?: string | Date | null;
+  lastDeliveredAt?: string | Date | null;
+  lastError?: string | null;
 }
 
 export interface TelegramPolicyExecutionResult {
@@ -135,7 +138,26 @@ export function shouldAttemptTelegramPolicy(
     return true;
   }
 
-  return getPolicyWindowKey(attemptedAt, policy.timezone).windowKey !== currentWindow.windowKey;
+  const attemptedWindow = getPolicyWindowKey(attemptedAt, policy.timezone).windowKey;
+  if (attemptedWindow !== currentWindow.windowKey) {
+    return true;
+  }
+
+  if (policy.lastDeliveredAt) {
+    const deliveredAt =
+      policy.lastDeliveredAt instanceof Date
+        ? policy.lastDeliveredAt
+        : new Date(policy.lastDeliveredAt);
+
+    if (
+      !Number.isNaN(deliveredAt.getTime()) &&
+      getPolicyWindowKey(deliveredAt, policy.timezone).windowKey === currentWindow.windowKey
+    ) {
+      return false;
+    }
+  }
+
+  return Boolean(policy.lastError);
 }
 
 export async function executeTelegramPolicyRun(
@@ -203,6 +225,12 @@ export async function executeTelegramPolicyRun(
         projectId: policy.projectId ?? undefined,
         locale: policy.locale,
         chatId: policy.chatId,
+        idempotencyKey: buildScheduledBriefDeliveryIdempotencyKey({
+          channel: "telegram",
+          policyId: policy.id,
+          windowKey: getPolicyWindowKey(now, policy.timezone).windowKey,
+        }),
+        scheduledPolicyId: policy.id,
       });
 
       deliveredPolicies += 1;
@@ -371,6 +399,8 @@ export async function runDueTelegramBriefDeliveryPolicies() {
       deliveryHour: policy.deliveryHour,
       active: policy.active,
       lastAttemptAt: policy.lastAttemptAt,
+      lastDeliveredAt: policy.lastDeliveredAt,
+      lastError: policy.lastError,
     })),
     {
       persistResult: async (input) => {

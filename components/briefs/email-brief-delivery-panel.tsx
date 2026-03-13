@@ -5,9 +5,18 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input, fieldStyles } from "@/components/ui/field";
+import type { BriefDeliveryLedgerRecord } from "@/lib/briefs/delivery-ledger";
 
 type DeliveryScope = "portfolio" | "project";
 type DeliveryLocale = "ru" | "en";
+
+function createDeliveryKey() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `email-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 interface DeliveryResponse {
   scope: DeliveryScope;
@@ -20,6 +29,8 @@ interface DeliveryResponse {
   previewText: string;
   bodyText: string;
   messageId?: string;
+  replayed?: boolean;
+  ledger?: BriefDeliveryLedgerRecord | null;
 }
 
 export function EmailBriefDeliveryPanel({
@@ -35,6 +46,7 @@ export function EmailBriefDeliveryPanel({
   const [error, setError] = useState<string | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [idempotencyKey, setIdempotencyKey] = useState(createDeliveryKey);
   const selectedProject = projectOptions.find((project) => project.id === projectId) ?? null;
   const scopeOptions = useMemo(
     () =>
@@ -62,6 +74,10 @@ export function EmailBriefDeliveryPanel({
     }
   }, [projectId, projectOptions, scope]);
 
+  useEffect(() => {
+    setIdempotencyKey(createDeliveryKey());
+  }, [scope, projectId, locale, recipient]);
+
   const submit = async (dryRun: boolean) => {
     setError(null);
 
@@ -82,6 +98,7 @@ export function EmailBriefDeliveryPanel({
           projectId: scope === "project" ? projectId : undefined,
           locale,
           recipient: recipient.trim() || undefined,
+          idempotencyKey,
           dryRun,
         }),
       });
@@ -199,11 +216,19 @@ export function EmailBriefDeliveryPanel({
             <Badge variant={result.delivered ? "success" : "info"}>
               {result.delivered ? "Delivered" : "Preview"}
             </Badge>
+            {result.replayed ? <Badge variant="warning">Idempotent replay</Badge> : null}
             <span className="text-xs text-[var(--ink-soft)]">
               {result.scope} · {result.locale} · {result.recipient ?? "env default / not set"}
             </span>
           </div>
           <div className="text-sm font-medium text-[var(--ink)]">{result.subject}</div>
+          {result.ledger ? (
+            <div className="text-xs text-[var(--ink-soft)]">
+              Ledger {result.ledger.status} · attempts {result.ledger.attemptCount} · retry{" "}
+              {result.ledger.retryPosture}
+              {result.ledger.providerMessageId ? ` · provider ${result.ledger.providerMessageId}` : ""}
+            </div>
+          ) : null}
           <div className="text-xs text-[var(--ink-soft)]">{result.previewText}</div>
           <pre className="whitespace-pre-wrap text-xs leading-6 text-[var(--ink-soft)]">
             {result.bodyText}

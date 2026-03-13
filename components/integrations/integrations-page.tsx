@@ -5,17 +5,21 @@ import { EnterpriseTruthCard } from "@/components/integrations/enterprise-truth-
 import { EvidenceFusionCard } from "@/components/integrations/evidence-fusion-card";
 import { ConnectorPolicyForm } from "@/components/integrations/connector-policy-form";
 import { EvidenceLedgerCard } from "@/components/integrations/evidence-ledger-card";
-import { GpsTelemetrySampleCard } from "@/components/integrations/gps-telemetry-sample-card";
+import { GpsTelemetryTruthCard } from "@/components/integrations/gps-telemetry-truth-card";
 import { IntegrationsOverviewCard } from "@/components/integrations/integrations-overview-card";
-import { OneCFinanceSampleCard } from "@/components/integrations/one-c-finance-sample-card";
+import { OneCFinanceTruthCard } from "@/components/integrations/one-c-finance-truth-card";
+import { ReconciliationCasefilesCard } from "@/components/integrations/reconciliation-casefiles-card";
 import { DomainApiCard } from "@/components/layout/domain-api-card";
 import { DomainPageHeader } from "@/components/layout/domain-page-header";
 import { OperatorRuntimeCard } from "@/components/layout/operator-runtime-card";
 import { buttonVariants } from "@/components/ui/button";
 import type { ConnectorStatus, ConnectorStatusSummary } from "@/lib/connectors";
-import type { EnterpriseTruthOverview } from "@/lib/enterprise-truth";
-import type { GpsTelemetrySampleSnapshot } from "@/lib/connectors/gps-client";
-import type { OneCFinanceSampleSnapshot } from "@/lib/connectors/one-c-client";
+import type {
+  EnterpriseTruthOverview,
+  ReconciliationCasefileListResult,
+} from "@/lib/enterprise-truth";
+import type { GpsTelemetryTruthSnapshot } from "@/lib/connectors/gps-client";
+import type { OneCFinanceTruthSnapshot } from "@/lib/connectors/one-c-client";
 import type { EvidenceFusionOverview, EvidenceListResult } from "@/lib/evidence";
 import {
   getOperatorTruthBadge,
@@ -40,8 +44,18 @@ const expectedEndpoints = [
   },
   {
     method: "GET" as const,
+    note: "Прочитать нормализованную GPS telemetry truth с session, equipment и geofence rollups.",
+    path: "/api/connectors/gps/telemetry",
+  },
+  {
+    method: "GET" as const,
     note: "Прочитать один live 1C finance sample через read-only project financials path.",
     path: "/api/connectors/one-c/sample",
+  },
+  {
+    method: "GET" as const,
+    note: "Прочитать нормализованную 1C financial truth с project deltas и portfolio rollups.",
+    path: "/api/connectors/one-c/finance",
   },
   {
     method: "GET" as const,
@@ -65,6 +79,16 @@ const expectedEndpoints = [
   },
   {
     method: "GET" as const,
+    note: "Прочитать persisted reconciliation casefiles и inspectable mismatch reasons.",
+    path: "/api/reconciliation/casefiles?limit=12",
+  },
+  {
+    method: "POST" as const,
+    note: "Явно запустить reconciliation sync и пересобрать casefiles из finance, field evidence и telemetry.",
+    path: "/api/reconciliation/sync",
+  },
+  {
+    method: "GET" as const,
     note: "Получить один evidence record по id.",
     path: "/api/evidence/:evidenceId",
   },
@@ -80,8 +104,9 @@ export function IntegrationsPage({
   evidence,
   enterpriseTruth,
   fusion,
-  gpsSample,
-  oneCSample,
+  gpsTelemetry,
+  oneCFinance,
+  reconciliation,
   runtimeTruth,
   summary,
 }: {
@@ -89,25 +114,26 @@ export function IntegrationsPage({
   evidence: EvidenceListResult;
   enterpriseTruth: EnterpriseTruthOverview;
   fusion: EvidenceFusionOverview;
-  gpsSample: GpsTelemetrySampleSnapshot;
-  oneCSample: OneCFinanceSampleSnapshot;
+  gpsTelemetry: GpsTelemetryTruthSnapshot;
+  oneCFinance: OneCFinanceTruthSnapshot;
+  reconciliation: ReconciliationCasefileListResult;
   runtimeTruth: OperatorRuntimeTruth;
   summary: ConnectorStatusSummary;
 }) {
   const liveConnectors = connectors.filter((connector) => !connector.stub).length;
   const runtimeBadge = getOperatorTruthBadge(runtimeTruth);
   const gpsSampleLabel =
-    gpsSample.status === "ok"
-      ? "GPS sample live"
-      : gpsSample.status === "degraded"
-        ? "GPS sample degraded"
-        : "GPS sample pending";
+    gpsTelemetry.status === "ok"
+      ? "GPS truth live"
+      : gpsTelemetry.status === "degraded"
+        ? "GPS truth degraded"
+        : "GPS truth pending";
   const oneCSampleLabel =
-    oneCSample.status === "ok"
-      ? "1C sample live"
-      : oneCSample.status === "degraded"
-        ? "1C sample degraded"
-        : "1C sample pending";
+    oneCFinance.status === "ok"
+      ? "1C truth live"
+      : oneCFinance.status === "degraded"
+        ? "1C truth degraded"
+        : "1C truth pending";
 
   return (
     <div className="grid min-w-0 gap-6">
@@ -122,12 +148,12 @@ export function IntegrationsPage({
           { label: "Registry-backed", variant: "success" },
           { label: summary.pending > 0 ? "Secrets required" : "Configured", variant: summary.pending > 0 ? "warning" : "success" },
           { label: liveConnectors > 0 ? `${liveConnectors} live probe${liveConnectors === 1 ? "" : "s"}` : "Stub adapters", variant: liveConnectors > 0 ? "success" : "info" },
-          { label: gpsSampleLabel, variant: gpsSample.status === "ok" ? "success" : gpsSample.status === "degraded" ? "danger" : "warning" },
-          { label: oneCSampleLabel, variant: oneCSample.status === "ok" ? "success" : oneCSample.status === "degraded" ? "danger" : "warning" },
+          { label: gpsSampleLabel, variant: gpsTelemetry.status === "ok" ? "success" : gpsTelemetry.status === "degraded" ? "danger" : "warning" },
+          { label: oneCSampleLabel, variant: oneCFinance.status === "ok" ? "success" : oneCFinance.status === "degraded" ? "danger" : "warning" },
           { label: enterpriseTruth.summary.corroborated > 0 ? `${enterpriseTruth.summary.corroborated} corroborated project truth${enterpriseTruth.summary.corroborated === 1 ? "" : "s"}` : "Enterprise truth expanding", variant: enterpriseTruth.summary.corroborated > 0 ? "success" : "info" },
           { label: evidence.summary.total > 0 ? `${evidence.summary.total} evidence record${evidence.summary.total === 1 ? "" : "s"}` : "Evidence pending", variant: evidence.summary.total > 0 ? "info" : "warning" },
         ]}
-        description="Раздел интеграций подключён к реальному connector registry. Здесь видно, какие коннекторы уже дают live probes, каких secrets не хватает, какой API surface уже подготовлен, какие read-only samples реально приходят из GPS и 1C, как эти факты вместе с visual evidence попадают в evidence ledger и где enterprise truth уже corroborated, а где ещё остаются finance-only или field-only gaps."
+        description="Раздел интеграций подключён к реальному connector registry. Здесь видно, какие коннекторы уже дают live probes, каких secrets не хватает, какой API surface уже подготовлен, какие read-only truth slices реально приходят из GPS и 1C, как эти факты вместе с visual evidence попадают в evidence ledger и где enterprise truth уже corroborated, а где ещё остаются explainable finance-only или field-only gaps."
         eyebrow="Platform trust"
         title="Connector Health"
       />
@@ -139,10 +165,11 @@ export function IntegrationsPage({
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
         <ConnectorHealthTable connectors={connectors} />
         <div className="grid gap-6">
-          <GpsTelemetrySampleCard snapshot={gpsSample} />
-          <OneCFinanceSampleCard snapshot={oneCSample} />
+          <GpsTelemetryTruthCard snapshot={gpsTelemetry} />
+          <OneCFinanceTruthCard snapshot={oneCFinance} />
           <EvidenceFusionCard fusion={fusion} />
           <EnterpriseTruthCard overview={enterpriseTruth} />
+          <ReconciliationCasefilesCard result={reconciliation} />
           <EvidenceLedgerCard evidence={evidence} />
           <ConnectorPolicyForm connectors={connectors} />
         </div>
