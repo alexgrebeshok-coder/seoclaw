@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import type { Adapter } from "next-auth/adapters";
 import bcrypt from "bcryptjs";
+import { checkAuthRateLimit } from "@/lib/auth-rate-limit";
 
 // Extend NextAuth types
 declare module "next-auth" {
@@ -35,9 +36,19 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
-          return null;
+          throw new Error("Email and password are required");
+        }
+
+        // Rate limiting: 5 attempts per 15 minutes per email/IP
+        const clientIp = req.headers?.["x-forwarded-for"] || "unknown";
+        const rateLimitKey = `auth:${credentials.email}:${clientIp}`;
+        const { allowed, remaining, resetAt } = checkAuthRateLimit(rateLimitKey);
+        
+        if (!allowed) {
+          const resetTime = resetAt ? Math.ceil((resetAt - Date.now()) / 60000) : 15;
+          throw new Error(`Too many login attempts. Please try again in ${resetTime} minutes.`);
         }
 
         const user = await prisma.user.findUnique({
@@ -47,7 +58,13 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.password) {
-          return null;
+          // Don't reveal whether user exists
+          throw new Error("Invalid email or password");
+        }
+
+        // Check email verification
+        if (!user.emailVerified) {
+          throw new Error("Please verify your email address before logging in");
         }
 
         // NOTE: Password hashing best practices:
@@ -57,7 +74,7 @@ export const authOptions: NextAuthOptions = {
         const passwordMatch = await bcrypt.compare(credentials.password, user.password);
 
         if (!passwordMatch) {
-          return null;
+          throw new Error("Invalid email or password");
         }
 
         return {
@@ -105,9 +122,36 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async signIn({ user, account, profile }) {
-      // Allow all sign-ins
-      // Add custom logic here if needed (e.g., check if user exists in database)
-      return true;
+      // Allow credentials provider (already validated in authorize)
+      if (account?.provider === "credentials") {
+        return true;
+      }
+
+      // For OAuth providers, check if user exists in database
+      // This prevents unauthorized users from accessing the system
+      if (account?.provider === "google" || account?.provider === "github") {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email || "" }
+        });
+
+        if (!existingUser) {
+          // Reject unknown users
+          // NOTE: For public apps, you might want to auto-create users instead
+          console.log(`OAuth sign-in rejected for unknown user: ${user.email}`);
+          return false;
+        }
+
+        // Check if email is verified
+        if (!existingUser.emailVerified) {
+          console.log(`OAuth sign-in rejected - email not verified: ${user.email}`);
+          return false;
+        }
+
+        return true;
+      }
+
+      // Unknown provider
+      return false;
     },
   },
   events: {
