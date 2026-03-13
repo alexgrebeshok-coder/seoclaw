@@ -11,9 +11,22 @@ import { Button } from "@/components/ui/button";
 import { ChatWidget } from "@/components/chat/chat-widget";
 import { cn } from "@/lib/utils";
 
+// Auth pages that don't need the app shell
+const AUTH_PAGES = ["/login", "/signup", "/forgot-password", "/reset-password"];
+
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? "/";
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Check if current page is an auth page
+  const isAuthPage = AUTH_PAGES.some(
+    (page) => pathname === page || pathname.startsWith(page + "/")
+  );
+
+  // For auth pages, render children directly without shell
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="h-[100dvh] min-h-[100dvh] overflow-hidden bg-[var(--surface)] text-[var(--ink)]">
