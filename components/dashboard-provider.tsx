@@ -259,16 +259,6 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       }
       setError(null);
 
-      // Check if running on Vercel without database
-      const useMockData = process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL;
-
-      if (useMockData) {
-        // Use mock data directly on Vercel without database
-        setState(initialDashboardState);
-        writeCachedState(initialDashboardState);
-        return initialDashboardState;
-      }
-
       const [projects, tasks, team, risks] = await Promise.all([
         api.get<ApiProject[]>("/api/projects"),
         api.get<ApiTask[]>("/api/tasks"),
