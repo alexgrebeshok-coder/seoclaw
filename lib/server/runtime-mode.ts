@@ -25,16 +25,20 @@ export function getServerDataMode(env: RuntimeEnv = process.env): ServerDataMode
 }
 
 function getNormalizedDatabaseUrl(env: RuntimeEnv = process.env): string | null {
-  const value = env.DATABASE_URL?.trim();
-  return value ? value : null;
+  // Prefer POSTGRES_PRISMA_URL for Neon PostgreSQL, fallback to DATABASE_URL
+  const postgresUrl = env.POSTGRES_PRISMA_URL?.trim();
+  if (postgresUrl) return postgresUrl;
+  
+  const databaseUrl = env.DATABASE_URL?.trim();
+  return databaseUrl ? databaseUrl : null;
 }
 
 export function isDatabaseConfigured(env: RuntimeEnv = process.env): boolean {
   const databaseUrl = getNormalizedDatabaseUrl(env);
   if (!databaseUrl) return false;
 
-  // The current Prisma datasource is SQLite, so the URL must resolve to a file path.
-  return databaseUrl.startsWith("file:");
+  // The Prisma datasource is PostgreSQL (Neon), so the URL must start with postgresql:// or postgres://
+  return databaseUrl.startsWith("postgresql://") || databaseUrl.startsWith("postgres://");
 }
 
 export function shouldServeMockData(env: RuntimeEnv = process.env): boolean {

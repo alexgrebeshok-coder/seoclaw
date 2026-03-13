@@ -19,28 +19,36 @@ assert.equal(
   "live"
 );
 
-assert.equal(isDatabaseConfigured({ DATABASE_URL: "" } as NodeJS.ProcessEnv), false);
+assert.equal(isDatabaseConfigured({} as NodeJS.ProcessEnv), false);
 assert.equal(
   isDatabaseConfigured({ DATABASE_URL: "file:./dev.db" } as NodeJS.ProcessEnv),
-  true
+  false
 );
 assert.equal(
   isDatabaseConfigured({ DATABASE_URL: "postgres://broken" } as NodeJS.ProcessEnv),
   false
+);
+assert.equal(
+  isDatabaseConfigured({ POSTGRES_PRISMA_URL: "postgresql://user:pass@host/db?sslmode=require" } as NodeJS.ProcessEnv),
+  true
+);
+assert.equal(
+  isDatabaseConfigured({ DATABASE_URL: "postgresql://user:pass@host/db" } as NodeJS.ProcessEnv),
+  true
 );
 
 assert.equal(shouldServeMockData({} as NodeJS.ProcessEnv), true);
 assert.equal(
   shouldServeMockData({
     APP_DATA_MODE: "demo",
-    DATABASE_URL: "file:./dev.db",
+    DATABASE_URL: "postgresql://user:pass@host/db",
   } as NodeJS.ProcessEnv),
   true
 );
 assert.equal(
   shouldServeMockData({
     APP_DATA_MODE: "live",
-    DATABASE_URL: "file:./dev.db",
+    DATABASE_URL: "postgresql://user:pass@host/db",
   } as NodeJS.ProcessEnv),
   false
 );
@@ -71,7 +79,7 @@ assert.equal(getLiveOperatorDataBlockReason(invalidDatabaseRuntime), "database_u
 
 const demoRuntime = getServerRuntimeState({
   APP_DATA_MODE: "demo",
-  DATABASE_URL: "file:./dev.db",
+  DATABASE_URL: "postgresql://user:pass@host/db",
 } as NodeJS.ProcessEnv);
 assert.equal(demoRuntime.healthStatus, "ok");
 assert.equal(demoRuntime.usingMockData, true);
@@ -84,7 +92,7 @@ assert.equal(getLiveOperatorDataBlockReason(autoFallbackRuntime), "database_unav
 
 const liveRuntime = getServerRuntimeState({
   APP_DATA_MODE: "live",
-  DATABASE_URL: "file:./dev.db",
+  DATABASE_URL: "postgresql://user:pass@host/db",
 } as NodeJS.ProcessEnv);
 assert.equal(canReadLiveOperatorData(liveRuntime), true);
 assert.equal(getLiveOperatorDataBlockReason(liveRuntime), null);
