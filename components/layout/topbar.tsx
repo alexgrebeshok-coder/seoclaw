@@ -14,6 +14,7 @@ import { ProjectFormModal } from "@/components/projects/project-form-modal";
 import { TaskFormModal } from "@/components/tasks/task-form-modal";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { UserMenu } from "@/components/auth/user-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CardContent, CardTitle } from "@/components/ui/card";
@@ -210,13 +211,7 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
               <LanguageSwitcher />
               <ThemeSwitcher />
 
-              <Link
-                aria-label={t("settings.workspaceLabel")}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line-strong)] bg-[var(--surface-panel)] text-sm font-semibold text-[var(--ink)]"
-                href="/team"
-              >
-                {activeWorkspace.initials}
-              </Link>
+              <UserMenu />
 
               <Button onClick={() => setProjectModalOpen(true)}>{t("action.addProject")}</Button>
             </div>
