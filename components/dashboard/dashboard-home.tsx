@@ -48,7 +48,7 @@ import {
 } from "@/components/ui/skeleton";
 import { DataErrorState } from "@/components/ui/data-error-state";
 import { useLocale } from "@/contexts/locale-context";
-import { downloadProjectsCsv } from "@/lib/export";
+import { downloadProjectsCsv, downloadDashboardPdf } from "@/lib/export";
 import { useDashboardSnapshot } from "@/lib/hooks/use-api";
 import { useEVMMetrics } from "@/lib/hooks/use-evm-metrics";
 import { useAutoRisks } from "@/lib/hooks/use-auto-risks";
@@ -608,6 +608,12 @@ export function DashboardHome() {
                     onClick={() => downloadProjectsCsv(projects)}
                   >
                     {t("action.exportExcel")}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => downloadDashboardPdf(projects, tasks, risks, team)}
+                  >
+                    {t("action.exportPdf") || "PDF"}
                   </Button>
                 </div>
               </div>
