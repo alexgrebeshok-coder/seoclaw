@@ -18,7 +18,7 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-  const authResult = authorizeRequest(request, {
+  const authResult = await authorizeRequest(request, {
     permission: "SEND_EMAIL_DIGESTS",
     workspaceId: "executive",
   });

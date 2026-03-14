@@ -63,6 +63,21 @@ async function sendTelegramMessage(chatId: number, text: string): Promise<void> 
  * Handle incoming Telegram webhook
  */
 export async function POST(request: NextRequest) {
+  // Verify Telegram secret token (if configured)
+  const secretToken = process.env.TELEGRAM_WEBHOOK_SECRET;
+  if (secretToken) {
+    const headerToken = request.headers.get("x-telegram-bot-api-secret-token");
+    if (headerToken !== secretToken) {
+      console.error("[Telegram Webhook] Invalid secret token");
+      return NextResponse.json(
+        { ok: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+  } else {
+    console.warn("[Telegram Webhook] TELEGRAM_WEBHOOK_SECRET not configured. Webhook is publicly accessible!");
+  }
+
   try {
     const update: TelegramUpdate = await request.json();
 

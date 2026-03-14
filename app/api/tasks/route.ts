@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { authorizeRequest } from "@/app/api/middleware/auth";
 import { prisma } from "@/lib/prisma";
 import {
   normalizeTaskStatus,
@@ -14,6 +15,14 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  // Require authentication
+  const authResult = await authorizeRequest(request, {
+    permission: "VIEW_TASKS",
+  });
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
   try {
     const runtime = getServerRuntimeState();
 

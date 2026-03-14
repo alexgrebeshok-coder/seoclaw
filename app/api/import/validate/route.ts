@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       permission: "MANAGE_IMPORTS",
       workspaceId: "delivery",
     });

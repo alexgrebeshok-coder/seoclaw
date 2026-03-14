@@ -23,7 +23,7 @@ export async function POST(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const authResult = authorizeRequest(request, {
+  const authResult = await authorizeRequest(request, {
     permission: "REVIEW_WORK_REPORTS",
     workspaceId: "delivery",
   });

@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(request: NextRequest, { params }: RouteContext) {
-  const authResult = authorizeRequest(request, {
+  const authResult = await authorizeRequest(request, {
     permission: "VIEW_WORK_REPORTS",
     workspaceId: "delivery",
   });

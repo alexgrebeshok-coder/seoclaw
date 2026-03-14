@@ -27,7 +27,7 @@ export async function GET(
   request: NextRequest,
   { params }: RouteContext
 ): Promise<NextResponse> {
-  const authResult = authorizeRequest(request, {
+  const authResult = await authorizeRequest(request, {
     permission: "VIEW_WORK_REPORTS",
   });
   if (authResult instanceof NextResponse) {
@@ -60,7 +60,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: RouteContext
 ): Promise<NextResponse> {
-  const authResult = authorizeRequest(request, {
+  const authResult = await authorizeRequest(request, {
     permission: "REVIEW_WORK_REPORTS",
   });
   if (authResult instanceof NextResponse) {

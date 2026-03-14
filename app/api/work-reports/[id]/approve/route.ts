@@ -26,7 +26,7 @@ export async function POST(
   { params }: RouteContext
 ): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       permission: "REVIEW_WORK_REPORTS",
       workspaceId: "delivery",
     });

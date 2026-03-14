@@ -32,7 +32,7 @@ export async function GET(
   { params }: RouteContext
 ): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       permission: "VIEW_WORK_REPORTS",
       workspaceId: "delivery",
     });
@@ -64,7 +64,7 @@ export async function PUT(
   { params }: RouteContext
 ): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       permission: "CREATE_WORK_REPORTS",
       workspaceId: "delivery",
     });
@@ -105,7 +105,7 @@ export async function DELETE(
   { params }: RouteContext
 ): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       permission: "REVIEW_WORK_REPORTS",
       workspaceId: "delivery",
     });

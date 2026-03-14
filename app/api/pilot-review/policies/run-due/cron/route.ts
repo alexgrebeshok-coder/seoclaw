@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       apiKey: process.env.CRON_SECRET,
       permission: "RUN_SCHEDULED_DIGESTS",
       requireApiKey: Boolean(process.env.CRON_SECRET),

@@ -16,7 +16,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  const authResult = authorizeRequest(request, {
+  const authResult = await authorizeRequest(request, {
     permission: "VIEW_CONNECTORS",
     workspaceId: "executive",
   });

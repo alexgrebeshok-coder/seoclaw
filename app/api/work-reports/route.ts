@@ -28,7 +28,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       permission: "VIEW_WORK_REPORTS",
       workspaceId: "delivery",
     });
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       permission: "CREATE_WORK_REPORTS",
       workspaceId: "delivery",
     });

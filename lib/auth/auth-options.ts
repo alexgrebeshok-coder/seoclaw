@@ -16,6 +16,9 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       image?: string | null;
+      role?: string;
+      organizationSlug?: string;
+      workspaceId?: string;
     };
   }
 }
@@ -111,6 +114,9 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email as string;
         session.user.name = token.name;
         session.user.image = token.picture;
+        session.user.role = token.role as string | undefined;
+        session.user.organizationSlug = token.organizationSlug as string | undefined;
+        session.user.workspaceId = token.workspaceId as string | undefined;
       }
       return session;
     },
@@ -118,6 +124,18 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
+
+        // Fetch user role and workspace from Membership
+        const membership = await prisma.membership.findFirst({
+          where: { userId: user.id },
+          include: { organization: true },
+        });
+
+        if (membership) {
+          token.role = membership.role;
+          token.organizationSlug = membership.organization.slug;
+          token.workspaceId = membership.workspaceMemberships[0]?.workspaceId;
+        }
       }
       return token;
     },

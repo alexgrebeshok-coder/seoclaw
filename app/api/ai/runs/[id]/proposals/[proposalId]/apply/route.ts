@@ -18,7 +18,7 @@ export async function POST(
     params: Promise<{ id: string; proposalId: string }>;
   }
 ) {
-  const authResult = authorizeRequest(request, {
+  const authResult = await authorizeRequest(request, {
     permission: "REVIEW_WORK_REPORTS",
     workspaceId: "delivery",
   });

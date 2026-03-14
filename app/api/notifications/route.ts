@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+
+import { authorizeRequest } from "@/app/api/middleware/auth";
 import { prisma } from "@/lib/prisma";
 import {
   badRequest,
@@ -12,6 +14,13 @@ import { getServerRuntimeState } from "@/lib/server/runtime-mode";
  * Get notifications for current user
  */
 export async function GET(request: NextRequest) {
+  // Require authentication
+  const authResult = await authorizeRequest(request);
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
+
   try {
     const runtime = getServerRuntimeState();
 
@@ -66,6 +75,13 @@ export async function GET(request: NextRequest) {
  * Create a new notification
  */
 export async function POST(request: NextRequest) {
+  // Require authentication
+  const authResult = await authorizeRequest(request);
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
+
   try {
     const runtime = getServerRuntimeState();
 

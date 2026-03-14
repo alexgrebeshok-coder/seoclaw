@@ -20,7 +20,7 @@ export async function GET(
   { params }: RouteContext
 ): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       permission: "VIEW_EXECUTIVE_BRIEFS",
       workspaceId: "executive",
     });

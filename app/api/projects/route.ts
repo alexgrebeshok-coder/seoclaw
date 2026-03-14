@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { authorizeRequest } from "@/app/api/middleware/auth";
+
 import { prisma } from "@/lib/prisma";
 import {
   calculateProjectHealth,
@@ -20,6 +22,13 @@ export async function HEAD(): Promise<NextResponse> {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  // Require authentication
+  const authResult = await authorizeRequest(request);
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
+
   try {
     const runtime = getServerRuntimeState();
 
@@ -89,6 +98,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  // Require authentication
+  const authResult = await authorizeRequest(request);
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
+
   try {
     const body = await request.json();
     const parsed = createProjectSchema.safeParse(body);

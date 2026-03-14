@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       permission: "VIEW_EXECUTIVE_BRIEFS",
       workspaceId: "executive",
     });

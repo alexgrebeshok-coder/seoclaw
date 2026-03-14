@@ -24,7 +24,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: RouteContext
 ): Promise<NextResponse> {
-  const authResult = authorizeRequest(request, {
+  const authResult = await authorizeRequest(request, {
     permission: "VIEW_CONNECTORS",
     workspaceId: "executive",
   });

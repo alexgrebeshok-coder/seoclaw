@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { authorizeRequest } from "@/app/api/middleware/auth";
+
 import { loadExecutiveSnapshot } from "@/lib/briefs/snapshot";
 import { buildPortfolioPlanFactSummary } from "@/lib/plan-fact/service";
 import { databaseUnavailable, serverError } from "@/lib/server/api-utils";
@@ -9,6 +11,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  // Require authentication
+  const authResult = await authorizeRequest(request);
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
+
   try {
     const runtimeState = getServerRuntimeState();
 

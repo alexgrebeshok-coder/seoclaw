@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authorizeRequest } from "@/app/api/middleware/auth";
 import { executeCommand } from "@/lib/command-handler";
 
 /**
@@ -6,6 +7,14 @@ import { executeCommand } from "@/lib/command-handler";
  * Proxies user messages to CommandHandler and returns responses
  */
 export async function POST(request: NextRequest) {
+  // Require authentication
+  const authResult = await authorizeRequest(request, {
+    permission: "RUN_AI_ACTIONS",
+  });
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
   try {
     const body = await request.json();
     const { message } = body;

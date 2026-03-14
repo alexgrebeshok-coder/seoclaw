@@ -16,7 +16,7 @@ import { getServerRuntimeState } from "@/lib/server/runtime-mode";
  */
 export async function POST(request: NextRequest) {
   try {
-    const authResult = authorizeRequest(request, {
+    const authResult = await authorizeRequest(request, {
       apiKey: process.env.CRON_SECRET,
       permission: "RUN_DUE_DATE_SCAN",
       requireApiKey: Boolean(process.env.CRON_SECRET),
