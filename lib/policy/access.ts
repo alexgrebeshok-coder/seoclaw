@@ -13,7 +13,9 @@ export type PlatformPermission =
   | "CREATE_WORK_REPORTS"
   | "REVIEW_WORK_REPORTS"
   | "RUN_MEETING_TO_ACTION"
-  | "RUN_DUE_DATE_SCAN";
+  | "RUN_DUE_DATE_SCAN"
+  | "RUN_AI_ACTIONS"
+  | "VIEW_TASKS";
 
 export interface PolicyWorkspaceOption {
   id: PlatformWorkspaceId;

@@ -127,7 +127,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         ...(includeDocuments
           ? {
               documents: {
-                select: { id: true, name: true, type: true, updatedAt: true },
+                select: { id: true, title: true, type: true, updatedAt: true },
                 orderBy: { updatedAt: "desc" },
               },
             }

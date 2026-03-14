@@ -48,7 +48,7 @@ export default async function PilotFeedbackRoute({
 
   if (liveFeedbackReady) {
     try {
-      [feedback, members] = await Promise.all([
+      const [feedbackResult, membersResult] = await Promise.all([
         listPilotFeedback({ includeResolved: true, limit: 24 }),
         prisma.teamMember.findMany({
           orderBy: { name: "asc" },
@@ -56,6 +56,8 @@ export default async function PilotFeedbackRoute({
           take: 50,
         }),
       ]);
+      feedback = feedbackResult;
+      members = membersResult;
     } catch (error) {
       console.error("[PilotFeedback] Failed to load live data, using fallback:", error);
       usingFallback = true;

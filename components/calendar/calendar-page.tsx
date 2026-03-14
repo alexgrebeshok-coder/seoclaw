@@ -253,7 +253,6 @@ export function CalendarPage() {
                         >
                           {event.subtitle}
                         </p>
-                      </div>
                       </button>
                     ))}
                     {hiddenEventsCount > 0 ? (

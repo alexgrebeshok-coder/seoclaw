@@ -102,6 +102,13 @@ export function notFound(
   return jsonError(404, code, message);
 }
 
+export function forbidden(
+  message: string,
+  code = "FORBIDDEN"
+): NextResponse<APIErrorPayload> {
+  return jsonError(403, code, message);
+}
+
 export function validationError(error: z.ZodError): NextResponse<APIErrorPayload> {
   return jsonError(400, "VALIDATION_ERROR", "Validation failed", error.flatten());
 }
