@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useLocale } from "@/contexts/locale-context";
 import { api } from "@/lib/client/api-error";
 import { Plus } from "lucide-react";
+import { TaskFormModal } from "@/components/tasks/task-form-modal";
 import type { Board, Task } from "@/lib/types";
 
 interface KanbanBoardProps {
@@ -22,6 +23,7 @@ export function KanbanBoard({ boardId }: KanbanBoardProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [taskModalOpen, setTaskModalOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -171,7 +173,7 @@ export function KanbanBoard({ boardId }: KanbanBoardProps) {
             {board.project?.name || "Без проекта"}
           </p>
         </div>
-        <Button size="sm">
+        <Button size="sm" onClick={() => setTaskModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Добавить задачу
         </Button>
@@ -205,6 +207,12 @@ export function KanbanBoard({ boardId }: KanbanBoardProps) {
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      <TaskFormModal
+        open={taskModalOpen}
+        onOpenChange={setTaskModalOpen}
+        projectId={board.projectId}
+      />
     </div>
   );
 }

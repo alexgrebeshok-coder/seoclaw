@@ -198,12 +198,21 @@ export function CalendarPage() {
                   </div>
                   <div className="grid min-h-0 flex-1 content-start gap-2 overflow-hidden">
                     {visibleEvents.map((event) => (
-                      <div
+                      <button
                         key={event.id}
+                        type="button"
+                        onClick={() => {
+                          // Navigate to task/project
+                          if (event.type === "task") {
+                            window.location.href = `/tasks?highlight=${event.id}`;
+                          } else {
+                            window.location.href = `/projects?highlight=${event.id.replace('-milestone', '')}`;
+                          }
+                        }}
                         className={
                           event.type === "milestone"
-                            ? "min-w-0 rounded-[10px] border border-[var(--brand)]/25 bg-[color:var(--surface-panel)] p-2.5"
-                            : "min-w-0 rounded-[10px] border border-[var(--line)] bg-[color:var(--surface-panel)] p-2.5"
+                            ? "min-w-0 rounded-[10px] border border-[var(--brand)]/25 bg-[color:var(--surface-panel)] p-2.5 text-left transition hover:scale-[1.02] hover:shadow-md"
+                            : "min-w-0 rounded-[10px] border border-[var(--line)] bg-[color:var(--surface-panel)] p-2.5 text-left transition hover:scale-[1.02] hover:shadow-md"
                         }
                       >
                         <div className="flex items-center gap-2">
@@ -245,6 +254,7 @@ export function CalendarPage() {
                           {event.subtitle}
                         </p>
                       </div>
+                      </button>
                     ))}
                     {hiddenEventsCount > 0 ? (
                       <div className="rounded-[18px] border border-dashed border-[var(--line)] bg-[color:var(--surface-panel)]/80 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-muted)]">

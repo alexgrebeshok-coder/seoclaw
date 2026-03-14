@@ -81,12 +81,19 @@ export function GanttPage() {
       return isBefore(date, min) ? date : min;
     }, parseISO(items[0]?.start ?? "2026-01-01"))
   );
-  const overallEnd = endOfMonth(
-    items.reduce((max, item) => {
+
+  const overallEnd = (() => {
+    const maxItemDate = items.reduce((max, item) => {
       const date = parseISO(item.end);
       return isAfter(date, max) ? date : max;
-    }, parseISO(items[0]?.end ?? "2026-12-31"))
-  );
+    }, parseISO(items[0]?.end ?? "2026-12-31"));
+
+    // Minimum 1 year from today
+    const oneYearFromToday = new Date();
+    oneYearFromToday.setFullYear(oneYearFromToday.getFullYear() + 1);
+
+    return endOfMonth(isAfter(maxItemDate, oneYearFromToday) ? maxItemDate : oneYearFromToday);
+  })();
 
   const columns = scale === "week" ? eachWeekOfInterval({ start: overallStart, end: overallEnd }, { weekStartsOn: 1 }) : eachMonthOfInterval({ start: overallStart, end: overallEnd });
 
