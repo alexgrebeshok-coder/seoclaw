@@ -39,17 +39,40 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // P2-4: Auto-verify email in development/demo mode
+    // In production, implement proper email verification flow
+    const isDevelopment = process.env.NODE_ENV !== "production";
+    const skipEmailVerification = process.env.SKIP_EMAIL_VERIFICATION === "true";
+
+    const emailVerified =
+      isDevelopment || skipEmailVerification ? new Date() : null;
+
     // Create user
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
+        emailVerified,
       },
     });
 
+    // P2-4: Log warning if email verification is skipped
+    if (!emailVerified) {
+      console.warn(
+        `[Auth] User ${email} registered without email verification. ` +
+          "Implement email verification flow or set SKIP_EMAIL_VERIFICATION=true"
+      );
+    }
+
     return NextResponse.json(
-      { message: "Пользователь создан", userId: user.id },
+      {
+        message: emailVerified
+          ? "Пользователь создан"
+          : "Пользователь создан. Пожалуйста, подтвердите email перед входом.",
+        userId: user.id,
+        requiresVerification: !emailVerified,
+      },
       { status: 201 }
     );
   } catch (error) {

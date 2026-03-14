@@ -111,11 +111,25 @@ export function serverError(
   fallback: string,
   code = "INTERNAL_SERVER_ERROR"
 ): NextResponse<APIErrorPayload> {
-  return jsonError(
-    500,
+  // P2-5: Log detailed error server-side, return generic message to client
+  const detailedMessage =
+    error instanceof Error && error.message.trim() ? error.message : fallback;
+
+  // Log full error details for debugging (server-side only)
+  console.error("[API Error]", {
     code,
-    error instanceof Error && error.message.trim() ? error.message : fallback
-  );
+    message: detailedMessage,
+    stack: error instanceof Error ? error.stack : undefined,
+    timestamp: new Date().toISOString(),
+  });
+
+  // Return generic message to client (don't leak internal details)
+  const clientMessage =
+    process.env.NODE_ENV === "development"
+      ? detailedMessage
+      : "An unexpected error occurred. Please try again later.";
+
+  return jsonError(500, code, clientMessage);
 }
 
 export function isPrismaNotFoundError(error: unknown): boolean {

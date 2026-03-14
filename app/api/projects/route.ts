@@ -49,49 +49,117 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const status = normalizeProjectStatus(searchParams.get("status"));
     const direction = searchParams.get("direction");
 
+    // P2-1: Add pagination to prevent overfetching
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100); // Max 100 per page
+    const skip = (page - 1) * limit;
+
+    // P2-1: Add optional includes to reduce payload size
+    const includeTasks = searchParams.get("includeTasks") === "true";
+    const includeTeam = searchParams.get("includeTeam") === "true";
+    const includeRisks = searchParams.get("includeRisks") === "true";
+    const includeMilestones = searchParams.get("includeMilestones") === "true";
+    const includeDocuments = searchParams.get("includeDocuments") === "true";
+
+    // P2-1: Use select to narrow fields and conditional includes
     const projects = await prisma.project.findMany({
       where: {
         ...(status && { status }),
         ...(direction && { direction }),
       },
-      include: {
-        tasks: {
-          include: {
-            assignee: {
-              select: { id: true, name: true, initials: true },
-            },
-          },
-          orderBy: [{ order: "asc" }, { dueDate: "asc" }],
-        },
-        team: {
-          orderBy: { name: "asc" },
-        },
-        risks: {
-          where: { status: "open" },
-          orderBy: { severity: "desc" },
-        },
-        milestones: {
-          orderBy: { date: "asc" },
-        },
-        documents: {
-          include: {
-            owner: {
-              select: { id: true, name: true, initials: true },
-            },
-          },
-          orderBy: { updatedAt: "desc" },
-        },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        status: true,
+        direction: true,
+        priority: true,
+        start: true,
+        end: true,
+        budgetPlan: true,
+        budgetFact: true,
+        progress: true,
+        health: true,
+        location: true,
+        createdAt: true,
+        updatedAt: true,
+        // Conditional includes - only fetch what's requested
+        ...(includeTasks
+          ? {
+              tasks: {
+                select: {
+                  id: true,
+                  title: true,
+                  status: true,
+                  priority: true,
+                  dueDate: true,
+                  assigneeId: true,
+                },
+                orderBy: [{ order: "asc" }, { dueDate: "asc" }],
+              },
+            }
+          : {}),
+        ...(includeTeam
+          ? {
+              team: {
+                select: { id: true, name: true, initials: true },
+                orderBy: { name: "asc" },
+              },
+            }
+          : {}),
+        ...(includeRisks
+          ? {
+              risks: {
+                where: { status: "open" },
+                select: { id: true, title: true, severity: true, status: true },
+                orderBy: { severity: "desc" },
+              },
+            }
+          : {}),
+        ...(includeMilestones
+          ? {
+              milestones: {
+                select: { id: true, title: true, date: true, status: true },
+                orderBy: { date: "asc" },
+              },
+            }
+          : {}),
+        ...(includeDocuments
+          ? {
+              documents: {
+                select: { id: true, name: true, type: true, updatedAt: true },
+                orderBy: { updatedAt: "desc" },
+              },
+            }
+          : {}),
       },
       orderBy: { updatedAt: "desc" },
+      skip,
+      take: limit,
     });
 
-    return NextResponse.json(
-      projects.map((project) => ({
+    // P2-1: Add pagination metadata
+    const total = await prisma.project.count({
+      where: {
+        ...(status && { status }),
+        ...(direction && { direction }),
+      },
+    });
+
+    return NextResponse.json({
+      projects: projects.map((project) => ({
         ...project,
         progress: calculateProjectProgress(project),
         health: calculateProjectHealth(project),
-      }))
-    );
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasMore: skip + limit < total,
+      },
+    });
   } catch (error) {
     return serverError(error, "Failed to fetch projects.");
   }

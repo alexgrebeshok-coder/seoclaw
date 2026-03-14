@@ -173,17 +173,23 @@ async function executeGatewayRun(runId: string) {
       ...entry,
       run: finalRun,
     });
-  } catch {
-    const fallbackRun = buildMockFinalRun(entry.input, {
-      id: runId,
-      createdAt: entry.run.createdAt,
+  } catch (error) {
+    // P2-3: Persist failed state instead of fabricating success
+    console.error(`AI Run ${runId} failed:`, error);
+    
+    const failedRun: AIRunRecord = {
+      ...entry.run,
+      status: "failed",
       updatedAt: new Date().toISOString(),
-      quickActionId: entry.run.quickActionId,
-    });
+      result: {
+        success: false,
+        message: error instanceof Error ? error.message : "AI Gateway error",
+      },
+    };
 
     await persistEntry({
       ...entry,
-      run: fallbackRun,
+      run: failedRun,
     });
   }
 }
