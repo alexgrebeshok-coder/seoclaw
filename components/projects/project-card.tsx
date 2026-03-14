@@ -36,27 +36,25 @@ function ProjectCardComponent({
   return (
     <Card className="group overflow-hidden transition duration-150 hover:border-[var(--brand)]">
       <CardContent className="flex h-full min-w-0 flex-col gap-5 p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge className={cn("ring-1", projectStatusMeta[project.status].className)}>
-                {enumLabel("projectStatus", project.status)}
-              </Badge>
-              <Badge className={cn("ring-1", priorityMeta[project.priority].className)}>
-                {enumLabel("priority", project.priority)}
-              </Badge>
-            </div>
-            <div className="min-w-0">
-              <h3 className="break-words font-heading text-[1.8rem] font-semibold tracking-[-0.05em] text-[var(--ink)]">
-                {project.name}
-              </h3>
-              <p className="mt-2 max-w-xl break-words text-sm leading-7 text-[var(--ink-soft)]">
-                {project.description}
-              </p>
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className={cn("ring-1", projectStatusMeta[project.status].className)}>
+              {enumLabel("projectStatus", project.status)}
+            </Badge>
+            <Badge className={cn("ring-1", priorityMeta[project.priority].className)}>
+              {enumLabel("priority", project.priority)}
+            </Badge>
+            <div className="rounded-[8px] border border-[var(--line)] bg-[var(--panel-soft)] px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--ink-muted)]">
+              {enumLabel("direction", project.direction)}
             </div>
           </div>
-          <div className="rounded-[8px] border border-[var(--line)] bg-[var(--panel-soft)] px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--ink-muted)]">
-            {enumLabel("direction", project.direction)}
+          <div className="min-w-0">
+            <h3 className="break-words font-heading text-[1.8rem] font-semibold tracking-[-0.05em] text-[var(--ink)]">
+              {project.name}
+            </h3>
+            <p className="mt-2 break-words text-sm leading-7 text-[var(--ink-soft)]">
+              {project.description}
+            </p>
           </div>
         </div>
 
