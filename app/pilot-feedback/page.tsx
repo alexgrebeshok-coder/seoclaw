@@ -1,6 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PilotFeedbackPage } from "@/components/pilot-feedback/pilot-feedback-page";
-import { listPilotFeedback } from "@/lib/pilot-feedback";
+import { listPilotFeedback, type PilotFeedbackListResult } from "@/lib/pilot-feedback";
 import { prisma } from "@/lib/prisma";
 import { canReadLiveOperatorData, getServerRuntimeState } from "@/lib/server/runtime-mode";
 import { buildPilotFeedbackRuntimeTruth } from "@/lib/server/runtime-truth";
@@ -25,7 +25,7 @@ export default async function PilotFeedbackRoute({
   const liveFeedbackReady = canReadLiveOperatorData(runtimeState);
   const params = (await searchParams) ?? {};
 
-  const emptyFeedback = {
+  const emptyFeedback: PilotFeedbackListResult = {
     items: [],
     summary: {
       total: 0,
