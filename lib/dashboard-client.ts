@@ -360,11 +360,12 @@ export class DashboardClient {
     const partialMatch = projects.find((p) =>
       p.name.toLowerCase().includes(lowerName)
     );
-  
+
     if (partialMatch) {
-    setCachedProject(name, partialMatch);
+      setCachedProject(name, partialMatch);
+      return partialMatch;
     }
-    
+
     return null;
   }
 }

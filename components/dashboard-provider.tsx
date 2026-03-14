@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -74,6 +75,7 @@ interface DashboardContextValue extends DashboardState {
   isHydrating: boolean;
   isLoading: boolean;
   error: string | null;
+  isDegradedMode: boolean;
   notifications: NotificationItem[];
   retry: () => void;
   addProject: (values: ProjectFormValues) => Promise<void>;
@@ -124,6 +126,18 @@ function writeCachedState(state: DashboardState) {
   });
   localStorage.setItem(CACHE_KEY, payload);
   localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(state));
+}
+
+// P3-2: Debounced version to avoid excessive localStorage writes
+let writeCacheTimer: ReturnType<typeof setTimeout> | null = null;
+function writeCachedStateDebounced(state: DashboardState, delay = 500) {
+  if (writeCacheTimer) {
+    clearTimeout(writeCacheTimer);
+  }
+  writeCacheTimer = setTimeout(() => {
+    writeCachedState(state);
+    writeCacheTimer = null;
+  }, delay);
 }
 
 function createOptimisticProject(values: ProjectFormValues, id: string): Project {
@@ -251,6 +265,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<DashboardState>(emptyDashboardState);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // P3-2: Track degraded mode (using cached/mock data)
+  const [isDegradedMode, setIsDegradedMode] = useState(false);
 
   const loadDashboardData = async (options?: { silent?: boolean }) => {
     try {
@@ -279,7 +295,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     } catch (loadError) {
       console.error("Failed to load dashboard data", loadError);
 
-      // Fallback to cached or mock data silently
+      // P3-2: Fallback to cached or mock data with degraded mode warning
+      setIsDegradedMode(true);
       const cachedState = readCachedState();
       if (cachedState && cachedState.projects.length > 0) {
         setState(cachedState);
@@ -301,12 +318,14 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (isLoading) return;
-    writeCachedState(state);
+    // P3-2: Use debounced write to avoid excessive localStorage writes
+    writeCachedStateDebounced(state);
   }, [isLoading, state]);
 
   const notifications = useMemo(() => buildNotifications(state, t), [state, t]);
 
   const retry = () => {
+    setIsDegradedMode(false);
     void loadDashboardData();
   };
 
@@ -799,6 +818,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         isHydrating: isLoading,
         isLoading,
         error,
+        isDegradedMode,
         notifications,
         retry,
         addProject,

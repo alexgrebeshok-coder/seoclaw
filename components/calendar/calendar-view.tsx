@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { DataErrorState } from "@/components/ui/data-error-state";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -82,13 +82,23 @@ export const CalendarView = React.memo(function CalendarView() {
     return days;
   }, []);
 
+  // P3-2: Pre-index events by date to avoid filtering on every day cell render
+  const eventsByDate = useMemo(() => {
+    const index = new Map<string, CalendarEvent[]>();
+    for (const event of events) {
+      const dateStr = new Date(event.start).toISOString().split("T")[0];
+      if (!index.has(dateStr)) {
+        index.set(dateStr, []);
+      }
+      index.get(dateStr)!.push(event);
+    }
+    return index;
+  }, [events]);
+
   const getEventsForDay = useCallback((date: Date) => {
     const dateStr = date.toISOString().split("T")[0];
-    return events.filter((e) => {
-      const eventDate = new Date(e.start).toISOString().split("T")[0];
-      return eventDate === dateStr;
-    });
-  }, [events]);
+    return eventsByDate.get(dateStr) || [];
+  }, [eventsByDate]);
 
   const handleMonthChange = useCallback((direction: 'prev' | 'next') => {
     if (isAnimating) return;
