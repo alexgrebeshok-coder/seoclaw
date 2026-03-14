@@ -1,13 +1,18 @@
 "use client";
 
-import { AlertTriangle, ShieldCheck, ShieldX } from "lucide-react";
+import { useState } from "react";
+import { AlertTriangle, Edit2, Plus, ShieldCheck, ShieldX, Trash2 } from "lucide-react";
 
+import { RiskFormModal } from "@/components/risks/risk-form-modal";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataErrorState } from "@/components/ui/data-error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocale } from "@/contexts/locale-context";
 import { useRisks } from "@/lib/hooks/use-api";
+import { RiskStatus } from "@/lib/types";
+import { toast } from "sonner";
 
 function summaryCardClass(tone: "danger" | "neutral" | "success") {
   switch (tone) {
@@ -87,6 +92,95 @@ function RisksSkeleton() {
 export function RisksPage() {
   const { enumLabel, t } = useLocale();
   const { error, isLoading, mutate, risks } = useRisks();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingRisk, setEditingRisk] = useState<{
+    id: string;
+    title: string;
+    description?: string | null;
+    probability: number;
+    impact: number;
+    status: RiskStatus;
+  } | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const handleCreateRisk = async (data: {
+    title: string;
+    description?: string;
+    probability: number;
+    impact: number;
+    status: RiskStatus;
+  }) => {
+    try {
+      const response = await fetch("/api/risks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Failed to create risk");
+      await mutate();
+      toast.success(t("risks.created"));
+    } catch (error) {
+      toast.error(t("error.saveDescription"));
+      throw error;
+    }
+  };
+
+  const handleUpdateRisk = async (data: {
+    title: string;
+    description?: string;
+    probability: number;
+    impact: number;
+    status: RiskStatus;
+  }) => {
+    if (!editingRisk) return;
+    try {
+      const response = await fetch(`/api/risks/${editingRisk.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Failed to update risk");
+      await mutate();
+      toast.success(t("risks.updated"));
+    } catch (error) {
+      toast.error(t("error.saveDescription"));
+      throw error;
+    }
+  };
+
+  const handleDeleteRisk = async (riskId: string) => {
+    if (!confirm(t("risks.confirmDelete"))) return;
+    setDeleting(riskId);
+    try {
+      const response = await fetch(`/api/risks/${riskId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Failed to delete risk");
+      await mutate();
+      toast.success(t("risks.deleted"));
+    } catch (error) {
+      toast.error(t("error.deleteDescription"));
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const openEditModal = (risk: typeof risks[0]) => {
+    setEditingRisk({
+      id: risk.id,
+      title: risk.title,
+      description: risk.description,
+      probability: risk.probability,
+      impact: risk.impact,
+      status: risk.status,
+    });
+    setModalOpen(true);
+  };
+
+  const openCreateModal = () => {
+    setEditingRisk(null);
+    setModalOpen(true);
+  };
 
   if (isLoading && risks.length === 0) {
     return <RisksSkeleton />;
@@ -154,9 +248,15 @@ export function RisksPage() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>{t("risks.title")}</CardTitle>
-          <p className="text-sm leading-7 text-[var(--ink-soft)]">{t("risks.description")}</p>
+        <CardHeader className="flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <CardTitle>{t("risks.title")}</CardTitle>
+            <p className="text-sm leading-7 text-[var(--ink-soft)]">{t("risks.description")}</p>
+          </div>
+          <Button onClick={openCreateModal} size="sm">
+            <Plus className="mr-2 h-4 w-4" />
+            {t("risks.create")}
+          </Button>
         </CardHeader>
         <CardContent className="grid min-w-0 gap-4">
           {risks.map((risk) => (
@@ -183,15 +283,39 @@ export function RisksPage() {
                   </span>
                 </div>
               </div>
-              <div className="flex items-start justify-end">
+              <div className="flex flex-col items-end gap-2">
                 <Badge variant={risk.status === "open" ? "danger" : risk.status === "mitigated" ? "warning" : "success"}>
                   {enumLabel("riskStatus", risk.status)}
                 </Badge>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => openEditModal(risk)}
+                    size="icon"
+                    variant="ghost"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    disabled={deleting === risk.id}
+                    onClick={() => handleDeleteRisk(risk.id)}
+                    size="icon"
+                    variant="ghost"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
         </CardContent>
       </Card>
+
+      <RiskFormModal
+        onSubmit={editingRisk ? handleUpdateRisk : handleCreateRisk}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        risk={editingRisk}
+      />
     </div>
   );
 }
