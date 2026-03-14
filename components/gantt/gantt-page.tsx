@@ -171,8 +171,8 @@ export function GanttPage() {
                     style={{ gridColumn: `2 / span ${columns.length}` }}
                   >
                     <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(84px, 1fr))` }}>
-                      {columns.map((column) => (
-                        <div key={`${item.id}-${column.toISOString()}`} className="border-r border-[var(--line)]/80" />
+                      {columns.map((column, index) => (
+                        <div key={`${item.id}-${column.toISOString()}`} className="border-r border-[var(--line)]" />
                       ))}
                     </div>
                     {overlap ? (

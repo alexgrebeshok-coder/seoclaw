@@ -707,7 +707,7 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
                           <div
                             key={`${probability}-${impact}`}
                             className={cn(
-                              "min-h-[76px] rounded-[18px] border p-2",
+                              "group relative min-h-[96px] rounded-[18px] border p-3 transition-all hover:scale-[1.02] hover:shadow-md",
                               danger
                                 ? "border-rose-200 bg-rose-50"
                                 : warning
@@ -715,19 +715,38 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
                                   : "border-slate-200 bg-slate-50"
                             )}
                           >
-                            <div className="text-[10px] uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+                            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
                               I{impact}
                             </div>
                             <div className="mt-2 grid gap-2">
-                              {cellRisks.map((risk) => (
+                              {cellRisks.slice(0, 2).map((risk) => (
                                 <div
                                   key={risk.id}
-                                  className="rounded-xl bg-white/80 px-2 py-1 text-xs font-medium text-[var(--ink)]"
+                                  className="truncate rounded-xl bg-white/80 px-2 py-1.5 text-xs font-medium text-[var(--ink)]"
+                                  title={risk.title}
                                 >
                                   {risk.title}
                                 </div>
                               ))}
+                              {cellRisks.length > 2 && (
+                                <div className="rounded-xl bg-white/60 px-2 py-1 text-xs text-[var(--ink-muted)]">
+                                  +{cellRisks.length - 2} more
+                                </div>
+                              )}
                             </div>
+                            {/* Hover tooltip for all risks */}
+                            {cellRisks.length > 0 && (
+                              <div className="absolute left-0 top-full z-10 mt-2 hidden w-48 rounded-lg border border-[var(--line)] bg-[var(--surface-panel)] p-3 shadow-lg group-hover:block">
+                                <div className="text-xs font-semibold text-[var(--ink)] mb-2">
+                                  {cellRisks.length} risk{cellRisks.length > 1 ? 's' : ''} in this cell
+                                </div>
+                                {cellRisks.map((risk) => (
+                                  <div key={risk.id} className="text-xs text-[var(--ink-soft)] py-1">
+                                    • {risk.title}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         );
                       })}
